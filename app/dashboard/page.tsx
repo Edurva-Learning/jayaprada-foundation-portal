@@ -1,0 +1,216 @@
+
+'use client'
+import React, { useState, useEffect } from "react";
+import { Home, Shield, Users, Calendar, FileText, Heart, GraduationCap, User, Sprout, HandHeart, Settings, Menu } from "lucide-react";
+import Dashboard from "@/app/components/Dashboard" // Adjust path as needed
+import UserManagement from "@/app/admin/UserManagement";
+import CampManagement from "@/app/admin/CampManagement";
+import SponsorshipTypes from "@/app/admin/SponsorshipTypes";
+import ParticipantManagement from "@/app/admin/ParticipantManagement";
+// Import other components as needed (e.g., HealthCamps, EducationSponsorship)
+
+const sidebarItems = [
+  {
+    label: "Dashboard",
+    icon: Home,
+    subItems: [], // No subs for dashboard
+  },
+  {
+    label: "Admin Controls",
+    icon: Shield,
+    subItems: [
+      "User Management",
+      "Camp Management",
+      "Sponsorship Types",
+      "Participant Management",
+    ],
+  },
+  {
+    label: "Health Camps",
+    icon: Heart,
+    subItems: [],
+  },
+  {
+    label: "Education Sponsorship",
+    icon: GraduationCap,
+    subItems: [
+      "Scholarships",
+      "Applications",
+    ],
+  },
+  {
+    label: "Women Empowerment",
+    icon: User,
+    subItems: [],
+  },
+  {
+    label: "Organic Agriculture",
+    icon: Sprout,
+    subItems: [],
+  },
+  {
+    label: "Community Outreach",
+    icon: HandHeart,
+    subItems: [],
+  },
+];
+
+export default function DashboardLayout() {
+  const [openGroup, setOpenGroup] = useState<string | null>(null); // Default no group open
+  const [selected, setSelected] = useState<{ group: string; sub: string } | null>({
+    group: "Dashboard",
+    sub: "Dashboard", // Default to Dashboard content
+  });
+  const [isCollapsed, setIsCollapsed] = useState(false); // Collapsed state
+
+  const handleGroupClick = (label: string) => {
+    if (label === "Dashboard") {
+      setSelected({ group: label, sub: label });
+      setOpenGroup(null);
+    } else {
+      setOpenGroup((prev) => (prev === label ? null : label));
+    }
+  };
+
+  const handleSubClick = (group: string, sub: string) => {
+    setSelected({ group, sub });
+  };
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => !prev);
+    // Close any open groups when collapsing
+    if (!isCollapsed) {
+      setOpenGroup(null);
+    }
+  };
+
+  // Render content based on selection
+  const renderContent = () => {
+    if (!selected) return <div className="text-2xl text-gray-400 p-8">Select a menu item</div>;
+
+    switch (selected.group) {
+      case "Dashboard":
+        return <Dashboard />; // Your dashboard content loads here
+      case "Admin Controls":
+        if (selected.sub === "User Management") return <UserManagement />;
+        if (selected.sub === "Camp Management") return <CampManagement />;
+        if (selected.sub === "Sponsorship Types") return <SponsorshipTypes />;
+        if (selected.sub === "Participant Management") return <ParticipantManagement />;
+        break;
+      // Add cases for other groups (e.g., Health Camps)
+      case "Health Camps":
+        return <div className="p-6"><h1>Health Camps Content</h1></div>; // Placeholder—replace with component
+      case "Education Sponsorship":
+        if (selected.sub === "Scholarships") return <div className="p-6"><h1>Scholarships</h1></div>;
+        if (selected.sub === "Applications") return <div className="p-6"><h1>Applications</h1></div>;
+        return <div className="p-6"><h1>Education Sponsorship Overview</h1></div>;
+      // ... Add similar for Women Empowerment, etc.
+      default:
+        return <div className="p-6 text-gray-500">Content for {selected.group} - {selected.sub} will render here.</div>;
+    }
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-50 overflow-hidden">
+      {/* Top Bar - Always Visible */}
+      <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={toggleCollapse}
+            className="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+            aria-label="Toggle sidebar"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <div className="text-xl font-bold text-cyan-600">Jayaprada</div>
+          <div className="text-sm text-gray-600">Foundation Portal</div>
+        </div>
+        {/* Optional: Add user info or other top bar elements here */}
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <aside
+          className={`bg-white text-gray-900 flex flex-col border-r border-gray-200 transition-all duration-300 z-10 ${
+            isCollapsed ? 'w-16' : 'w-64'
+          }`}
+        >
+          <nav className="flex-1 overflow-y-auto py-6 px-4">
+            <ul className="space-y-2">
+              {sidebarItems.map((item) => {
+                const Icon = item.icon;
+                const isSelectedGroup = selected?.group === item.label;
+                const hasSubs = item.subItems.length > 0;
+                const showSubs = openGroup === item.label && !isCollapsed; // Hide subs when collapsed
+
+                return (
+                  <li key={item.label}>
+                    <div
+                      className={`flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer font-medium transition-colors ${
+                        isSelectedGroup || openGroup === item.label
+                          ? "bg-cyan-50 text-cyan-700 border border-cyan-200" 
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                      onClick={() => handleGroupClick(item.label)}
+                    >
+                      <span className="flex items-center">
+                        <Icon className="w-5 h-5 mr-3 text-current flex-shrink-0" />
+                        {!isCollapsed && <span className="text-current">{item.label}</span>}
+                      </span>
+                      {!isCollapsed && hasSubs && (
+                        <span className="ml-2 text-xs transform transition-transform">
+                          {showSubs ? "▲" : "▼"}
+                        </span>
+                      )}
+                    </div>
+                    {!isCollapsed && hasSubs && showSubs && (
+                      <ul className="ml-8 mt-2 space-y-1">
+                        {item.subItems.map((sub) => (
+                          <li
+                            key={sub}
+                            className={`text-sm py-2 px-3 rounded cursor-pointer transition-colors ${
+                              selected?.group === item.label && selected?.sub === sub
+                                ? "bg-cyan-100 text-cyan-700" 
+                                : "text-gray-600 hover:bg-gray-100"
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent group toggle
+                              handleSubClick(item.label, sub);
+                            }}
+                          >
+                            {sub}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+          {/* User Profile - Bottom of Sidebar - Hidden when collapsed */}
+          {!isCollapsed && (
+            <div className="mt-auto pt-6 border-t border-gray-200 px-3 pb-6">
+              <div className="flex items-center space-x-3">
+                {/* <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">A</span>
+                </div> */}
+                {/* <div>
+                  <p className="text-sm font-medium text-gray-900">Admin User</p>
+                  <p className="text-xs text-gray-500">admin@jayaprada.org</p>
+                </div> */}
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 overflow-auto bg-white">
+          <div className="p-6">
+            {renderContent()}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
