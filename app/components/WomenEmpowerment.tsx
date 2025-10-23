@@ -43,6 +43,13 @@ export default function WomenEmpowerment() {
 
   const [participants, setParticipants] = useState<any[]>([]);
 
+  // Always display participants in ascending order of ID
+  const sortedParticipants = [...participants].sort((a, b) => {
+    const ida = Number(a?.id ?? 0);
+    const idb = Number(b?.id ?? 0);
+    return ida - idb;
+  });
+
   const API_WE_BASE = 'http://localhost:5000/women-empowerment';
 
   const fetchParticipants = async () => {
@@ -388,7 +395,7 @@ export default function WomenEmpowerment() {
                     </tr>
                   </thead>
                   <tbody>
-                    {participants.map((participant: any) => (
+                    {sortedParticipants.map((participant: any) => (
                       <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
                         <td className="p-3">{participant.id}</td>
                         <td className="p-3">{participant.name}</td>
