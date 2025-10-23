@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, User, Phone, IdCard, Download, Eye, MapPin, Users, Calendar, X, Camera, FileText } from 'lucide-react';
+import { Search, User, Phone, IdCard, Download, Eye, MapPin, Users, Calendar, X, Camera, FileText, Loader2 } from 'lucide-react';
 
 export default function WomenEmpowerment() {
   const [activeTab, setActiveTab] = useState<'participants' | 'records'>('participants');
@@ -42,6 +42,7 @@ export default function WomenEmpowerment() {
   });
 
   const [participants, setParticipants] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Always display participants in ascending order of ID
   const sortedParticipants = [...participants].sort((a, b) => {
@@ -54,12 +55,15 @@ export default function WomenEmpowerment() {
 
   const fetchParticipants = async () => {
     try {
+      setLoading(true);
       const res = await fetch(`${API_WE_BASE}/participants`);
       if (!res.ok) throw new Error('Failed to load participants');
       const data = await res.json();
       setParticipants(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching participants:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -395,7 +399,22 @@ export default function WomenEmpowerment() {
                     </tr>
                   </thead>
                   <tbody>
-                    {sortedParticipants.map((participant: any) => (
+                    {loading && (
+                      <tr>
+                        <td colSpan={8} className="p-6">
+                          <div className="flex items-center justify-center gap-3 text-[#0077b6]">
+                            <Loader2 className="animate-spin" size={20} />
+                            <span className="font-medium">Loading participants...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {!loading && sortedParticipants.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="p-6 text-center text-gray-600">No participants found</td>
+                      </tr>
+                    )}
+                    {!loading && sortedParticipants.map((participant: any) => (
                       <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
                         <td className="p-3">{participant.id}</td>
                         <td className="p-3">{participant.name}</td>
