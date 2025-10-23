@@ -262,6 +262,7 @@ export default function CommunityPage() {
   });
 
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     aadhar: '',
@@ -290,10 +291,39 @@ export default function CommunityPage() {
     showNotice(`View details for record #${id}`, 'info');
   };
   const handleEdit = (id: number) => {
-    showNotice(`Edit record #${id} (coming soon)`, 'info');
+    const rec = participants.find(p => p.id === id);
+    if (!rec) {
+      showNotice('Record not found', 'error');
+      return;
+    }
+    setEditingId(id);
+    setFormData({
+      name: rec.name || '',
+      aadhar: rec.aadhar || '',
+      mobile: rec.mobile || '',
+      address: rec.address || '',
+      purpose: rec.purpose || '',
+      familyHead: rec.familyHead || '',
+      children: rec.children?.toString?.() || '',
+      details: rec.details || '',
+      amount: rec.amount?.toString?.() || ''
+    });
+    setIsFormOpen(true);
   };
-  const handleDelete = (id: number) => {
-    showNotice(`Delete record #${id} (coming soon)`, 'info');
+  const handleDelete = async (id: number) => {
+    const rec = participants.find(p => p.id === id);
+    const title = rec?.name ? `${rec.name} (ID ${id})` : `record #${id}`;
+    const confirmed = typeof window !== 'undefined' ? window.confirm(`Delete ${title}? This cannot be undone.`) : true;
+    if (!confirmed) return;
+    try {
+      const res = await fetch(`${API_CO_BASE}/participants/${id}`, { method: 'DELETE' });
+      if (!res.ok && res.status !== 204) throw new Error('Failed to delete');
+      await fetchParticipants();
+      showNotice('Record deleted', 'success');
+    } catch (e: any) {
+      console.error('Delete failed:', e);
+      showNotice(e?.message || 'Failed to delete record', 'error');
+    }
   };
 
   const fetchParticipants = async () => {
@@ -324,6 +354,22 @@ export default function CommunityPage() {
   };
 
   useEffect(() => { fetchParticipants(); }, []);
+
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setEditingId(null);
+    setFormData({
+      name: '',
+      aadhar: '',
+      mobile: '',
+      address: '',
+      purpose: '',
+      familyHead: '',
+      children: '',
+      details: '',
+      amount: ''
+    });
+  };
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -360,15 +406,18 @@ export default function CommunityPage() {
     }
 
     try {
-      const res = await fetch(`${API_CO_BASE}/participants`, {
-        method: 'POST',
+      const isEdit = editingId !== null;
+      const url = isEdit ? `${API_CO_BASE}/participants/${editingId}` : `${API_CO_BASE}/participants`;
+      const method = isEdit ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to save participant');
+        throw new Error(err.error || `Failed to ${isEdit ? 'update' : 'save'} participant`);
       }
 
       await fetchParticipants();
@@ -384,8 +433,9 @@ export default function CommunityPage() {
         details: '',
         amount: ''
       });
+      setEditingId(null);
       setIsFormOpen(false);
-      showNotice('Community support saved successfully', 'success');
+      showNotice(`Community support ${isEdit ? 'updated' : 'saved'} successfully`, 'success');
     } catch (e: any) {
       console.error('Save participant failed:', e);
       showNotice(e.message || 'Failed to save participant', 'error');
@@ -556,7 +606,7 @@ export default function CommunityPage() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-800">Community Support Records</h2>
             <button 
-              onClick={() => setIsFormOpen(true)}
+              onClick={() => { setEditingId(null); setFormData({ name:'', aadhar:'', mobile:'', address:'', purpose:'', familyHead:'', children:'', details:'', amount:'' }); setIsFormOpen(true); }}
               className="px-4 py-2 bg-[#00b4d8] text-white rounded-md hover:bg-[#0099c3] transition-colors flex items-center"
             >
               <span className="mr-2">+</span> Add Community Support
@@ -647,7 +697,7 @@ export default function CommunityPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Participant</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">{editingId ? 'Edit Participant' : 'Add New Participant'}</h2>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -778,7 +828,7 @@ export default function CommunityPage() {
                 <div className="flex justify-end space-x-4 pt-4">
                   <button
                     type="button"
-                    onClick={() => setIsFormOpen(false)}
+                    onClick={closeForm}
                     className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
                   >
                     Close
@@ -787,7 +837,7 @@ export default function CommunityPage() {
                     type="submit"
                     className="px-6 py-2 bg-[#00b4d8] text-white rounded-md hover:bg-[#0099c3] transition-colors"
                   >
-                    Save
+                    {editingId ? 'Update' : 'Save'}
                   </button>
                 </div>
               </form>
