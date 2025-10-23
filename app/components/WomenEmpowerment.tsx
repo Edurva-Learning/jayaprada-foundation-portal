@@ -867,7 +867,8 @@ export default function WomenEmpowerment() {
     phone: '',
     aadhar: '',
     address: '',
-    registrationSource: ''
+    registrationSource: 'Women Empowerment',
+    registeredThrough: ''
   });
 
   // Record Form state
@@ -937,7 +938,8 @@ export default function WomenEmpowerment() {
       phone: '',
       aadhar: '',
       address: '',
-      registrationSource: ''
+      registrationSource: 'Women Empowerment',
+      registeredThrough: ''
     });
     setShowParticipantForm(false);
   };
@@ -982,7 +984,8 @@ export default function WomenEmpowerment() {
       phone: '',
       aadhar: '',
       address: '',
-      registrationSource: ''
+      registrationSource: 'Women Empowerment',
+      registeredThrough: ''
     });
     setShowParticipantForm(false);
   };
@@ -1484,11 +1487,28 @@ export default function WomenEmpowerment() {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <Users size={16} className="text-[#00b4d8]" />
-                      Registration Source
+                      Registration Source *
                     </label>
                     <select
                       name="registrationSource"
                       value={participantForm.registrationSource}
+                      onChange={handleParticipantFormChange}
+                      disabled
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none"
+                    >
+                      <option value="Women Empowerment">Women Empowerment</option>
+                    </select>
+                  </div>
+
+                  {/* Registered through */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Users size={16} className="text-[#00b4d8]" />
+                      Registered through
+                    </label>
+                    <select
+                      name="registeredThrough"
+                      value={participantForm.registeredThrough}
                       onChange={handleParticipantFormChange}
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                     >
