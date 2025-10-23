@@ -16,6 +16,12 @@ export default function WomenEmpowerment() {
     employmentStatus: 'All Statuses',
     workshop: 'All'
   });
+  // Participants search is applied only when user presses Search
+  const [appliedParticipantsFilters, setAppliedParticipantsFilters] = useState({
+    name: '',
+    aadhar: '',
+    phone: ''
+  });
 
   const [showParticipantForm, setShowParticipantForm] = useState(false);
   const [showRecordForm, setShowRecordForm] = useState(false);
@@ -51,6 +57,21 @@ export default function WomenEmpowerment() {
     const ida = Number(a?.id ?? 0);
     const idb = Number(b?.id ?? 0);
     return ida - idb;
+  });
+
+  // Normalize numeric strings for phone/aadhar
+  const digitsOnly = (v: any) => String(v ?? '').replace(/\D/g, '');
+
+  // Apply client-side filtering for participants tab
+  const filteredParticipants = sortedParticipants.filter((p: any) => {
+    const nameMatch = !appliedParticipantsFilters.name || String(p?.name ?? '')
+      .toLowerCase()
+      .includes(appliedParticipantsFilters.name.toLowerCase());
+    const aadharMatch = !appliedParticipantsFilters.aadhar || digitsOnly(p?.aadhar)
+      .includes(digitsOnly(appliedParticipantsFilters.aadhar));
+    const phoneMatch = !appliedParticipantsFilters.phone || digitsOnly(p?.phone)
+      .includes(digitsOnly(appliedParticipantsFilters.phone));
+    return nameMatch && aadharMatch && phoneMatch;
   });
 
   const API_WE_BASE = 'http://localhost:5000/women-empowerment';
@@ -123,6 +144,7 @@ export default function WomenEmpowerment() {
       employmentStatus: 'All Statuses',
       workshop: 'All'
     });
+    setAppliedParticipantsFilters({ name: '', aadhar: '', phone: '' });
   };
 
   // Helper to show a temporary, non-blocking message
@@ -334,7 +356,7 @@ export default function WomenEmpowerment() {
                 </div>
 
                 {/* Search Section */}
-                <div className="space-y-4">
+                <form onSubmit={(e) => { e.preventDefault(); setAppliedParticipantsFilters({ name: filters.name, aadhar: filters.aadhar, phone: filters.phone }); }} className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">Search by Name</label>
@@ -383,12 +405,23 @@ export default function WomenEmpowerment() {
                   </div>
                   
                   <div className="flex gap-3">
-                    <button className="px-6 py-2.5 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center gap-2">
+                    <button type="submit" className="px-6 py-2.5 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center gap-2">
                       <Search size={18} />
                       Search
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const empty = { name: '', aadhar: '', phone: '' };
+                        setFilters(prev => ({ ...prev, ...empty }));
+                        setAppliedParticipantsFilters(empty);
+                      }}
+                      className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                    >
+                      Clear
+                    </button>
                   </div>
-                </div>
+                </form>
               </div>
             </div>
 
@@ -435,7 +468,12 @@ export default function WomenEmpowerment() {
                         <td colSpan={8} className="p-6 text-center text-gray-600">No participants found</td>
                       </tr>
                     )}
-                    {!loading && sortedParticipants.map((participant: any) => (
+                    {!loading && filteredParticipants.length === 0 && sortedParticipants.length > 0 && (
+                      <tr>
+                        <td colSpan={8} className="p-6 text-center text-gray-600">No participants match your search</td>
+                      </tr>
+                    )}
+                    {!loading && filteredParticipants.map((participant: any) => (
                       <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
                         <td className="p-3">{participant.id}</td>
                         <td className="p-3">{participant.name}</td>
