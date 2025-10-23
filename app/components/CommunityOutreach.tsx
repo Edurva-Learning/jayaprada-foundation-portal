@@ -248,6 +248,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Eye, Loader2, Pencil, Trash2 } from 'lucide-react';
 
 export default function CommunityPage() {
   // Inline toast/notice similar to WomenEmpowerment
@@ -282,6 +283,17 @@ export default function CommunityPage() {
   const showNotice = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setNotice({ type, message });
     setTimeout(() => setNotice(null), 3000);
+  };
+
+  // Action handlers (stubs for now)
+  const handleView = (id: number) => {
+    showNotice(`View details for record #${id}`, 'info');
+  };
+  const handleEdit = (id: number) => {
+    showNotice(`Edit record #${id} (coming soon)`, 'info');
+  };
+  const handleDelete = (id: number) => {
+    showNotice(`Delete record #${id} (coming soon)`, 'info');
   };
 
   const fetchParticipants = async () => {
@@ -552,24 +564,29 @@ export default function CommunityPage() {
           </div>
           
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <table className="w-full">
+            <table className="w-full text-left">
               <thead>
                 <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-center">ID</th>
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-left">Beneficiary</th>
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-left">Aadhar</th>
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-left">Mobile</th>
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-left">Family Head</th>
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-center">Children</th>
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-right">Amount</th>
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-center">Created At</th>
-                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-center">Actions</th>
+                  <th className="p-3 font-semibold">ID</th>
+                  <th className="p-3 font-semibold">Beneficiary</th>
+                  <th className="p-3 font-semibold">Aadhar</th>
+                  <th className="p-3 font-semibold">Mobile</th>
+                  <th className="p-3 font-semibold">Family Head</th>
+                  <th className="p-3 font-semibold">Children</th>
+                  <th className="p-3 font-semibold">Amount</th>
+                  <th className="p-3 font-semibold">Created At</th>
+                  <th className="p-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading && (
                   <tr>
-                    <td colSpan={9} className="p-6 text-center text-gray-600">Loading participants...</td>
+                    <td colSpan={9} className="p-6">
+                      <div className="flex items-center justify-center gap-3 text-[#0077b6]">
+                        <Loader2 className="animate-spin" size={20} />
+                        <span className="font-medium">Loading participants...</span>
+                      </div>
+                    </td>
                   </tr>
                 )}
                 {!loading && participants.length === 0 && (
@@ -579,31 +596,39 @@ export default function CommunityPage() {
                 )}
                 {!loading && participants.map((record) => (
                   <tr key={record.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{record.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.aadhar}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.mobile}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.familyHead}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{record.children}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{formatAmount(record.amount)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{formatDate(record.created_at)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="flex items-center justify-center gap-2">
-                        <button className="text-[#00b4d8] hover:text-[#0096c7] transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                          </svg>
+                    <td className="p-3">{record.id}</td>
+                    <td className="p-3">{record.name}</td>
+                    <td className="p-3">{record.aadhar}</td>
+                    <td className="p-3">{record.mobile}</td>
+                    <td className="p-3">{record.familyHead}</td>
+                    <td className="p-3">{record.children}</td>
+                    <td className="p-3">{formatAmount(record.amount)}</td>
+                    <td className="p-3">{formatDate(record.created_at)}</td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handleView(record.id)}
+                          className="text-[#00b4d8] hover:text-[#0096c7] p-2 rounded-lg transition-colors"
+                          aria-label="View"
+                          title="View"
+                        >
+                          <Eye size={18} />
                         </button>
-                        <button className="text-green-600 hover:text-green-800 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
+                        <button
+                          onClick={() => handleEdit(record.id)}
+                          className="text-green-600 hover:text-green-700 p-2 rounded-lg transition-colors"
+                          aria-label="Edit"
+                          title="Edit"
+                        >
+                          <Pencil size={18} />
                         </button>
-                        <button className="text-red-600 hover:text-red-800 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
+                        <button
+                          onClick={() => handleDelete(record.id)}
+                          className="text-red-600 hover:text-red-700 p-2 rounded-lg transition-colors"
+                          aria-label="Delete"
+                          title="Delete"
+                        >
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </td>
