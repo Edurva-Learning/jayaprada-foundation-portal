@@ -11,6 +11,10 @@ import HealthCampPage from "../components/HealthCamps";
 import OrganicAgriculture from "../components/OraganicAgriculture";
 import CommunityPage from "../components/CommunityOutreach";
 import WomenEmpowerment from "../components/WomenEmpowerment";
+import ProgramOverview from "../components/ProgramOverview";
+import SponsorshipsList from "../components/SponsorshipsList";
+import SponsorshipType from "../components/SponsorshipType";
+import FinancePage from "../components/FinancePage";
 // Import other components as needed (e.g., HealthCamps, EducationSponsorship)
 
 const sidebarItems = [
@@ -38,8 +42,9 @@ const sidebarItems = [
     label: "Education Sponsorship",
     icon: GraduationCap,
     subItems: [
-      "Scholarships",
-      "Applications",
+      "Program Statistics",
+      "Sponsorships",
+      "Sponsorship Types",
     ],
   },
   {
@@ -49,6 +54,11 @@ const sidebarItems = [
   },
   {
     label: "Organic Agriculture",
+    icon: Sprout,
+    subItems: [],
+  },
+  {
+    label: "Finance And Audit",
     icon: Sprout,
     subItems: [],
   },
@@ -115,8 +125,10 @@ export default function DashboardLayout() {
         if(selected.sub === "Health Camps") return <HealthCampPage />
         return <div className="p-6"><h1>Health Camps Content</h1></div>; // Placeholder—replace with component
       case "Education Sponsorship":
-        if (selected.sub === "Scholarships") return <div className="p-6"><h1>Scholarships</h1></div>;
-        if (selected.sub === "Applications") return <div className="p-6"><h1>Applications</h1></div>;
+        if (selected.sub === "Program Statistics") return <ProgramOverview/>
+        if (selected.sub === "Sponsorships") return <SponsorshipsList/> ;
+        if (selected.sub === "Sponsorship Types") return <SponsorshipType/>;
+
         return <div className="p-6"><h1>Education Sponsorship Overview</h1></div>;
       // ... Add similar for Women Empowerment, etc.
       case "Organic Agriculture" :
@@ -125,6 +137,11 @@ export default function DashboardLayout() {
       case "Community Outreach" :
         if(selected.sub === "Community Outreach") return <CommunityPage />
          return <div className="p-6"><h1>Community Outreach Content</h1></div>;
+
+       case "Finance And Audit" :
+        if(selected.sub === "Finance And Audit") return <FinancePage/>
+         return <div className="p-6"><h1>Finance Content</h1></div>;
+         
        case "Women Empowerment" :
         if(selected.sub === "Women Empowerment") return <WomenEmpowerment/>
          return <div className="p-6"><h1>Women Empowerment Content</h1></div>;
