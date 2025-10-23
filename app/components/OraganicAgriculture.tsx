@@ -177,10 +177,11 @@
 // }
 'use client';
 
-import { useState } from 'react';
-import { Search, User, Phone, IdCard, Plus, Eye, Edit, Trash2, X, MapPin, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Search, User, Phone, IdCard, Plus, Eye, Edit, Trash2, X, MapPin, Users, Loader2 } from 'lucide-react';
 
 export default function OrganicAgricultureParticipants() {
+  const [notice, setNotice] = useState<null | { type: 'success' | 'error' | 'info'; message: string }>(null);
   const [searchFilters, setSearchFilters] = useState({
     name: '',
     aadhar: '',
@@ -198,6 +199,16 @@ export default function OrganicAgricultureParticipants() {
     registeredThrough: '',
     address: ''
   });
+
+  const [participants, setParticipants] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const API_OA_BASE = 'http://localhost:5000/organic-agriculture';
+
+  const showNotice = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setNotice({ type, message });
+    setTimeout(() => setNotice(null), 3000);
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -221,21 +232,58 @@ export default function OrganicAgricultureParticipants() {
     // Implement search logic here
   };
 
-  const handleAddParticipant = (e: React.FormEvent) => {
+  const fetchParticipants = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_OA_BASE}/participants`);
+      if (!res.ok) throw new Error('Failed to load participants');
+      const data = await res.json();
+      setParticipants(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching participants:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchParticipants(); }, []);
+
+  const handleAddParticipant = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('New participant:', newParticipant);
-    // Implement add participant logic here
-    setNewParticipant({
-      name: '',
-      age: '',
-      gender: '',
-      phone: '',
-      aadhar: '',
-      registrationSource: 'Organic Agriculture',
-      registeredThrough: '',
-      address: ''
-    });
-    setShowAddForm(false);
+    if (!newParticipant.name) {
+      showNotice('Name is required', 'error');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_OA_BASE}/participants`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newParticipant),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to save participant');
+      }
+
+      await fetchParticipants();
+
+      setNewParticipant({
+        name: '',
+        age: '',
+        gender: '',
+        phone: '',
+        aadhar: '',
+        registrationSource: 'Organic Agriculture',
+        registeredThrough: '',
+        address: ''
+      });
+      setShowAddForm(false);
+      showNotice('Participant saved successfully', 'success');
+    } catch (e: any) {
+      console.error('Save participant failed:', e);
+      showNotice(e.message || 'Failed to save participant', 'error');
+    }
   };
 
   const handleCloseForm = () => {
@@ -252,43 +300,32 @@ export default function OrganicAgricultureParticipants() {
     setShowAddForm(false);
   };
 
-  // Sample data
-  const participantsData = [
-    {
-      id: 1,
-      name: 'Rahul Sharma',
-      age: 32,
-      gender: 'Male',
-      phone: '9876543210',
-      aadhar: '1234-5678-9012',
-      registrationSource: 'Field Visit',
-      createdAt: '2024-01-15'
-    },
-    {
-      id: 2,
-      name: 'Priya Patel',
-      age: 28,
-      gender: 'Female',
-      phone: '8765432109',
-      aadhar: '2345-6789-0123',
-      registrationSource: 'Referral',
-      createdAt: '2024-01-16'
-    },
-    {
-      id: 3,
-      name: 'Amit Kumar',
-      age: 45,
-      gender: 'Male',
-      phone: '7654321098',
-      aadhar: '3456-7890-1234',
-      registrationSource: 'Campaign',
-      createdAt: '2024-01-17'
-    }
-  ];
+  const sortedParticipants = [...participants].sort((a, b) => {
+    const ida = Number(a?.id ?? 0);
+    const idb = Number(b?.id ?? 0);
+    return ida - idb;
+  });
+
+  const formatDate = (d?: string) => {
+    if (!d) return '';
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return d as string;
+    return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
+        {notice && (
+          <div
+            role="alert"
+            className={`fixed top-4 right-4 z-[60] px-4 py-3 rounded-lg shadow-lg text-white ${
+              notice.type === 'success' ? 'bg-green-600' : notice.type === 'error' ? 'bg-red-600' : 'bg-gray-800'
+            }`}
+          >
+            {notice.message}
+          </div>
+        )}
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Organic Agriculture Participants</h1>
@@ -397,7 +434,22 @@ export default function OrganicAgricultureParticipants() {
                 </tr>
               </thead>
               <tbody>
-                {participantsData.map((participant) => (
+                {loading && (
+                  <tr>
+                    <td colSpan={9} className="p-6">
+                      <div className="flex items-center justify-center gap-3 text-[#0077b6]">
+                        <Loader2 className="animate-spin" size={20} />
+                        <span className="font-medium">Loading participants...</span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {!loading && sortedParticipants.length === 0 && (
+                  <tr>
+                    <td colSpan={9} className="p-6 text-center text-gray-600">No participants found</td>
+                  </tr>
+                )}
+                {!loading && sortedParticipants.map((participant: any) => (
                   <tr key={participant.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 text-sm text-gray-900">{participant.id}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{participant.name}</td>
@@ -406,7 +458,7 @@ export default function OrganicAgricultureParticipants() {
                     <td className="px-6 py-4 text-sm text-gray-900">{participant.phone}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{participant.aadhar}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{participant.registrationSource}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{participant.createdAt}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{formatDate(participant.created_at)}</td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
                         <button className="p-2 text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-colors">
