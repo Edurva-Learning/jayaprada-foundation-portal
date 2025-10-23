@@ -337,11 +337,11 @@ export default function OrganicAgricultureParticipants() {
         )}
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Organic Agriculture Participants</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">Organic Agriculture Program</h1>
         </div>
 
         {/* Search Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Search by Name */}
@@ -413,10 +413,10 @@ export default function OrganicAgricultureParticipants() {
         </div>
 
         {/* Participants Table Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm">
           {/* Table Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800">Participants List</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-[#0077b6]">Participants List</h3>
             <button 
               onClick={() => { setEditId(null); setShowAddForm(true); }}
               className="px-6 py-2.5 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center gap-2"
@@ -431,15 +431,15 @@ export default function OrganicAgricultureParticipants() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">ID</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Name</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Age</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Gender</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Phone</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Aadhar</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Registration Source</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Created At</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
+                  <th className="p-3 font-semibold">ID</th>
+                  <th className="p-3 font-semibold">Name</th>
+                  <th className="p-3 font-semibold">Age</th>
+                  <th className="p-3 font-semibold">Gender</th>
+                  <th className="p-3 font-semibold">Phone</th>
+                  <th className="p-3 font-semibold">Aadhar</th>
+                  <th className="p-3 font-semibold">Registration Source</th>
+                  <th className="p-3 font-semibold">Created At</th>
+                  <th className="p-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -459,16 +459,16 @@ export default function OrganicAgricultureParticipants() {
                   </tr>
                 )}
                 {!loading && sortedParticipants.map((participant: any) => (
-                  <tr key={participant.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-gray-900">{participant.id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{participant.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{participant.age}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{participant.gender}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{participant.phone}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{participant.aadhar}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{participant.registrationSource}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{formatDate(participant.created_at)}</td>
-                    <td className="px-6 py-4">
+                  <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="p-3">{participant.id}</td>
+                    <td className="p-3">{participant.name}</td>
+                    <td className="p-3">{participant.age}</td>
+                    <td className="p-3">{participant.gender}</td>
+                    <td className="p-3">{participant.phone}</td>
+                    <td className="p-3">{participant.aadhar}</td>
+                    <td className="p-3">{participant.registrationSource}</td>
+                    <td className="p-3">{formatDate(participant.created_at)}</td>
+                    <td className="p-3">
                       <div className="flex gap-2">
                         <button className="p-2 text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-colors">
                           <Eye size={16} />
