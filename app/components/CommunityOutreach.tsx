@@ -304,6 +304,12 @@ export default function CommunityPage() {
     if (isNaN(date.getTime())) return d as string;
     return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
   };
+  const formatAmount = (amt?: number | string) => {
+    if (amt === null || amt === undefined) return '';
+    const n = typeof amt === 'string' ? Number(amt) : amt;
+    if (isNaN(Number(n))) return String(amt);
+    return new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n));
+  };
 
   useEffect(() => { fetchParticipants(); }, []);
 
@@ -546,44 +552,44 @@ export default function CommunityPage() {
           </div>
           
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <table className="w-full text-left">
+            <table className="w-full">
               <thead>
                 <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
-                  <th className="p-3 font-semibold">ID</th>
-                  <th className="p-3 font-semibold">Beneficiary</th>
-                  <th className="p-3 font-semibold">Aadhar</th>
-                  <th className="p-3 font-semibold">Mobile</th>
-                  <th className="p-3 font-semibold">Family Head</th>
-                  <th className="p-3 font-semibold">Children</th>
-                  <th className="p-3 font-semibold">Amount</th>
-                  <th className="p-3 font-semibold">Created At</th>
-                  <th className="p-3 font-semibold">Actions</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-center">ID</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-left">Beneficiary</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-left">Aadhar</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-left">Mobile</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-left">Family Head</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-center">Children</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-right">Amount</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-center">Created At</th>
+                  <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading && (
                   <tr>
-                    <td colSpan={8} className="p-6 text-center text-gray-600">Loading participants...</td>
+                    <td colSpan={9} className="p-6 text-center text-gray-600">Loading participants...</td>
                   </tr>
                 )}
                 {!loading && participants.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="p-6 text-center text-gray-600">No records found</td>
+                    <td colSpan={9} className="p-6 text-center text-gray-600">No records found</td>
                   </tr>
                 )}
                 {!loading && participants.map((record) => (
                   <tr key={record.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{record.id}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.aadhar}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.mobile}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.familyHead}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.children}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.amount}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(record.created_at)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{record.children}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{formatAmount(record.amount)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{formatDate(record.created_at)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-800 transition-colors">
+                      <div className="flex items-center justify-center gap-2">
+                        <button className="text-[#00b4d8] hover:text-[#0096c7] transition-colors">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                             <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
