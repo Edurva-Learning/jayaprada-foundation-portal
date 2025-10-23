@@ -5,6 +5,8 @@ import { Search, User, Phone, IdCard, Download, Eye, MapPin, Users, Calendar, X,
 
 export default function WomenEmpowerment() {
   const [activeTab, setActiveTab] = useState<'participants' | 'records'>('participants');
+  // Lightweight inline toast/notice (non-blocking replacement for alert)
+  const [notice, setNotice] = useState<null | { type: 'success' | 'error' | 'info'; message: string }>(null);
   const [filters, setFilters] = useState({
     name: '',
     aadhar: '',
@@ -123,10 +125,17 @@ export default function WomenEmpowerment() {
     });
   };
 
+  // Helper to show a temporary, non-blocking message
+  const showNotice = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setNotice({ type, message });
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => setNotice(null), 3000);
+  };
+
   const handleSaveParticipant = async () => {
     // basic validation
     if (!participantForm.name) {
-      alert('Name is required');
+      showNotice('Name is required', 'error');
       return;
     }
 
@@ -155,10 +164,10 @@ export default function WomenEmpowerment() {
         registeredThrough: ''
       });
       setShowParticipantForm(false);
-      alert('Participant saved successfully');
+      showNotice('Participant saved successfully', 'success');
     } catch (e:any) {
       console.error('Save participant failed:', e);
-      alert(e.message || 'Failed to save participant');
+      showNotice(e.message || 'Failed to save participant', 'error');
     }
   };
 
@@ -166,18 +175,18 @@ export default function WomenEmpowerment() {
     console.log("Saving record:", recordForm);
     // Validate required fields
     if (!recordForm.participant || !recordForm.trainingType) {
-      alert('Please fill in all required fields');
+      showNotice('Please fill in all required fields', 'error');
       return;
     }
     
     // Validate file sizes if files are selected
     if (recordForm.photo && recordForm.photo.size > 100 * 1024) {
-      alert('Photo size should be less than 100KB');
+      showNotice('Photo size should be less than 100KB', 'error');
       return;
     }
     
     if (recordForm.idProof && recordForm.idProof.size > 200 * 1024) {
-      alert('ID Proof size should be less than 200KB');
+      showNotice('ID Proof size should be less than 200KB', 'error');
       return;
     }
     
@@ -192,6 +201,7 @@ export default function WomenEmpowerment() {
       idProof: null
     });
     setShowRecordForm(false);
+    showNotice('Record saved', 'success');
   };
 
   const handleCloseParticipantForm = () => {
@@ -256,6 +266,17 @@ export default function WomenEmpowerment() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Inline toast/notice */}
+        {notice && (
+          <div
+            role="alert"
+            className={`fixed top-4 right-4 z-[60] px-4 py-3 rounded-lg shadow-lg text-white ${
+              notice.type === 'success' ? 'bg-green-600' : notice.type === 'error' ? 'bg-red-600' : 'bg-gray-800'
+            }`}
+          >
+            {notice.message}
+          </div>
+        )}
         {/* Header Section */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">Women Empowerment Program</h1>
