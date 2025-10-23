@@ -247,9 +247,11 @@
 // app/community/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function CommunityPage() {
+  // Inline toast/notice similar to WomenEmpowerment
+  const [notice, setNotice] = useState<null | { type: 'success' | 'error' | 'info'; message: string }>(null);
   const [filters, setFilters] = useState({
     aadhar: '',
     mobile: '',
@@ -270,6 +272,40 @@ export default function CommunityPage() {
     details: '',
     amount: ''
   });
+
+  // Participants list state
+  const [participants, setParticipants] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const API_CO_BASE = 'http://localhost:5000/community-outreach';
+
+  const showNotice = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setNotice({ type, message });
+    setTimeout(() => setNotice(null), 3000);
+  };
+
+  const fetchParticipants = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_CO_BASE}/participants`);
+      if (!res.ok) throw new Error('Failed to load participants');
+      const data = await res.json();
+      setParticipants(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching Community Outreach participants:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (d?: string) => {
+    if (!d) return '';
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return d as string;
+    return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+  };
+
+  useEffect(() => { fetchParticipants(); }, []);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -297,23 +333,45 @@ export default function CommunityPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form data:', formData);
-    setIsFormOpen(false);
-    // Reset form
-    setFormData({
-      name: '',
-      aadhar: '',
-      mobile: '',
-      address: '',
-      purpose: '',
-      familyHead: '',
-      children: '',
-      details: '',
-      amount: ''
-    });
+
+    if (!formData.name) {
+      showNotice('Name is required', 'error');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_CO_BASE}/participants`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to save participant');
+      }
+
+      await fetchParticipants();
+
+      setFormData({
+        name: '',
+        aadhar: '',
+        mobile: '',
+        address: '',
+        purpose: '',
+        familyHead: '',
+        children: '',
+        details: '',
+        amount: ''
+      });
+      setIsFormOpen(false);
+      showNotice('Community support saved successfully', 'success');
+    } catch (e: any) {
+      console.error('Save participant failed:', e);
+      showNotice(e.message || 'Failed to save participant', 'error');
+    }
   };
 
   const supportRecords = [
@@ -342,6 +400,16 @@ export default function CommunityPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
+        {notice && (
+          <div
+            role="alert"
+            className={`fixed top-4 right-4 z-[60] px-4 py-3 rounded-lg shadow-lg text-white ${
+              notice.type === 'success' ? 'bg-green-600' : notice.type === 'error' ? 'bg-red-600' : 'bg-gray-800'
+            }`}
+          >
+            {notice.message}
+          </div>
+        )}
         {/* Header Section */}
         {/* Header Section */}
 <div className="mb-8">
@@ -486,23 +554,33 @@ export default function CommunityPage() {
                   <th className="p-3 font-semibold">Aadhar</th>
                   <th className="p-3 font-semibold">Mobile</th>
                   <th className="p-3 font-semibold">Family Head</th>
-                  <th className="p-3 font-semibold">Childern</th>
+                  <th className="p-3 font-semibold">Children</th>
                   <th className="p-3 font-semibold">Amount</th>
                   <th className="p-3 font-semibold">Created At</th>
                   <th className="p-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {supportRecords.map((record) => (
+                {loading && (
+                  <tr>
+                    <td colSpan={8} className="p-6 text-center text-gray-600">Loading participants...</td>
+                  </tr>
+                )}
+                {!loading && participants.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="p-6 text-center text-gray-600">No records found</td>
+                  </tr>
+                )}
+                {!loading && participants.map((record) => (
                   <tr key={record.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.beneficiary}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.aadhar}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.mobile}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.familyHead}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.children}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.amount}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.createdAt}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(record.created_at)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex space-x-2">
                         <button className="text-blue-600 hover:text-blue-800 transition-colors">
