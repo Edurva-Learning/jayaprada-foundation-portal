@@ -40,34 +40,6 @@
 //       children: 3,
 //       amount: '¥10,000.00',
 //       createdAt: 'Sep 20, 2025'
-//     },
-//     {
-//       id: 1,
-//       beneficiary: 'Support1',
-//       aadhar: '012345678933',
-//       mobile: '0129384755',
-//       familyHead: 'Father1',
-//       children: 2,
-//       amount: '¥20,000.00',
-//       createdAt: 'Sep 20, 2025'
-//     }
-//   ];
-
-//   return (
-//     <div className="min-h-screen bg-gray-50 p-6">
-//       <div className="max-w-7xl mx-auto">
-//         {/* Header Section */}
-//         <div className="mb-8">
-//           <h1 className="text-3xl font-bold text-gray-800 mb-2">Community Outreach</h1>
-          
-//           <div className="flex space-x-6 mt-6">
-//             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 w-64">
-//               <h2 className="text-sm font-medium text-gray-500 mb-1">Total Donations</h2>
-//               <p className="text-2xl font-semibold text-gray-800">¥30,000.00</p>
-//             </div>
-            
-//             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 w-64">
-//               <h2 className="text-sm font-medium text-gray-500 mb-1">Total Beneficiaries</h2>
 //               <p className="text-2xl font-semibold text-gray-800">2</p>
 //             </div>
 //           </div>
@@ -260,6 +232,14 @@ export default function CommunityPage() {
     dateFrom: '',
     dateTo: ''
   });
+  // Apply filters only when user clicks Apply (client-side filtering)
+  const [appliedFilters, setAppliedFilters] = useState({
+    aadhar: '',
+    mobile: '',
+    name: '',
+    dateFrom: '',
+    dateTo: ''
+  });
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -355,6 +335,42 @@ export default function CommunityPage() {
 
   useEffect(() => { fetchParticipants(); }, []);
 
+  // Normalize numeric strings for phone/aadhar
+  const digitsOnly = (v: any) => String(v ?? '').replace(/\D/g, '');
+
+  // Client-side filtered list based on applied filters
+  const filteredParticipants = participants.filter((p: any) => {
+    const nameMatch = !appliedFilters.name || String(p?.name ?? '')
+      .toLowerCase()
+      .includes(appliedFilters.name.toLowerCase());
+    const aadharMatch = !appliedFilters.aadhar || digitsOnly(p?.aadhar)
+      .includes(digitsOnly(appliedFilters.aadhar));
+    const mobileMatch = !appliedFilters.mobile || digitsOnly(p?.mobile)
+      .includes(digitsOnly(appliedFilters.mobile));
+
+    // Date filter: inclusive from (and to, if provided)
+    let dateMatch = true;
+    if (appliedFilters.dateFrom || appliedFilters.dateTo) {
+      const recDate = new Date(p?.created_at ?? p?.createdAt ?? '');
+      if (!isNaN(recDate.getTime())) {
+        if (appliedFilters.dateFrom) {
+          const from = new Date(appliedFilters.dateFrom);
+          if (!isNaN(from.getTime())) dateMatch = dateMatch && recDate >= from;
+        }
+        if (appliedFilters.dateTo) {
+          const to = new Date(appliedFilters.dateTo);
+          // Make 'to' inclusive by setting to end-of-day
+          if (!isNaN(to.getTime())) {
+            to.setHours(23, 59, 59, 999);
+            dateMatch = dateMatch && recDate <= to;
+          }
+        }
+      }
+    }
+
+    return nameMatch && aadharMatch && mobileMatch && dateMatch;
+  });
+
   const closeForm = () => {
     setIsFormOpen(false);
     setEditingId(null);
@@ -395,6 +411,7 @@ export default function CommunityPage() {
       dateFrom: '',
       dateTo: ''
     });
+    setAppliedFilters({ aadhar: '', mobile: '', name: '', dateFrom: '', dateTo: '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -508,6 +525,7 @@ export default function CommunityPage() {
         <div className="mb-10">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Filter Community Support</h2>
           
+          <form onSubmit={(e) => { e.preventDefault(); setAppliedFilters({ ...filters }); }}>
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
@@ -565,29 +583,37 @@ export default function CommunityPage() {
               </label>
               <div>
                 <div className="flex space-x-2">
-                  <input
-                    type="date"
-                    name="dateFrom"
-                    value={filters.dateFrom}
-                    onChange={handleFilterChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                    placeholder="From"
-                  />
-                  {/* <input
-                    type="date"
-                    name="dateTo"
-                    value={filters.dateTo}
-                    onChange={handleFilterChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                    placeholder="To"
-                  /> */}
+                  <div className="w-full">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">From</label>
+                    <input
+                      type="date"
+                      name="dateFrom"
+                      value={filters.dateFrom}
+                      onChange={handleFilterChange}
+                      max={filters.dateTo || undefined}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
+                      aria-label="From date"
+                    />
+                  </div>
+                  <div className="w-full">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">To</label>
+                    <input
+                      type="date"
+                      name="dateTo"
+                      value={filters.dateTo}
+                      onChange={handleFilterChange}
+                      min={filters.dateFrom || undefined}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
+                      aria-label="To date"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           
           <div className="flex space-x-4 mt-6">
-            <button className="px-4 py-2 bg-[#00b4d8] text-white rounded-md hover:bg-[#0099c3] transition-colors">
+            <button type="submit" className="px-4 py-2 bg-[#00b4d8] text-white rounded-md hover:bg-[#0099c3] transition-colors">
               Apply Filters
             </button>
             <button 
@@ -597,6 +623,7 @@ export default function CommunityPage() {
               Reset
             </button>
           </div>
+          </form>
         </div>
 
         <div className="h-px bg-gray-200 my-8"></div>
@@ -644,7 +671,12 @@ export default function CommunityPage() {
                     <td colSpan={9} className="p-6 text-center text-gray-600">No records found</td>
                   </tr>
                 )}
-                {!loading && participants.map((record) => (
+                {!loading && filteredParticipants.length === 0 && participants.length > 0 && (
+                  <tr>
+                    <td colSpan={9} className="p-6 text-center text-gray-600">No records match your filters</td>
+                  </tr>
+                )}
+                {!loading && filteredParticipants.map((record) => (
                   <tr key={record.id} className="hover:bg-gray-50">
                     <td className="p-3">{record.id}</td>
                     <td className="p-3">{record.name}</td>
