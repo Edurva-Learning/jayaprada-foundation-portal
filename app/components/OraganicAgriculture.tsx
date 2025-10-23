@@ -187,6 +187,12 @@ export default function OrganicAgricultureParticipants() {
     aadhar: '',
     phone: ''
   });
+  // Filters applied when user clicks Search (so typing doesn't filter until submitted)
+  const [appliedFilters, setAppliedFilters] = useState({
+    name: '',
+    aadhar: '',
+    phone: ''
+  });
 
   const [showAddForm, setShowAddForm] = useState(false);
   // when editId is set, the same form acts as Edit
@@ -230,8 +236,8 @@ export default function OrganicAgricultureParticipants() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Search filters:', searchFilters);
-    // Implement search logic here
+    // Apply filters locally (frontend-only filtering)
+    setAppliedFilters({ ...searchFilters });
   };
 
   const fetchParticipants = async () => {
@@ -313,6 +319,21 @@ export default function OrganicAgricultureParticipants() {
     const ida = Number(a?.id ?? 0);
     const idb = Number(b?.id ?? 0);
     return ida - idb;
+  });
+
+  // Helper to normalize numeric fields like phone/aadhar
+  const digitsOnly = (v: any) => String(v ?? '').replace(/\D/g, '');
+
+  // Apply client-side filtering based on the last submitted/applied filters
+  const filteredParticipants = sortedParticipants.filter((p: any) => {
+    const nameMatch = !appliedFilters.name || String(p?.name ?? '')
+      .toLowerCase()
+      .includes(appliedFilters.name.toLowerCase());
+    const aadharMatch = !appliedFilters.aadhar || digitsOnly(p?.aadhar)
+      .includes(digitsOnly(appliedFilters.aadhar));
+    const phoneMatch = !appliedFilters.phone || digitsOnly(p?.phone)
+      .includes(digitsOnly(appliedFilters.phone));
+    return nameMatch && aadharMatch && phoneMatch;
   });
 
   const formatDate = (d?: string) => {
@@ -408,6 +429,17 @@ export default function OrganicAgricultureParticipants() {
                 <Search size={18} />
                 Search
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const empty = { name: '', aadhar: '', phone: '' };
+                  setSearchFilters(empty);
+                  setAppliedFilters(empty);
+                }}
+                className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+              >
+                Clear
+              </button>
             </div>
           </form>
         </div>
@@ -458,7 +490,12 @@ export default function OrganicAgricultureParticipants() {
                     <td colSpan={9} className="p-6 text-center text-gray-600">No participants found</td>
                   </tr>
                 )}
-                {!loading && sortedParticipants.map((participant: any) => (
+                {!loading && filteredParticipants.length === 0 && sortedParticipants.length > 0 && (
+                  <tr>
+                    <td colSpan={9} className="p-6 text-center text-gray-600">No participants match your search</td>
+                  </tr>
+                )}
+                {!loading && filteredParticipants.map((participant: any) => (
                   <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="p-3">{participant.id}</td>
                     <td className="p-3">{participant.name}</td>
