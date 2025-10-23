@@ -189,6 +189,8 @@ export default function OrganicAgricultureParticipants() {
   });
 
   const [showAddForm, setShowAddForm] = useState(false);
+  // when editId is set, the same form acts as Edit
+  const [editId, setEditId] = useState<number | null>(null);
   const [newParticipant, setNewParticipant] = useState({
     name: '',
     age: '',
@@ -255,8 +257,13 @@ export default function OrganicAgricultureParticipants() {
       return;
     }
     try {
-      const res = await fetch(`${API_OA_BASE}/participants`, {
-        method: 'POST',
+      const isEdit = editId !== null;
+      const url = isEdit
+        ? `${API_OA_BASE}/participants/${editId}`
+        : `${API_OA_BASE}/participants`;
+      const method = isEdit ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newParticipant),
       });
@@ -278,8 +285,9 @@ export default function OrganicAgricultureParticipants() {
         registeredThrough: '',
         address: ''
       });
+      setEditId(null);
       setShowAddForm(false);
-      showNotice('Participant saved successfully', 'success');
+      showNotice(isEdit ? 'Participant updated successfully' : 'Participant saved successfully', 'success');
     } catch (e: any) {
       console.error('Save participant failed:', e);
       showNotice(e.message || 'Failed to save participant', 'error');
@@ -297,6 +305,7 @@ export default function OrganicAgricultureParticipants() {
       registeredThrough: '',
       address: ''
     });
+    setEditId(null);
     setShowAddForm(false);
   };
 
@@ -409,7 +418,7 @@ export default function OrganicAgricultureParticipants() {
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-800">Participants List</h3>
             <button 
-              onClick={() => setShowAddForm(true)}
+              onClick={() => { setEditId(null); setShowAddForm(true); }}
               className="px-6 py-2.5 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center gap-2"
             >
               <Plus size={18} />
@@ -464,10 +473,46 @@ export default function OrganicAgricultureParticipants() {
                         <button className="p-2 text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-colors">
                           <Eye size={16} />
                         </button>
-                        <button className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                        <button
+                          onClick={() => {
+                            // Prefill form for edit
+                            setNewParticipant({
+                              name: participant.name || '',
+                              age: participant.age ? String(participant.age) : '',
+                              gender: participant.gender || '',
+                              phone: participant.phone || '',
+                              aadhar: participant.aadhar || '',
+                              registrationSource: participant.registrationSource || 'Organic Agriculture',
+                              registeredThrough: participant.registeredThrough || '',
+                              address: participant.address || '',
+                            });
+                            setEditId(Number(participant.id));
+                            setShowAddForm(true);
+                          }}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        >
                           <Edit size={16} />
                         </button>
-                        <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <button
+                          onClick={async () => {
+                            if (!participant?.id) return;
+                            const confirmDel = window.confirm('Delete this participant?');
+                            if (!confirmDel) return;
+                            try {
+                              const res = await fetch(`${API_OA_BASE}/participants/${participant.id}`, { method: 'DELETE' });
+                              if (!res.ok) {
+                                const err = await res.json().catch(() => ({}));
+                                throw new Error(err.error || 'Failed to delete');
+                              }
+                              await fetchParticipants();
+                              showNotice('Participant deleted successfully', 'success');
+                            } catch (e: any) {
+                              console.error('Delete failed:', e);
+                              showNotice(e.message || 'Failed to delete participant', 'error');
+                            }
+                          }}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -488,7 +533,7 @@ export default function OrganicAgricultureParticipants() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <User size={24} />
-                    <h2 className="text-2xl font-bold">Add New Participant</h2>
+                    <h2 className="text-2xl font-bold">{editId ? 'Edit Participant' : 'Add New Participant'}</h2>
                   </div>
                   <button 
                     onClick={handleCloseForm}
@@ -497,7 +542,7 @@ export default function OrganicAgricultureParticipants() {
                     <X size={20} />
                   </button>
                 </div>
-                <p className="text-blue-100 mt-2">Fill in the participant details below</p>
+                <p className="text-blue-100 mt-2">{editId ? 'Update the participant details below' : 'Fill in the participant details below'}</p>
               </div>
 
               {/* Form */}
@@ -658,7 +703,7 @@ export default function OrganicAgricultureParticipants() {
                     className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center justify-center gap-2"
                   >
                     <User size={18} />
-                    Save Participant
+                    {editId ? 'Update Participant' : 'Save Participant'}
                   </button>
                 </div>
               </form>
