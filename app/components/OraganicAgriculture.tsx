@@ -391,10 +391,10 @@ export default function OrganicAgricultureParticipants() {
             </div>
             
             {/* Search Button */}
-            <div className="flex justify-end">
+            <div className="flex gap-3">
               <button
                 type="submit"
-                className="px-8 py-2.5 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center gap-2"
+                className="px-6 py-2.5 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center gap-2"
               >
                 <Search size={18} />
                 Search
