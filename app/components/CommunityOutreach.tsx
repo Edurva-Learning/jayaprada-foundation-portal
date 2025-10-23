@@ -482,6 +482,13 @@ export default function CommunityPage() {
     }
   ];
 
+  // Compute summary stats from community_outreach_participants (participants state)
+  const totalDonations = participants.reduce(
+    (sum: number, p: any) => sum + (Number(p?.amount) || 0),
+    0
+  );
+  const totalBeneficiaries = participants.length;
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -502,11 +509,11 @@ export default function CommunityPage() {
     Community Outreach
   </h1>
 
-  {/* Stats Grid (same style as the first one) */}
+  {/* Stats Grid (computed from community_outreach_participants) */}
   <div className="grid grid-cols-4 gap-4">
     {[
-      { label: "Total Donations", value: "¥30,000.00" },
-      { label: "Total Beneficiaries", value: "2" },
+      { label: "Total Donations", value: `₹${formatAmount(totalDonations)}` },
+      { label: "Total Beneficiaries", value: String(totalBeneficiaries) },
     ].map((stat, i) => (
       <div
         key={i}
