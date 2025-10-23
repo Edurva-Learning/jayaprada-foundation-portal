@@ -24,3 +24,20 @@ body {
   color: black;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Ensure pointer cursor on all clickable buttons */
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  cursor: pointer;
+}
+
+/* Keep disabled buttons with appropriate cursor for accessibility */
+button:disabled,
+input[type="button"][disabled],
+input[type="submit"][disabled],
+input[type="reset"][disabled] {
+  cursor: not-allowed;
+}
