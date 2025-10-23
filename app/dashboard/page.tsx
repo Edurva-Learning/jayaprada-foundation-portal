@@ -7,6 +7,10 @@ import UserManagement from "@/app/admin/UserManagement";
 import CampManagement from "@/app/admin/CampManagement";
 import SponsorshipTypes from "@/app/admin/SponsorshipTypes";
 import ParticipantManagement from "@/app/admin/ParticipantManagement";
+import HealthCampPage from "../components/HealthCamps";
+import OrganicAgriculture from "../components/OraganicAgriculture";
+import CommunityPage from "../components/CommunityOutreach";
+import WomenEmpowerment from "../components/WomenEmpowerment";
 // Import other components as needed (e.g., HealthCamps, EducationSponsorship)
 
 const sidebarItems = [
@@ -64,7 +68,16 @@ export default function DashboardLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false); // Collapsed state
 
   const handleGroupClick = (label: string) => {
-    if (label === "Dashboard") {
+
+    const clickedItem = sidebarItems.find((item) => item.label === label);
+
+      if (!clickedItem) return;
+
+  if (clickedItem.subItems.length === 0) {
+    // Direct item — select it
+    setSelected({ group: label, sub: label });
+    setOpenGroup(null);
+  } else if (label === "Dashboard") {
       setSelected({ group: label, sub: label });
       setOpenGroup(null);
     } else {
@@ -99,12 +112,23 @@ export default function DashboardLayout() {
         break;
       // Add cases for other groups (e.g., Health Camps)
       case "Health Camps":
+        if(selected.sub === "Health Camps") return <HealthCampPage />
         return <div className="p-6"><h1>Health Camps Content</h1></div>; // Placeholder—replace with component
       case "Education Sponsorship":
         if (selected.sub === "Scholarships") return <div className="p-6"><h1>Scholarships</h1></div>;
         if (selected.sub === "Applications") return <div className="p-6"><h1>Applications</h1></div>;
         return <div className="p-6"><h1>Education Sponsorship Overview</h1></div>;
       // ... Add similar for Women Empowerment, etc.
+      case "Organic Agriculture" :
+        if(selected.sub === "Organic Agriculture") return <OrganicAgriculture />
+         return <div className="p-6"><h1>Organic Agriculture Content</h1></div>;
+      case "Community Outreach" :
+        if(selected.sub === "Community Outreach") return <CommunityPage />
+         return <div className="p-6"><h1>Community Outreach Content</h1></div>;
+       case "Women Empowerment" :
+        if(selected.sub === "Women Empowerment") return <WomenEmpowerment/>
+         return <div className="p-6"><h1>Women Empowerment Content</h1></div>;
+
       default:
         return <div className="p-6 text-gray-500">Content for {selected.group} - {selected.sub} will render here.</div>;
     }
