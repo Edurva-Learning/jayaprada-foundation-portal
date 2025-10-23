@@ -281,7 +281,7 @@ const CampManagement: React.FC = () => {
     services: '',
   });
 
-  const API_URL = 'http://localhost:5000/camps'; // Replace with your backend URL
+  const API_URL = 'http://jpf-portal.eba-8rkbadvd.us-east-1.elasticbeanstalk.com/camps'; // Replace with your backend URL
 
   // Fetch all camps
   const fetchCamps = async () => {
