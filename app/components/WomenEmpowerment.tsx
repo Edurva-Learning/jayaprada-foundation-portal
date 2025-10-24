@@ -49,6 +49,10 @@ export default function WomenEmpowerment() {
     idProof: null as File | null
   });
 
+  // Typeahead state for Participant field in Add Record form
+  const [participantQuery, setParticipantQuery] = useState('');
+  const [showParticipantSuggestions, setShowParticipantSuggestions] = useState(false);
+
   const [participants, setParticipants] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -72,6 +76,14 @@ export default function WomenEmpowerment() {
     const phoneMatch = !appliedParticipantsFilters.phone || digitsOnly(p?.phone)
       .includes(digitsOnly(appliedParticipantsFilters.phone));
     return nameMatch && aadharMatch && phoneMatch;
+  });
+
+  // Suggestions list for typeahead (match by name only)
+  const participantSuggestions = sortedParticipants.filter((p: any) => {
+    const q = participantQuery.toLowerCase();
+    if (!q) return true; // show all when empty
+    const name = String(p?.name ?? '').toLowerCase();
+    return name.includes(q);
   });
 
   const API_WE_BASE = 'http://localhost:5000/women-empowerment';
@@ -98,6 +110,15 @@ export default function WomenEmpowerment() {
   };
 
   useEffect(() => { fetchParticipants(); }, []);
+
+  // Keep the typeahead input in sync when the modal opens/closes
+  useEffect(() => {
+    if (showRecordForm) {
+      setParticipantQuery(recordForm.participant || '');
+    } else {
+      setShowParticipantSuggestions(false);
+    }
+  }, [showRecordForm]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -258,6 +279,7 @@ export default function WomenEmpowerment() {
       ...prev,
       participant: participantName
     }));
+    setParticipantQuery(participantName || '');
     setShowRecordForm(true);
   };
 
@@ -303,7 +325,6 @@ export default function WomenEmpowerment() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">Women Empowerment Program</h1>
           
-          {/* Navigation Tabs */}
           <div className="flex border-b border-gray-200">
             <button
               onClick={() => setActiveTab('participants')}
@@ -873,24 +894,57 @@ export default function WomenEmpowerment() {
               {/* Form */}
               <div className="p-6 max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-2 gap-6">
-                  {/* Participant * */}
+                  {/* Participant * (Typeahead) */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <User size={16} className="text-[#00b4d8]" />
                       Participant *
                     </label>
-                    <select
-                      name="participant"
-                      value={recordForm.participant}
-                      onChange={handleRecordFormChange}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                      required
-                    >
-                      <option value="">Select Participant</option>
-                      <option value="Women1">Women1</option>
-                      <option value="Women2">Women2</option>
-                      <option value="Women3">Women3</option>
-                    </select>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="participant"
+                        value={participantQuery}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setParticipantQuery(v);
+                          setRecordForm(prev => ({ ...prev, participant: v }));
+                          setShowParticipantSuggestions(true);
+                        }}
+                        onFocus={() => setShowParticipantSuggestions(true)}
+                        onBlur={() => setTimeout(() => setShowParticipantSuggestions(false), 120)}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                        placeholder="Type to search participant by name"
+                        required
+                      />
+
+                      {showParticipantSuggestions && (
+                        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+                          {participantSuggestions.length === 0 ? (
+                            <div className="px-3 py-2 text-sm text-gray-500">No matches</div>
+                          ) : (
+                            participantSuggestions.map((p: any) => (
+                              <button
+                                key={p.id}
+                                type="button"
+                                className="w-full text-left px-3 py-2 hover:bg-gray-50 focus:bg-gray-50"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => {
+                                  const name = (p?.name && String(p.name).trim()) || 'Unnamed participant';
+                                  setParticipantQuery(name);
+                                  setRecordForm(prev => ({ ...prev, participant: name }));
+                                  setShowParticipantSuggestions(false);
+                                }}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="text-sm text-gray-900">{(p?.name && String(p.name).trim()) || 'Unnamed participant'}</span>
+                                </div>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Training Type * */}
