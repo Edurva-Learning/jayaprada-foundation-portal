@@ -179,7 +179,10 @@ export default function WomenEmpowerment() {
   useEffect(() => { fetchParticipants(); fetchRecords(); }, []);
 
   // Client-side filtering for records based on applied filters
-  const filteredRecords = records.filter((r: any) => {
+  // Always display empowerment records in ascending order of ID
+  const filteredRecords = [...records]
+    .sort((a, b) => Number(a?.id ?? 0) - Number(b?.id ?? 0))
+    .filter((r: any) => {
     // Training Type
     if (appliedRecordsFilters.trainingType !== 'All Training Types') {
       if (norm(r?.trainingType) !== norm(appliedRecordsFilters.trainingType)) return false;
