@@ -40,6 +40,10 @@ export default function WomenEmpowerment() {
     if (!key) return '';
     return labelMap[key] ?? key;
   };
+
+  // Normalization helpers for comparisons when counting stats
+  const norm = (v: any) => String(v ?? '').toLowerCase().replace(/[-_]/g, ' ').trim();
+  const isOneOf = (v: any, targets: string[]) => targets.some(t => norm(v) === norm(t));
   const [filters, setFilters] = useState({
     name: '',
     aadhar: '',
@@ -151,6 +155,12 @@ export default function WomenEmpowerment() {
       setRecordsLoading(false);
     }
   };
+
+  // Derived stats (dynamic)
+  const totalParticipants = sortedParticipants.length;
+  const sewingMachineTrained = records.filter((r: any) => isOneOf(r?.trainingType, ['Sewing Machine', 'sewing-machine'])).length;
+  const workshopAttendedCount = records.filter((r: any) => isOneOf(r?.workshopAttended, ['Yes', 'yes'])).length;
+  const employedParticipants = records.filter((r: any) => isOneOf(r?.employmentStatus, ['Employed', 'Self-employed'])).length;
 
   const formatDate = (d?: string) => {
     if (!d) return '';
@@ -441,19 +451,19 @@ export default function WomenEmpowerment() {
                 <div className="mb-6">
                   <div className="grid grid-cols-4 gap-4">
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-black mb-1">1</div>
+                      <div className="text-2xl font-bold text-black mb-1">{totalParticipants}</div>
                       <div className="text-sm font-medium text-black">Total Participants</div>
                     </div>
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-black mb-1">1</div>
+                      <div className="text-2xl font-bold text-black mb-1">{sewingMachineTrained}</div>
                       <div className="text-sm font-medium text-black">Sewing Machine Trained</div>
                     </div>
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-black mb-1">1</div>
+                      <div className="text-2xl font-bold text-black mb-1">{workshopAttendedCount}</div>
                       <div className="text-sm font-medium text-black">Workshop Attended</div>
                     </div>
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-black mb-1">0</div>
+                      <div className="text-2xl font-bold text-black mb-1">{employedParticipants}</div>
                       <div className="text-sm font-medium text-black">Employed Participants</div>
                     </div>
                   </div>
@@ -621,19 +631,19 @@ export default function WomenEmpowerment() {
                   
                   <div className="grid grid-cols-4 gap-4 mb-6">
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-black mb-1">1</div>
+                      <div className="text-2xl font-bold text-black mb-1">{totalParticipants}</div>
                       <div className="text-sm font-medium text-black">Total Participants</div>
                     </div>
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-black mb-1">1</div>
+                      <div className="text-2xl font-bold text-black mb-1">{sewingMachineTrained}</div>
                       <div className="text-sm font-medium text-black">Sewing Machine Trained</div>
                     </div>
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-black mb-1">1</div>
+                      <div className="text-2xl font-bold text-black mb-1">{workshopAttendedCount}</div>
                       <div className="text-sm font-medium text-black">Workshop Attended</div>
                     </div>
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-black mb-1">0</div>
+                      <div className="text-2xl font-bold text-black mb-1">{employedParticipants}</div>
                       <div className="text-sm font-medium text-black">Employed Participants</div>
                     </div>
                   </div>
