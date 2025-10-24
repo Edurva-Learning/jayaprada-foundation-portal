@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, User, Phone, IdCard, Download, Eye, MapPin, Users, Calendar, X, Camera, FileText, Loader2 } from 'lucide-react';
+import { Search, User, Phone, IdCard, Download, Eye, MapPin, Users, Calendar, X, Camera, FileText, Loader2, Pencil, Trash2 } from 'lucide-react';
 
 export default function WomenEmpowerment() {
   const [activeTab, setActiveTab] = useState<'participants' | 'records'>('participants');
@@ -401,6 +401,19 @@ export default function WomenEmpowerment() {
       idProof: null
     });
     setShowRecordForm(false);
+  };
+
+  // Placeholder actions for records table – backend edit/delete not implemented yet
+  const handleViewRecord = (record: any) => {
+    showNotice(`View record #${record?.id} – feature coming soon`, 'info');
+  };
+  const handleEditRecord = (record: any) => {
+    showNotice(`Edit record #${record?.id} – feature coming soon`, 'info');
+  };
+  const handleDeleteRecord = async (record: any) => {
+    const ok = window.confirm('Delete this record?');
+    if (!ok) return;
+    showNotice('Delete record is not available yet', 'info');
   };
 
   const handleAddRecord = (participantId: number, participantName: string) => {
@@ -836,12 +849,30 @@ export default function WomenEmpowerment() {
                         <td className="p-3">{displayLabel(record.employmentStatus) || '-'}</td>
                         <td className="p-3">{formatDate(record.created_at || record.createdAt)}</td>
                         <td className="p-3">
-                          <div className="flex gap-2">
-                            <button className="text-gray-600 hover:text-[#00b4d8] transition-colors text-lg">
-                              💬
-                            </button>
-                            <button className="text-gray-600 hover:text-[#00b4d8] transition-colors">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleViewRecord(record)}
+                              className="text-[#00b4d8] hover:text-[#0096c7] p-2 rounded-lg transition-colors"
+                              aria-label="View"
+                              title="View"
+                            >
                               <Eye size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleEditRecord(record)}
+                              className="text-green-600 hover:text-green-700 p-2 rounded-lg transition-colors"
+                              aria-label="Edit"
+                              title="Edit"
+                            >
+                              <Pencil size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRecord(record)}
+                              className="text-red-600 hover:text-red-700 p-2 rounded-lg transition-colors"
+                              aria-label="Delete"
+                              title="Delete"
+                            >
+                              <Trash2 size={18} />
                             </button>
                           </div>
                         </td>
