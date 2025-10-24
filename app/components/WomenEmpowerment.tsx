@@ -664,7 +664,8 @@ export default function WomenEmpowerment() {
                 <h2 className="text-lg font-semibold text-[#0077b6] mb-4">Participants</h2>
                 
                 <div className="mb-6">
-                  <h3 className="text-md font-medium text-gray-700 mb-4">Empowerment Records</h3>
+                  {/* Section heading: Empowerment Records */}
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">Empowerment Records</h2>
                   
                   <div className="grid grid-cols-4 gap-4 mb-6">
                     <div className="bg-[#caf0f8] border border-[#90e0ef] p-4 rounded-lg text-center">
@@ -685,7 +686,8 @@ export default function WomenEmpowerment() {
                     </div>
                   </div>
 
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">Filter Empowerment Records</h4>
+                  {/* Filters heading */}
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Filter Empowerment Records</h3>
                   
                   <div className="grid grid-cols-4 gap-4 mb-6">
                     <div className="space-y-2">
