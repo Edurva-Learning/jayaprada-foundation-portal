@@ -210,6 +210,8 @@ export default function OrganicAgricultureParticipants() {
 
   const [participants, setParticipants] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const API_OA_BASE = 'http://localhost:5000/organic-agriculture';
 
@@ -263,6 +265,7 @@ export default function OrganicAgricultureParticipants() {
       return;
     }
     try {
+      setSaving(true);
       const isEdit = editId !== null;
       const url = isEdit
         ? `${API_OA_BASE}/participants/${editId}`
@@ -297,6 +300,29 @@ export default function OrganicAgricultureParticipants() {
     } catch (e: any) {
       console.error('Save participant failed:', e);
       showNotice(e.message || 'Failed to save participant', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteParticipant = async (id: number) => {
+    if (!id) return;
+    const confirmDel = window.confirm('Delete this participant?');
+    if (!confirmDel) return;
+    try {
+      setDeletingId(id);
+      const res = await fetch(`${API_OA_BASE}/participants/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to delete');
+      }
+      await fetchParticipants();
+      showNotice('Participant deleted successfully', 'success');
+    } catch (e: any) {
+      console.error('Delete failed:', e);
+      showNotice(e.message || 'Failed to delete participant', 'error');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -537,28 +563,13 @@ export default function OrganicAgricultureParticipants() {
                           <Pencil size={18} />
                         </button>
                         <button
-                          onClick={async () => {
-                            if (!participant?.id) return;
-                            const confirmDel = window.confirm('Delete this participant?');
-                            if (!confirmDel) return;
-                            try {
-                              const res = await fetch(`${API_OA_BASE}/participants/${participant.id}`, { method: 'DELETE' });
-                              if (!res.ok) {
-                                const err = await res.json().catch(() => ({}));
-                                throw new Error(err.error || 'Failed to delete');
-                              }
-                              await fetchParticipants();
-                              showNotice('Participant deleted successfully', 'success');
-                            } catch (e: any) {
-                              console.error('Delete failed:', e);
-                              showNotice(e.message || 'Failed to delete participant', 'error');
-                            }
-                          }}
-                          className="text-red-600 hover:text-red-700 p-2 rounded-lg transition-colors"
+                          onClick={() => participant?.id && handleDeleteParticipant(participant.id)}
+                          disabled={deletingId === participant.id}
+                          className={`p-2 rounded-lg transition-colors ${deletingId === participant.id ? 'text-red-400 cursor-not-allowed' : 'text-red-600 hover:text-red-700'}`}
                           aria-label="Delete"
                           title="Delete"
                         >
-                          <Trash2 size={18} />
+                          {deletingId === participant.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 size={18} />}
                         </button>
                       </div>
                     </td>
@@ -748,10 +759,14 @@ export default function OrganicAgricultureParticipants() {
                 <button
                   type="submit"
                   form="oaAddParticipantForm"
-                  className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center justify-center gap-2"
+                  disabled={saving}
+                  className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-white ${saving ? 'bg-[#00b4d8]/70 cursor-not-allowed' : 'bg-[#00b4d8] hover:bg-[#0096c7]'}`}
                 >
-                  <User size={18} />
-                  {editId ? 'Update Participant' : 'Save Participant'}
+                  {saving ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> {editId ? 'Updating...' : 'Saving...'}</>
+                  ) : (
+                    <><User size={18} /> {editId ? 'Update Participant' : 'Save Participant'}</>
+                  )}
                 </button>
               </div>
             </div>

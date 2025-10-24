@@ -131,6 +131,10 @@ export default function WomenEmpowerment() {
   const [records, setRecords] = useState<any[]>([]);
   const [recordsLoading, setRecordsLoading] = useState<boolean>(false);
   const [editingRecordId, setEditingRecordId] = useState<number | null>(null);
+  // Button/loading states
+  const [savingParticipant, setSavingParticipant] = useState(false);
+  const [savingRecord, setSavingRecord] = useState(false);
+  const [deletingRecordId, setDeletingRecordId] = useState<number | null>(null);
   // Records filters are applied only when user presses Apply Filters
   const [appliedRecordsFilters, setAppliedRecordsFilters] = useState({
     trainingType: 'All Training Types',
@@ -316,6 +320,7 @@ export default function WomenEmpowerment() {
     }
 
     try {
+      setSavingParticipant(true);
       const res = await fetch(`${API_WE_BASE}/participants`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -344,10 +349,12 @@ export default function WomenEmpowerment() {
     } catch (e:any) {
       console.error('Save participant failed:', e);
       showNotice(e.message || 'Failed to save participant', 'error');
+    } finally {
+      setSavingParticipant(false);
     }
   };
 
-  const handleSaveRecord = () => {
+  const handleSaveRecord = async () => {
     console.log("Saving record:", recordForm, editingRecordId ? `(editing id ${editingRecordId})` : '(new)');
     // Validate required fields
     if (!recordForm.participantId || !recordForm.trainingType) {
@@ -379,40 +386,38 @@ export default function WomenEmpowerment() {
     const url = editingRecordId ? `${API_WE_BASE}/records/${editingRecordId}` : `${API_WE_BASE}/records`;
     const method = editingRecordId ? 'PUT' : 'POST';
 
-    fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({} as any));
-          throw new Error((err as any).error || 'Failed to save record');
-        }
-        return res.json();
-      })
-      .then(() => {
-        // Refresh lists and reset form
-        fetchRecords();
-        setRecordForm({
-          participantId: null,
-          participant: '',
-          trainingType: '',
-          workshopAttended: '',
-          counsellingDone: '',
-          employmentStatus: '',
-          photo: null,
-          idProof: null
-        });
-        setParticipantQuery('');
-        setEditingRecordId(null);
-        setShowRecordForm(false);
-        showNotice(editingRecordId ? 'Record updated successfully' : 'Record saved successfully', 'success');
-      })
-      .catch((e:any) => {
-        console.error('Save record failed:', e);
-        showNotice(e.message || 'Failed to save record', 'error');
+    try {
+      setSavingRecord(true);
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({} as any));
+        throw new Error((err as any).error || 'Failed to save record');
+      }
+      await fetchRecords();
+      setRecordForm({
+        participantId: null,
+        participant: '',
+        trainingType: '',
+        workshopAttended: '',
+        counsellingDone: '',
+        employmentStatus: '',
+        photo: null,
+        idProof: null
+      });
+      setParticipantQuery('');
+      setEditingRecordId(null);
+      setShowRecordForm(false);
+      showNotice(editingRecordId ? 'Record updated successfully' : 'Record saved successfully', 'success');
+    } catch (e: any) {
+      console.error('Save record failed:', e);
+      showNotice(e.message || 'Failed to save record', 'error');
+    } finally {
+      setSavingRecord(false);
+    }
   };
 
   const handleCloseParticipantForm = () => {
@@ -467,6 +472,7 @@ export default function WomenEmpowerment() {
     const ok = window.confirm('Delete this record? This cannot be undone.');
     if (!ok) return;
     try {
+      setDeletingRecordId(record?.id ?? null);
       const res = await fetch(`${API_WE_BASE}/records/${record?.id}`, { method: 'DELETE' });
       if (!res.ok && res.status !== 204) {
         const err = await res.json().catch(() => ({}));
@@ -477,6 +483,8 @@ export default function WomenEmpowerment() {
     } catch (e: any) {
       console.error('Delete record failed:', e);
       showNotice(e.message || 'Failed to delete record', 'error');
+    } finally {
+      setDeletingRecordId(null);
     }
   };
 
@@ -932,11 +940,12 @@ export default function WomenEmpowerment() {
                             </button>
                             <button
                               onClick={() => handleDeleteRecord(record)}
-                              className="text-red-600 hover:text-red-700 p-2 rounded-lg transition-colors"
+                              disabled={deletingRecordId === record.id}
+                              className={`p-2 rounded-lg transition-colors ${deletingRecordId === record.id ? 'text-red-400 cursor-not-allowed' : 'text-red-600 hover:text-red-700'}`}
                               aria-label="Delete"
                               title="Delete"
                             >
-                              <Trash2 size={18} />
+                              {deletingRecordId === record.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 size={18} />}
                             </button>
                           </div>
                         </td>
@@ -1120,10 +1129,10 @@ export default function WomenEmpowerment() {
                 </button>
                 <button
                   onClick={handleSaveParticipant}
-                  className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center justify-center gap-2"
+                  disabled={savingParticipant}
+                  className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-white ${savingParticipant ? 'bg-[#00b4d8]/70 cursor-not-allowed' : 'bg-[#00b4d8] hover:bg-[#0096c7]'}`}
                 >
-                  <User size={18} />
-                  Save Participant
+                  {savingParticipant ? (<><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>) : (<><User size={18} /> Save Participant</>)}
                 </button>
               </div>
             </div>
@@ -1349,10 +1358,18 @@ export default function WomenEmpowerment() {
                 </button>
                 <button
                   onClick={handleSaveRecord}
-                  className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center justify-center gap-2"
+                  disabled={savingRecord}
+                  className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-white ${savingRecord ? 'bg-[#00b4d8]/70 cursor-not-allowed' : 'bg-[#00b4d8] hover:bg-[#0096c7]'}`}
                 >
-                  <FileText size={18} />
-                  {editingRecordId ? 'Update Record' : 'Save Record'}
+                  {savingRecord ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> {editingRecordId ? 'Updating...' : 'Saving...'}
+                    </>
+                  ) : (
+                    <>
+                      <FileText size={18} /> {editingRecordId ? 'Update Record' : 'Save Record'}
+                    </>
+                  )}
                 </button>
               </div>
             </div>
