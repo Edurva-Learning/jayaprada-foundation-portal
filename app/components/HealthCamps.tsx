@@ -1,231 +1,21 @@
-// // "use client";
-
-// // import { useState, useRef } from "react";
-// // import { Search, Eye, EyeIcon, TestTube, Heart, Pill, Ear, Activity } from "lucide-react";
-
-// // export default function HealthCampPage() {
-// //   const [searchName, setSearchName] = useState("");
-// //   const [searchAadhar, setSearchAadhar] = useState("");
-// //   const [searchPhone, setSearchPhone] = useState("");
-// //   const [isSearching, setIsSearching] = useState(false);
-// //   const participantsRef = useRef<HTMLDivElement>(null);
-
-// //   const [participants] = useState([
-// //     { id: 5, name: "Health3", age: 56, gender: "female", phone: "0192837465", aadhar: "017345678916", createdAt: "Sep 20, 2025" },
-// //     { id: 4, name: "Health2", age: 47, gender: "male", phone: "0192837465", aadhar: "012345678915", createdAt: "Sep 20, 2025" },
-// //     { id: 3, name: "Health1", age: 46, gender: "male", phone: "0192834651", aadhar: "012345678914", createdAt: "Sep 20, 2025" },
-// //     { id: 1, name: "Eye Camp Participant", age: 43, gender: "male", phone: "0122837465", aadhar: "012345678912", createdAt: "Sep 19, 2025" },
-// //   ]);
-// //   const [filteredParticipants, setFilteredParticipants] = useState(participants);
-
-// //   const handleSearch = () => {
-// //     if (searchName === "" && searchAadhar === "" && searchPhone === "") {
-// //       setFilteredParticipants(participants);
-// //       setIsSearching(false);
-// //       return;
-// //     }
-
-// //     const filtered = participants.filter(participant => {
-// //       const nameMatch = participant.name.toLowerCase().includes(searchName.toLowerCase());
-// //       const aadharMatch = participant.aadhar.includes(searchAadhar);
-// //       const phoneMatch = participant.phone.includes(searchPhone);
-      
-// //       return (searchName === "" || nameMatch) && 
-// //              (searchAadhar === "" || aadharMatch) && 
-// //              (searchPhone === "" || phoneMatch);
-// //     });
-// //     setFilteredParticipants(filtered);
-// //     setIsSearching(true);
-// //   };
-
-// //   const handleResetSearch = () => {
-// //     setSearchName("");
-// //     setSearchAadhar("");
-// //     setSearchPhone("");
-// //     setFilteredParticipants(participants);
-// //     setIsSearching(false);
-// //   };
-
-// //   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-// //     if (e.key === 'Enter') {
-// //       handleSearch();
-// //     }
-// //   };
-
-// //   const scrollToParticipants = () => {
-// //     participantsRef.current?.scrollIntoView({ behavior: 'smooth' });
-// //   };
-
-// //   const serviceData = [
-// //     { label: "Eye Check", value: 2, icon: EyeIcon },
-// //     { label: "Hemoglobin Test", value: 0, icon: TestTube },
-// //     { label: "Anemia Test", value: 0, icon: Heart },
-// //     { label: "Dental Check", value: 1, icon: Pill },
-// //     { label: "Ear Check", value: 0, icon: Ear },
-// //     { label: "Cancer Screening", value: 0, icon: Activity },
-// //   ];
-
-// //   return (
-// //     <div className="p-6 bg-gray-50 min-h-screen">
-// //       <div className="max-w-7xl mx-auto">
-// //         {/* Header */}
-// //         <h1 className="text-2xl font-bold mb-6 text-gray-800">Health Camp Program</h1>
-
-// //         {/* Tabs */}
-// //         <div className="flex mb-6 border-b border-gray-200">
-// //           <button className="px-6 py-3 text-white bg-[#00b4d8] font-medium mr-2 rounded-t-lg">
-// //             Participants
-// //           </button>
-// //           <button className="px-6 py-3 text-gray-600 bg-gray-100 font-medium rounded-t-lg">
-// //             Camp Participants
-// //           </button>
-// //         </div>
-
-// //         {/* Stats Grid */}
-// //         <div className="grid grid-cols-4 gap-4 mb-8">
-// //           {[
-// //             { label: "Total Participants", value: 4 },
-// //             { label: "Health Camps Conducted", value: 3 },
-// //             { label: "Total Health Checks", value: 3 },
-// //             { label: "Treatment Required", value: 0 },
-// //             { label: "Surgery Required", value: 2 },
-// //             { label: "Follow-up Required", value: 0 },
-// //             { label: "Services Performed", value: 2 },
-// //             { label: "Participants with Surgery", value: 2 },
-// //           ].map((stat, i) => (
-// //             <div
-// //               key={i}
-// //               className="p-4 border border-[#90e0ef] rounded-lg bg-[#caf0f8] text-center shadow-sm"
-// //             >
-// //               <h2 className="text-2xl font-bold text-[#0077b6]">{stat.value}</h2>
-// //               <p className="text-[#0077b6] text-sm font-medium">{stat.label}</p>
-// //             </div>
-// //           ))}
-// //         </div>
-
-// //         {/* Service Breakdown */}
-// //         <div className="border border-[#90e0ef] rounded-lg p-6 bg-white mb-8 shadow-sm">
-// //           <h2 className="font-semibold text-lg mb-4 text-[#0077b6] flex items-center gap-2">
-// //             <span>📊</span> Service Breakdown
-// //           </h2>
-// //           <div className="grid grid-cols-6 text-center">
-// //             {serviceData.map((item, i) => {
-// //               const IconComponent = item.icon;
-// //               return (
-// //                 <div key={i} className="p-3">
-// //                   <div className="flex justify-center mb-2">
-// //                     <IconComponent size={24} className="text-[#0077b6]" />
-// //                   </div>
-// //                   <h3 className="text-2xl font-bold text-[#0077b6]">{item.value}</h3>
-// //                   <p className="text-[#0077b6] text-sm font-medium">{item.label}</p>
-// //                 </div>
-// //               );
-// //             })}
-// //           </div>
-// //         </div>
-
-// //         {/* Search Section */}
-// //         <div className="flex items-center gap-3 mb-6">
-// //           <input
-// //             type="text"
-// //             placeholder="Search by Name"
-// //             value={searchName}
-// //             onChange={(e) => setSearchName(e.target.value)}
-// //             onKeyPress={handleKeyPress}
-// //             className="border border-gray-300 rounded-lg px-4 py-2.5 w-1/4 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-// //           />
-// //           <input
-// //             type="text"
-// //             placeholder="Search by Aadhar"
-// //             value={searchAadhar}
-// //             onChange={(e) => setSearchAadhar(e.target.value)}
-// //             onKeyPress={handleKeyPress}
-// //             className="border border-gray-300 rounded-lg px-4 py-2.5 w-1/4 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-// //           />
-// //           <input
-// //             type="text"
-// //             placeholder="Search by Phone"
-// //             value={searchPhone}
-// //             onChange={(e) => setSearchPhone(e.target.value)}
-// //             onKeyPress={handleKeyPress}
-// //             className="border border-gray-300 rounded-lg px-4 py-2.5 w-1/4 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-// //           />
-// //           <button 
-// //             onClick={handleSearch}
-// //             className="bg-[#00b4d8] hover:bg-[#0096c7] text-white px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-colors"
-// //           >
-// //             <Search size={18} /> Search
-// //           </button>
-// //           {isSearching && (
-// //             <button 
-// //               onClick={handleResetSearch}
-// //               className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
-// //             >
-// //               Reset
-// //             </button>
-// //           )}
-// //           <button 
-// //             onClick={scrollToParticipants}
-// //             className="bg-[#00b4d8] hover:bg-[#0096c7] text-white px-6 py-2.5 rounded-lg font-medium transition-colors ml-auto"
-// //           >
-// //             Add Participate
-// //           </button>
-// //         </div>
-
-// //         {/* Table */}
-// //         <div ref={participantsRef} className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6">
-// //           <h2 className="text-lg font-semibold mb-4 text-[#0077b6]">Health Camp Participants</h2>
-// //           <table className="w-full text-left">
-// //             <thead>
-// //               <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
-// //                 <th className="p-3 font-semibold">ID</th>
-// //                 <th className="p-3 font-semibold">Name</th>
-// //                 <th className="p-3 font-semibold">Age</th>
-// //                 <th className="p-3 font-semibold">Gender</th>
-// //                 <th className="p-3 font-semibold">Phone</th>
-// //                 <th className="p-3 font-semibold">Aadhar</th>
-// //                 <th className="p-3 font-semibold">Created At</th>
-// //                 <th className="p-3 font-semibold">Actions</th>
-// //               </tr>
-// //             </thead>
-// //             <tbody>
-// //               {filteredParticipants.map((participant) => (
-// //                 <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
-// //                   <td className="p-3">{participant.id}</td>
-// //                   <td className="p-3">{participant.name}</td>
-// //                   <td className="p-3">{participant.age}</td>
-// //                   <td className="p-3">{participant.gender}</td>
-// //                   <td className="p-3">{participant.phone}</td>
-// //                   <td className="p-3">{participant.aadhar}</td>
-// //                   <td className="p-3">{participant.createdAt}</td>
-// //                   <td className="p-3">
-// //                     <div className="flex gap-2">
-// //                       <button className="bg-[#00b4d8] hover:bg-[#0096c7] text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
-// //                         + Add Camp
-// //                       </button>
-// //                       <button className="bg-[#00b4d8] hover:bg-[#0096c7] text-white p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors">
-// //                         <Eye size={16} />
-// //                       </button>
-// //                     </div>
-// //                   </td>
-// //                 </tr>
-// //               ))}
-// //             </tbody>
-// //           </table>
-// //         </div>
-// //       </div>
-// //     </div>
-// //   );
-// // }
-
-
-
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Search, Eye, EyeIcon, TestTube, Heart, Pill, Ear, Activity, X, User, IdCard, Calendar, MapPin, Phone, Users, CalendarIcon, Stethoscope, Filter, Download } from "lucide-react";
 
 type View = 'participants' | 'campParticipants';
+
+interface Participant {
+  participant_id: number;
+  full_name: string;
+  aadhar_number: string;
+  age: number;
+  gender: string;
+  phone_number: string;
+  registration_source: string;
+  address: string;
+  created_at: string;
+}
 
 export default function HealthCampPage() {
   const [currentView, setCurrentView] = useState<View>('participants');
@@ -237,17 +27,20 @@ export default function HealthCampPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [showParticipantForm, setShowParticipantForm] = useState(false);
   const [showCampForm, setShowCampForm] = useState(false);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [filteredParticipants, setFilteredParticipants] = useState<Participant[]>([]);
+  const [loading, setLoading] = useState(false);
   const participantsRef = useRef<HTMLDivElement>(null);
 
   // Participant Form state
   const [formData, setFormData] = useState({
-    name: "",
-    aadhar: "",
+    full_name: "",
+    aadhar_number: "",
     age: "",
-    address: "",
     gender: "",
-    phone: "",
-    registrationSource: ""
+    phone_number: "",
+    registration_source: "",
+    address: ""
   });
 
   // Camp Form state
@@ -262,14 +55,6 @@ export default function HealthCampPage() {
     followUpDate: "",
     surgeryRequired: ""
   });
-
-  const [participants] = useState([
-    { id: 5, name: "Health3", age: 56, gender: "female", phone: "0192837465", aadhar: "017345678916", createdAt: "Sep 20, 2025" },
-    { id: 4, name: "Health2", age: 47, gender: "male", phone: "0192837465", aadhar: "012345678915", createdAt: "Sep 20, 2025" },
-    { id: 3, name: "Health1", age: 46, gender: "male", phone: "0192834651", aadhar: "012345678914", createdAt: "Sep 20, 2025" },
-    { id: 1, name: "Eye Camp Participant", age: 43, gender: "male", phone: "0122837465", aadhar: "012345678912", createdAt: "Sep 19, 2025" },
-  ]);
-  const [filteredParticipants, setFilteredParticipants] = useState(participants);
 
   const campOptions = [
     "Cancer Screening",
@@ -335,6 +120,52 @@ export default function HealthCampPage() {
     }
   ];
 
+  // API Calls
+  const fetchParticipants = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/camp-participants');
+      if (!response.ok) {
+        throw new Error('Failed to fetch participants');
+      }
+      const data = await response.json();
+      setParticipants(data);
+      setFilteredParticipants(data);
+    } catch (error) {
+      console.error('Error fetching participants:', error);
+      alert('Failed to fetch participants');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createParticipant = async (participantData: any) => {
+    try {
+      const response = await fetch('http://localhost:5000/camp-participants', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(participantData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create participant');
+      }
+
+      const newParticipant = await response.json();
+      return newParticipant;
+    } catch (error) {
+      console.error('Error creating participant:', error);
+      throw error;
+    }
+  };
+
+  // Load participants on component mount
+  useEffect(() => {
+    fetchParticipants();
+  }, []);
+
   // Participants Page Functions
   const handleSearch = () => {
     if (searchName === "" && searchAadhar === "" && searchPhone === "") {
@@ -344,9 +175,9 @@ export default function HealthCampPage() {
     }
 
     const filtered = participants.filter(participant => {
-      const nameMatch = participant.name.toLowerCase().includes(searchName.toLowerCase());
-      const aadharMatch = participant.aadhar.includes(searchAadhar);
-      const phoneMatch = participant.phone.includes(searchPhone);
+      const nameMatch = participant.full_name.toLowerCase().includes(searchName.toLowerCase());
+      const aadharMatch = participant.aadhar_number.includes(searchAadhar);
+      const phoneMatch = participant.phone_number.includes(searchPhone);
       
       return (searchName === "" || nameMatch) && 
              (searchAadhar === "" || aadharMatch) && 
@@ -395,18 +226,56 @@ export default function HealthCampPage() {
     }));
   };
 
-  const handleSaveParticipant = () => {
-    console.log("Saving participant:", formData);
-    setFormData({
-      name: "",
-      aadhar: "",
-      age: "",
-      address: "",
-      gender: "",
-      phone: "",
-      registrationSource: ""
-    });
-    setShowParticipantForm(false);
+  const handleSaveParticipant = async () => {
+    try {
+      // Validate required fields
+      if (!formData.full_name || !formData.aadhar_number || !formData.age || !formData.gender || !formData.phone_number || !formData.registration_source || !formData.address) {
+        alert("Please fill in all required fields");
+        return;
+      }
+
+      // Validate Aadhar number (12 digits)
+      if (formData.aadhar_number.length !== 12 || !/^\d+$/.test(formData.aadhar_number)) {
+        alert("Please enter a valid 12-digit Aadhar number");
+        return;
+      }
+
+      // Validate phone number (10 digits)
+      if (formData.phone_number.length !== 10 || !/^\d+$/.test(formData.phone_number)) {
+        alert("Please enter a valid 10-digit phone number");
+        return;
+      }
+
+      // Validate age
+      const age = parseInt(formData.age);
+      if (age < 1 || age > 120) {
+        alert("Please enter a valid age");
+        return;
+      }
+
+      const newParticipant = await createParticipant(formData);
+      
+      // Update the participants list with the new participant
+      setParticipants(prev => [newParticipant, ...prev]);
+      setFilteredParticipants(prev => [newParticipant, ...prev]);
+      
+      // Reset form and close modal
+      setFormData({
+        full_name: "",
+        aadhar_number: "",
+        age: "",
+        gender: "",
+        phone_number: "",
+        registration_source: "",
+        address: ""
+      });
+      setShowParticipantForm(false);
+      
+      alert("Participant added successfully!");
+    } catch (error) {
+      console.error("Error saving participant:", error);
+      alert("Failed to save participant. Please try again.");
+    }
   };
 
   const handleSaveCamp = () => {
@@ -427,13 +296,13 @@ export default function HealthCampPage() {
 
   const handleCloseForm = () => {
     setFormData({
-      name: "",
-      aadhar: "",
+      full_name: "",
+      aadhar_number: "",
       age: "",
-      address: "",
       gender: "",
-      phone: "",
-      registrationSource: ""
+      phone_number: "",
+      registration_source: "",
+      address: ""
     });
     setShowParticipantForm(false);
   };
@@ -483,6 +352,16 @@ export default function HealthCampPage() {
     { label: "Ear Check", value: 0, icon: Ear },
     { label: "Cancer Screening", value: 0, icon: Activity },
   ];
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
 
   // Render Camp Participants View
   const renderCampParticipants = () => (
@@ -577,20 +456,6 @@ export default function HealthCampPage() {
 
           {/* Second Row Filters */}
           <div className="grid grid-cols-4 gap-4 mb-6">
-            {/* All Camps */}
-            {/* <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">All Camps</label>
-              <select
-                value={campFilters.allCamps}
-                onChange={(e) => handleCampFilterChange("allCamps", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-              >
-                <option value="">All</option>
-                <option value="camp1">Camp 1</option>
-                <option value="camp2">Camp 2</option>
-              </select>
-            </div> */}
-
             {/* Surgery Date From */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Surgery Date From</label>
@@ -623,13 +488,12 @@ export default function HealthCampPage() {
 
             {/* Surgery Suggested */}
             <div className="space-y-2">
-  <label className="text-sm font-medium text-gray-700">Surgery Suggested</label>
-  <input
-    type="text"
-    placeholder="Search surgery suggestions"
-    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-  />
-
+              <label className="text-sm font-medium text-gray-700">Surgery Suggested</label>
+              <input
+                type="text"
+                placeholder="Search surgery suggestions"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
+              />
             </div>
           </div>
 
@@ -674,7 +538,7 @@ export default function HealthCampPage() {
 
         {/* Table Section */}
         <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm">
-         <table className="w-full text-left">
+          <table className="w-full text-left">
             <thead>
               <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
                 <th className="p-3 font-semibold">ID</th>
@@ -701,23 +565,23 @@ export default function HealthCampPage() {
                   <td className="p-3">{participant.createdAt}</td>
                   <td className="p-3">
                     <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-800 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                        <button className="text-green-600 hover:text-green-800 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                        </button>
-                        <button className="text-red-600 hover:text-red-800 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      </div>
+                      <button className="text-blue-600 hover:text-blue-800 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                      <button className="text-green-600 hover:text-green-800 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </button>
+                      <button className="text-red-600 hover:text-red-800 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -751,7 +615,7 @@ export default function HealthCampPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Participants", value: 4 },
+            { label: "Total Participants", value: participants.length },
             { label: "Health Camps Conducted", value: 3 },
             { label: "Total Health Checks", value: 3 },
             { label: "Treatment Required", value: 0 },
@@ -836,54 +700,71 @@ export default function HealthCampPage() {
             className="bg-[#00b4d8] hover:bg-[#0096c7] text-white px-6 py-2.5 rounded-lg font-medium transition-colors ml-auto flex items-center gap-2"
           >
             <User size={18} />
-            Add Participate
+            Add Participant
           </button>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6 text-center">
+            <p className="text-gray-600">Loading participants...</p>
+          </div>
+        )}
+
         {/* Table */}
-        <div ref={participantsRef} className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6">
-          <h2 className="text-lg font-semibold mb-4 text-[#0077b6]">Health Camp Participants</h2>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
-                <th className="p-3 font-semibold">ID</th>
-                <th className="p-3 font-semibold">Name</th>
-                <th className="p-3 font-semibold">Age</th>
-                <th className="p-3 font-semibold">Gender</th>
-                <th className="p-3 font-semibold">Phone</th>
-                <th className="p-3 font-semibold">Aadhar</th>
-                <th className="p-3 font-semibold">Created At</th>
-                <th className="p-3 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredParticipants.map((participant) => (
-                <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="p-3">{participant.id}</td>
-                  <td className="p-3">{participant.name}</td>
-                  <td className="p-3">{participant.age}</td>
-                  <td className="p-3">{participant.gender}</td>
-                  <td className="p-3">{participant.phone}</td>
-                  <td className="p-3">{participant.aadhar}</td>
-                  <td className="p-3">{participant.createdAt}</td>
-                  <td className="p-3">
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => setShowCampForm(true)}
-                        className="bg-[#00b4d8] hover:bg-[#0096c7] text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
-                      >
-                        + Add Camp
-                      </button>
-                      <button className="bg-[#00b4d8] hover:bg-[#0096c7] text-white p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors">
-                        <Eye size={16} />
-                      </button>
-                    </div>
-                  </td>
+        {!loading && (
+          <div ref={participantsRef} className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6">
+            <h2 className="text-lg font-semibold mb-4 text-[#0077b6]">Health Camp Participants</h2>
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
+                  <th className="p-3 font-semibold">ID</th>
+                  <th className="p-3 font-semibold">Name</th>
+                  <th className="p-3 font-semibold">Age</th>
+                  <th className="p-3 font-semibold">Gender</th>
+                  <th className="p-3 font-semibold">Phone</th>
+                  <th className="p-3 font-semibold">Aadhar</th>
+                  <th className="p-3 font-semibold">Created At</th>
+                  <th className="p-3 font-semibold">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredParticipants.length > 0 ? (
+                  filteredParticipants.map((participant) => (
+                    <tr key={participant.participant_id} className="border-b border-gray-200 hover:bg-gray-50">
+                      <td className="p-3">{participant.participant_id}</td>
+                      <td className="p-3">{participant.full_name}</td>
+                      <td className="p-3">{participant.age}</td>
+                      <td className="p-3">{participant.gender}</td>
+                      <td className="p-3">{participant.phone_number}</td>
+                      <td className="p-3">{participant.aadhar_number}</td>
+                      <td className="p-3">{formatDate(participant.created_at)}</td>
+                      <td className="p-3">
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => setShowCampForm(true)}
+                            className="bg-[#00b4d8] hover:bg-[#0096c7] text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
+                          >
+                            + Add Camp
+                          </button>
+                          <button className="bg-[#00b4d8] hover:bg-[#0096c7] text-white p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors">
+                            <Eye size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} className="p-3 text-center text-gray-500">
+                      No participants found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Add Participant Form Modal */}
@@ -918,8 +799,8 @@ export default function HealthCampPage() {
                   </label>
                   <input
                     type="text"
-                    name="name"
-                    value={formData.name}
+                    name="full_name"
+                    value={formData.full_name}
                     onChange={handleInputChange}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                     placeholder="Enter full name"
@@ -934,11 +815,12 @@ export default function HealthCampPage() {
                   </label>
                   <input
                     type="text"
-                    name="aadhar"
-                    value={formData.aadhar}
+                    name="aadhar_number"
+                    value={formData.aadhar_number}
                     onChange={handleInputChange}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                     placeholder="Enter 12-digit Aadhar"
+                    maxLength={12}
                   />
                 </div>
 
@@ -955,6 +837,8 @@ export default function HealthCampPage() {
                     onChange={handleInputChange}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                     placeholder="Enter age"
+                    min="1"
+                    max="120"
                   />
                 </div>
 
@@ -985,11 +869,12 @@ export default function HealthCampPage() {
                   </label>
                   <input
                     type="tel"
-                    name="phone"
-                    value={formData.phone}
+                    name="phone_number"
+                    value={formData.phone_number}
                     onChange={handleInputChange}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                     placeholder="Enter phone number"
+                    maxLength={10}
                   />
                 </div>
 
@@ -1000,8 +885,8 @@ export default function HealthCampPage() {
                     Registration Source *
                   </label>
                   <select
-                    name="registrationSource"
-                    value={formData.registrationSource}
+                    name="registration_source"
+                    value={formData.registration_source}
                     onChange={handleInputChange}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                   >
@@ -1089,11 +974,11 @@ export default function HealthCampPage() {
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                   >
                     <option value="">Select Participant</option>
-                    <option value="participant">Participant</option>
-                    <option value="eye-camp-participant">Eye Camp Participant</option>
-                    <option value="health1">Health1</option>
-                    <option value="health2">Health2</option>
-                    <option value="health3">Health3</option>
+                    {participants.map((participant) => (
+                      <option key={participant.participant_id} value={participant.participant_id}>
+                        {participant.full_name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
