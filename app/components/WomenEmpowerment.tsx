@@ -9,6 +9,37 @@ export default function WomenEmpowerment() {
   const fieldBase = "w-full h-12 border border-gray-300 rounded-lg px-4 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all";
   // Lightweight inline toast/notice (non-blocking replacement for alert)
   const [notice, setNotice] = useState<null | { type: 'success' | 'error' | 'info'; message: string }>(null);
+  // Map saved tokens to user-facing labels (for backward compatibility with existing rows)
+  const labelMap: Record<string, string> = {
+    // booleans
+    yes: 'Yes',
+    no: 'No',
+    // training types
+    'sewing-machine': 'Sewing Machine',
+    'computer-training': 'Computer Training',
+    'beauty-parlor': 'Beauty Parlor',
+    handicrafts: 'Handicrafts',
+    other: 'Other',
+    // employment
+    'self-employed': 'Self-employed',
+    employed: 'Employed',
+    unemployed: 'Unemployed',
+    'seeking-employment': 'Seeking Employment',
+    // gender and misc sources
+    male: 'Male',
+    female: 'Female',
+    // keep generic other mapping as well
+    // Note: "other" already mapped above
+    'walk-in': 'Walk-in',
+    referral: 'Referral',
+    campaign: 'Campaign',
+  };
+
+  const displayLabel = (v: any): string => {
+    const key = String(v ?? '').trim();
+    if (!key) return '';
+    return labelMap[key] ?? key;
+  };
   const [filters, setFilters] = useState({
     name: '',
     aadhar: '',
@@ -551,7 +582,7 @@ export default function WomenEmpowerment() {
                         <td className="p-3">{participant.id}</td>
                         <td className="p-3">{participant.name}</td>
                         <td className="p-3">{participant.age}</td>
-                        <td className="p-3">{participant.gender}</td>
+                        <td className="p-3">{displayLabel(participant.gender)}</td>
                         <td className="p-3">{participant.phone}</td>
                         <td className="p-3">{participant.aadhar}</td>
                         <td className="p-3">{formatDate(participant.created_at)}</td>
@@ -732,10 +763,10 @@ export default function WomenEmpowerment() {
                       <tr key={record.id} className="border-b border-gray-200 hover:bg-gray-50">
                         <td className="p-3">{record.id}</td>
                         <td className="p-3">{record.participant || '-'}</td>
-                        <td className="p-3">{record.trainingType}</td>
-                        <td className="p-3">{record.workshopAttended || '-'}</td>
-                        <td className="p-3">{record.counsellingDone || '-'}</td>
-                        <td className="p-3">{record.employmentStatus || '-'}</td>
+                        <td className="p-3">{displayLabel(record.trainingType)}</td>
+                        <td className="p-3">{displayLabel(record.workshopAttended) || '-'}</td>
+                        <td className="p-3">{displayLabel(record.counsellingDone) || '-'}</td>
+                        <td className="p-3">{displayLabel(record.employmentStatus) || '-'}</td>
                         <td className="p-3">{formatDate(record.created_at || record.createdAt)}</td>
                         <td className="p-3">
                           <div className="flex gap-2">
@@ -825,9 +856,9 @@ export default function WomenEmpowerment() {
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                     >
                       <option value="">Select Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
 
@@ -893,9 +924,9 @@ export default function WomenEmpowerment() {
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
                     >
                       <option value="">Select Source</option>
-                      <option value="walk-in">Walk-in</option>
-                      <option value="referral">Referral</option>
-                      <option value="campaign">Campaign</option>
+                      <option value="Walk-in">Walk-in</option>
+                      <option value="Referral">Referral</option>
+                      <option value="Campaign">Campaign</option>
                     </select>
                   </div>
 
@@ -1044,11 +1075,11 @@ export default function WomenEmpowerment() {
                       required
                     >
                       <option value="">Select Training Type</option>
-                      <option value="sewing-machine">Sewing Machine</option>
-                      <option value="computer-training">Computer Training</option>
-                      <option value="beauty-parlor">Beauty Parlor</option>
-                      <option value="handicrafts">Handicrafts</option>
-                      <option value="other">Other</option>
+                      <option value="Sewing Machine">Sewing Machine</option>
+                      <option value="Computer Training">Computer Training</option>
+                      <option value="Beauty Parlor">Beauty Parlor</option>
+                      <option value="Handicrafts">Handicrafts</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
 
@@ -1065,8 +1096,8 @@ export default function WomenEmpowerment() {
                       className={fieldBase}
                     >
                       <option value="">Select Option</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -1083,8 +1114,8 @@ export default function WomenEmpowerment() {
                       className={fieldBase}
                     >
                       <option value="">Select Option</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -1101,10 +1132,10 @@ export default function WomenEmpowerment() {
                       className={fieldBase}
                     >
                       <option value="">Select Status</option>
-                      <option value="self-employed">Self-employed</option>
-                      <option value="employed">Employed</option>
-                      <option value="unemployed">Unemployed</option>
-                      <option value="seeking-employment">Seeking Employment</option>
+                      <option value="Self-employed">Self-employed</option>
+                      <option value="Employed">Employed</option>
+                      <option value="Unemployed">Unemployed</option>
+                      <option value="Seeking Employment">Seeking Employment</option>
                     </select>
                   </div>
 
