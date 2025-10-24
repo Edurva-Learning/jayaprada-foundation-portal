@@ -155,7 +155,7 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-gray-50 overflow-x-hidden overflow-y-auto">
       {/* Top Bar - Always Visible */}
       <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
@@ -241,23 +241,9 @@ export default function DashboardLayout() {
               })}
             </ul>
           </nav>
-          {/* Collapse/Expand control at the bottom of sidebar */}
-          <div className="px-3 pb-3 border-t border-gray-200">
-            <button
-              onClick={toggleCollapse}
-              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              className="w-full p-2 mt-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center justify-center"
-            >
-              {isCollapsed ? (
-                <ChevronRight className="w-5 h-5" />
-              ) : (
-                <ChevronLeft className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-          {/* User Profile - Bottom of Sidebar - Hidden when collapsed */}
+          {/* User Profile - Shown above toggle when expanded */}
           {!isCollapsed && (
-            <div className="mt-auto pt-6 border-t border-gray-200 px-3 pb-6">
+            <div className="pt-6 px-3 pb-6">
               <div className="flex items-center space-x-3">
                 {/* <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-semibold text-sm">A</span>
@@ -269,10 +255,24 @@ export default function DashboardLayout() {
               </div>
             </div>
           )}
+          {/* Collapse/Expand control pinned to the bottom of sidebar */}
+          <div className="mt-auto px-3 pb-3 border-t border-gray-200">
+            <button
+              onClick={toggleCollapse}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              className="w-full p-2 mt-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center justify-center"
+            >
+              {isCollapsed ? (
+                <ChevronRight className="w-5 h-5" />
+              ) : (
+                <ChevronLeft className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0 overflow-auto bg-white">
+        <main className="flex-1 min-w-0 bg-white">
           <div className="p-6">
             {renderContent()}
           </div>
