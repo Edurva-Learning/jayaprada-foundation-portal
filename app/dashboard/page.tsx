@@ -1,7 +1,7 @@
 
 'use client'
 import React, { useState, useEffect } from "react";
-import { Home, Shield, Users, Calendar, FileText, Heart, GraduationCap, User, Sprout, HandHeart, Settings, Menu, IndianRupee, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, Shield, Users, Calendar, FileText, Heart, GraduationCap, User, Sprout, HandHeart, Settings, Menu, IndianRupee, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import Dashboard from "@/app/components/Dashboard" // Adjust path as needed
 import UserManagement from "@/app/admin/UserManagement";
 import CampManagement from "@/app/admin/CampManagement";
@@ -189,31 +189,35 @@ export default function DashboardLayout() {
                 return (
                   <li key={item.label}>
                     <div
-                      className={`flex items-center py-3 px-3 rounded-lg cursor-pointer font-medium transition-colors ${
+                      className={`flex items-center min-h-10 py-2 px-3 rounded-lg cursor-pointer font-medium transition-colors ${
                         isSelectedGroup || openGroup === item.label
                           ? "bg-cyan-50 text-cyan-700 border border-cyan-200" 
                           : "text-gray-700 hover:bg-gray-100"
                       }`}
                       onClick={() => handleGroupClick(item.label)}
                     >
-                      <span className="flex items-center min-w-0">
-                        <Icon className="w-5 h-5 mr-3 text-current flex-shrink-0" />
+                      <span className="flex items-center min-w-0 flex-1 gap-3">
+                        <Icon className="w-5 h-5 text-current shrink-0" />
                         <span
-                          className={`text-current whitespace-nowrap transition-opacity duration-200 ${
+                          className={`text-current whitespace-normal break-words transition-opacity duration-200 ${
                             isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                          }`}
+                          } pr-2`}
                         >
                           {item.label}
                         </span>
                       </span>
                       {!isCollapsed && hasSubs && (
-                        <span className="ml-auto text-xs transform transition-transform">
-                          {showSubs ? "▲" : "▼"}
+                        <span className="ml-2 shrink-0 flex items-center justify-center">
+                          {showSubs ? (
+                            <ChevronUp className="w-4 h-4 text-current" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-current" />
+                          )}
                         </span>
                       )}
                     </div>
                     {!isCollapsed && hasSubs && showSubs && (
-                      <ul className="ml-8 mt-2 space-y-1">
+                      <ul className="pl-11 mt-2 space-y-1 border-l border-gray-200">
                         {item.subItems.map((sub) => (
                           <li
                             key={sub}
