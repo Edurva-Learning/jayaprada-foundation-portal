@@ -262,7 +262,7 @@ export default function CommunityPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [viewRecord, setViewRecord] = useState<any | null>(null);
 
-  const API_CO_BASE = 'http://localhost:5000/community-outreach';
+  const API_CO_BASE = 'https://api.jpf-portal-api.com/community-outreach';
 
   const showNotice = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setNotice({ type, message });

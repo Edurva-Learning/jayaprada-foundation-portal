@@ -214,7 +214,7 @@ export default function OrganicAgricultureParticipants() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [viewParticipant, setViewParticipant] = useState<any | null>(null);
 
-  const API_OA_BASE = 'http://localhost:5000/organic-agriculture';
+  const API_OA_BASE = 'https://api.jpf-portal-api.com/organic-agriculture';
 
   const showNotice = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setNotice({ type, message });

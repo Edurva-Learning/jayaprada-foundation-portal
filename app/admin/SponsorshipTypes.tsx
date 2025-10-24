@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Pencil, Trash2, Plus, X } from 'lucide-react';
 import Skeleton from '@mui/material/Skeleton';
 
-const API_BASE = 'http://localhost:5000/sponsorships';
+const API_BASE = 'https://api.jpf-portal-api.com/sponsorships';
 
 interface Sponsorship {
   id: number;

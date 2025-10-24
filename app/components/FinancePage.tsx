@@ -50,7 +50,7 @@ const FinancePage: React.FC = () => {
   const fetchExpenses = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/expenses');
+      const response = await fetch('https://api.jpf-portal-api.com/expenses');
       if (!response.ok) {
         throw new Error('Failed to fetch expenses');
       }
@@ -125,7 +125,7 @@ const FinancePage: React.FC = () => {
       let response;
       if (editingExpense) {
         // Update existing expense
-        response = await fetch(`http://localhost:5000/expenses/${editingExpense.id}`, {
+        response = await fetch(`https://api.jpf-portal-api.com/expenses/${editingExpense.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ const FinancePage: React.FC = () => {
         });
       } else {
         // Create new expense
-        response = await fetch('http://localhost:5000/expenses', {
+        response = await fetch('https://api.jpf-portal-api.com/expenses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -178,7 +178,7 @@ const FinancePage: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/expenses/${id}`, {
+      const response = await fetch(`https://api.jpf-portal-api.com/expenses/${id}`, {
         method: 'DELETE',
       });
 

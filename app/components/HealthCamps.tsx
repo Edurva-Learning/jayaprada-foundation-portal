@@ -124,7 +124,7 @@ export default function HealthCampPage() {
   const fetchParticipants = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/camp-participants');
+      const response = await fetch('https://api.jpf-portal-api.com/camp-participants');
       if (!response.ok) {
         throw new Error('Failed to fetch participants');
       }
@@ -141,7 +141,7 @@ export default function HealthCampPage() {
 
   const createParticipant = async (participantData: any) => {
     try {
-      const response = await fetch('http://localhost:5000/camp-participants', {
+      const response = await fetch('https://api.jpf-portal-api.com/camp-participants', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

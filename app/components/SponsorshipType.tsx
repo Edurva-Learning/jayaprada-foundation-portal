@@ -18,7 +18,7 @@ export default function SponsorshipTypes() {
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [editingType, setEditingType] = useState<SponsorshipType | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const API_URL = 'http://localhost:5000/sponsorshiptypes';
+  const API_URL = 'https://api.jpf-portal-api.com/sponsorshiptypes';
 
   // Fetch all sponsorship types on load
   useEffect(() => {

@@ -83,8 +83,8 @@ export default function ProgramOverview() {
     const fetchData = async () => {
       try {
         const [sponsorshipRes, typeRes] = await Promise.all([
-          fetch('http://localhost:5000/edu-sponsorships'),
-          fetch('http://localhost:5000/sponsorshiptypes'),
+          fetch('https://api.jpf-portal-api.com/edu-sponsorships'),
+          fetch('https://api.jpf-portal-api.com/sponsorshiptypes'),
         ]);
 
         if (!sponsorshipRes.ok || !typeRes.ok) throw new Error('Failed to fetch');

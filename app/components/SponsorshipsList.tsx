@@ -64,7 +64,7 @@ const SponsorshipsList: React.FC = () => {
   // ✅ Fetch Sponsorships
   const fetchSponsorships = async () => {
     try {
-      const res = await fetch('http://localhost:5000/edu-sponsorships');
+      const res = await fetch('https://api.jpf-portal-api.com/edu-sponsorships');
       const data = await res.json();
       setSponsorships(data);
       setFilteredSponsorships(data);
@@ -79,7 +79,7 @@ const SponsorshipsList: React.FC = () => {
   const fetchSponsorshipTypes = async () => {
     try {
       setTypesLoading(true);
-      const res = await fetch('http://localhost:5000/sponsorshiptypes');
+      const res = await fetch('https://api.jpf-portal-api.com/sponsorshiptypes');
       if (!res.ok) throw new Error('Failed to fetch types');
       const data = await res.json();
       setSponsorshipTypes(data);

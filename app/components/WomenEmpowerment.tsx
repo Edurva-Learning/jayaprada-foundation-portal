@@ -176,7 +176,7 @@ export default function WomenEmpowerment() {
     return name.includes(q);
   });
 
-  const API_WE_BASE = 'http://localhost:5000/women-empowerment';
+  const API_WE_BASE = 'https://api.jpf-portal-api.com/women-empowerment';
 
   const fetchParticipants = async () => {
     try {

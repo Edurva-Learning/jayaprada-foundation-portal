@@ -227,7 +227,7 @@ const UserManagement: React.FC = () => {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const API_URL = 'http://localhost:5000/users'; // update if needed
+  const API_URL = 'https://api.jpf-portal-api.com/users'; // update if needed
 
   // Fetch all users
   const fetchUsers = async () => {
