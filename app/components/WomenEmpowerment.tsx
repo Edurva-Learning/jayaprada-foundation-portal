@@ -95,6 +95,13 @@ export default function WomenEmpowerment() {
   const [loading, setLoading] = useState<boolean>(true);
   const [records, setRecords] = useState<any[]>([]);
   const [recordsLoading, setRecordsLoading] = useState<boolean>(false);
+  // Records filters are applied only when user presses Apply Filters
+  const [appliedRecordsFilters, setAppliedRecordsFilters] = useState({
+    trainingType: 'All Training Types',
+    counselling: 'All',
+    employmentStatus: 'All Statuses',
+    workshop: 'All'
+  });
 
   // Always display participants in ascending order of ID
   const sortedParticipants = [...participants].sort((a, b) => {
@@ -171,6 +178,27 @@ export default function WomenEmpowerment() {
 
   useEffect(() => { fetchParticipants(); fetchRecords(); }, []);
 
+  // Client-side filtering for records based on applied filters
+  const filteredRecords = records.filter((r: any) => {
+    // Training Type
+    if (appliedRecordsFilters.trainingType !== 'All Training Types') {
+      if (norm(r?.trainingType) !== norm(appliedRecordsFilters.trainingType)) return false;
+    }
+    // Counselling Done
+    if (appliedRecordsFilters.counselling !== 'All') {
+      if (norm(r?.counsellingDone) !== norm(appliedRecordsFilters.counselling)) return false;
+    }
+    // Employment Status
+    if (appliedRecordsFilters.employmentStatus !== 'All Statuses') {
+      if (norm(r?.employmentStatus) !== norm(appliedRecordsFilters.employmentStatus)) return false;
+    }
+    // Workshop Attended
+    if (appliedRecordsFilters.workshop !== 'All') {
+      if (norm(r?.workshopAttended) !== norm(appliedRecordsFilters.workshop)) return false;
+    }
+    return true;
+  });
+
   // Keep the typeahead input in sync when the modal opens/closes
   useEffect(() => {
     if (showRecordForm) {
@@ -226,6 +254,12 @@ export default function WomenEmpowerment() {
       workshop: 'All'
     });
     setAppliedParticipantsFilters({ name: '', aadhar: '', phone: '' });
+    setAppliedRecordsFilters({
+      trainingType: 'All Training Types',
+      counselling: 'All',
+      employmentStatus: 'All Statuses',
+      workshop: 'All'
+    });
   };
 
   // Helper to show a temporary, non-blocking message
@@ -663,6 +697,8 @@ export default function WomenEmpowerment() {
                         <option>Sewing Machine</option>
                         <option>Computer Training</option>
                         <option>Beauty Parlor</option>
+                        <option>Handicrafts</option>
+                        <option>Other</option>
                       </select>
                     </div>
                     
@@ -692,6 +728,7 @@ export default function WomenEmpowerment() {
                         <option>Self-employed</option>
                         <option>Employed</option>
                         <option>Unemployed</option>
+                        <option>Seeking Employment</option>
                       </select>
                     </div>
                     
@@ -712,7 +749,17 @@ export default function WomenEmpowerment() {
                 </div>
 
                 <div className="flex gap-4">
-                  <button className="px-6 py-2.5 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      setAppliedRecordsFilters({
+                        trainingType: filters.trainingType,
+                        counselling: filters.counselling,
+                        employmentStatus: filters.employmentStatus,
+                        workshop: filters.workshop,
+                      })
+                    }
+                    className="px-6 py-2.5 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center gap-2"
+                  >
                     <Search size={18} />
                     Apply Filters
                   </button>
@@ -769,7 +816,12 @@ export default function WomenEmpowerment() {
                         <td colSpan={8} className="p-6 text-center text-gray-600">No records found</td>
                       </tr>
                     )}
-                    {!recordsLoading && records.map((record:any) => (
+                    {!recordsLoading && records.length > 0 && filteredRecords.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="p-6 text-center text-gray-600">No records match your filters</td>
+                      </tr>
+                    )}
+                    {!recordsLoading && filteredRecords.map((record:any) => (
                       <tr key={record.id} className="border-b border-gray-200 hover:bg-gray-50">
                         <td className="p-3">{record.id}</td>
                         <td className="p-3">{record.participant || '-'}</td>
