@@ -408,10 +408,12 @@ export default function WomenEmpowerment() {
         photo: null,
         idProof: null
       });
-      setParticipantQuery('');
-      setEditingRecordId(null);
-      setShowRecordForm(false);
-      showNotice(editingRecordId ? 'Record updated successfully' : 'Record saved successfully', 'success');
+  setParticipantQuery('');
+  setEditingRecordId(null);
+  setShowRecordForm(false);
+  // After a successful save/update, automatically take the user to Empowerment Records tab
+  setActiveTab('records');
+  showNotice(editingRecordId ? 'Record updated successfully' : 'Record saved successfully', 'success');
     } catch (e: any) {
       console.error('Save record failed:', e);
       showNotice(e.message || 'Failed to save record', 'error');
