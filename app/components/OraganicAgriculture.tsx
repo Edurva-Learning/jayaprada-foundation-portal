@@ -178,7 +178,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, User, Phone, IdCard, Plus, Eye, Edit, Trash2, X, MapPin, Users, Loader2 } from 'lucide-react';
+import { Search, User, Phone, IdCard, Plus, Eye, Pencil, Trash2, X, MapPin, Users, Loader2 } from 'lucide-react';
 
 export default function OrganicAgricultureParticipants() {
   const [notice, setNotice] = useState<null | { type: 'success' | 'error' | 'info'; message: string }>(null);
@@ -506,9 +506,13 @@ export default function OrganicAgricultureParticipants() {
                     <td className="p-3">{participant.registrationSource}</td>
                     <td className="p-3">{formatDate(participant.created_at)}</td>
                     <td className="p-3">
-                      <div className="flex gap-2">
-                        <button className="p-2 text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-colors">
-                          <Eye size={16} />
+                      <div className="flex items-center gap-3">
+                        <button
+                          className="text-[#00b4d8] hover:text-[#0096c7] p-2 rounded-lg transition-colors"
+                          aria-label="View"
+                          title="View"
+                        >
+                          <Eye size={18} />
                         </button>
                         <button
                           onClick={() => {
@@ -526,9 +530,11 @@ export default function OrganicAgricultureParticipants() {
                             setEditId(Number(participant.id));
                             setShowAddForm(true);
                           }}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          className="text-green-600 hover:text-green-700 p-2 rounded-lg transition-colors"
+                          aria-label="Edit"
+                          title="Edit"
                         >
-                          <Edit size={16} />
+                          <Pencil size={18} />
                         </button>
                         <button
                           onClick={async () => {
@@ -548,9 +554,11 @@ export default function OrganicAgricultureParticipants() {
                               showNotice(e.message || 'Failed to delete participant', 'error');
                             }
                           }}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="text-red-600 hover:text-red-700 p-2 rounded-lg transition-colors"
+                          aria-label="Delete"
+                          title="Delete"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </td>
