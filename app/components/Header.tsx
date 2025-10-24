@@ -1,14 +1,26 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from '../context/UserContext';
 
 const Header = () => {
   const router = useRouter();
+  const { user, setUser } = useUser();
+  
+  // Debug logging
+  console.log('Header - Current user:', user);
 
   const handleLogout = () => {
-    // Clear stored user info
     localStorage.removeItem('user');
-    // Navigate to login page
+    setUser(null);
+    
+    // ✅ Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('userUpdated'));
+    
+    router.push('/login');
+  };
+
+  const handleLogin = () => {
     router.push('/login');
   };
 
@@ -16,19 +28,32 @@ const Header = () => {
     <header className="bg-[#00b4d8] text-white px-6 py-4 flex justify-between items-center">
       <img
         src="/logo/Jayaprada Foundation Logo (1).png"
-        alt="Jayaprada Foundation Logo"
+        alt="Logo"
         className="h-19"
       />
+
       <nav className="flex items-center space-x-6">
-        <span className="text-sm">Welcome, Administrator</span>
-        <a href="/profile" className="text-sm hover:underline">Profile</a>
-      
-        <button
-          onClick={handleLogout}
-          className="text-sm hover:underline bg-transparent border-none cursor-pointer"
-        >
-          Logout
-        </button>
+        {user ? (
+          <>
+            <span className="text-sm">Welcome, {user.name || user.username || 'User'}</span>
+            <a href="/profile" className="text-sm hover:underline">
+              Profile
+            </a>
+            <button
+              onClick={handleLogout}
+              className="text-sm hover:underline bg-transparent border-none cursor-pointer"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={handleLogin}
+            className="text-sm hover:underline bg-transparent border-none cursor-pointer"
+          >
+            Login
+          </button>
+        )}
       </nav>
     </header>
   );

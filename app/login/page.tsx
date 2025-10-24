@@ -1,9 +1,11 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from '../context/UserContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setUser } = useUser();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,8 +31,14 @@ export default function LoginPage() {
         return;
       }
 
-      // ✅ Save logged-in user info
+      // ✅ Save logged-in user info to localStorage
       localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // ✅ Update UserContext immediately
+      setUser(data.user);
+      
+      // ✅ Dispatch custom event to notify other components
+      window.dispatchEvent(new CustomEvent('userUpdated'));
 
       // ✅ Redirect to dashboard
       router.push('/dashboard');
