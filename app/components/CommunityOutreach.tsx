@@ -220,7 +220,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Eye, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Eye, Loader2, Pencil, Trash2, User, X } from 'lucide-react';
 
 export default function CommunityPage() {
   // Inline toast/notice similar to WomenEmpowerment
@@ -731,155 +731,171 @@ export default function CommunityPage() {
         <div className="h-px bg-gray-200 my-8"></div>
       </div>
 
-      {/* Add Participant Modal */}
+      {/* Add Community Support Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">{editingId ? 'Edit Participant' : 'Add New Participant'}</h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Support Given To (Name) *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Aadhar Number *
-                    </label>
-                    <input
-                      type="text"
-                      name="aadhar"
-                      value={formData.aadhar}
-                      onChange={handleFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Mobile Number *
-                    </label>
-                    <input
-                      type="text"
-                      name="mobile"
-                      value={formData.mobile}
-                      onChange={handleFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Family Head Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="familyHead"
-                      value={formData.familyHead}
-                      onChange={handleFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of Children *
-                    </label>
-                    <input
-                      type="number"
-                      name="children"
-                      value={formData.children}
-                      onChange={handleFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Amount (₹) *
-                    </label>
-                    <input
-                      type="number"
-                      name="amount"
-                      value={formData.amount}
-                      onChange={handleFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                      required
-                    />
-                  </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+            {/* Header */}
+            <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <User size={24} />
+                  <h2 className="text-2xl font-bold">{editingId ? 'Edit Community Support' : 'Add Community Support'}</h2>
                 </div>
-                
+                <button 
+                  onClick={closeForm}
+                  className="p-2 hover:bg-[#0096c7] rounded-full transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <p className="text-blue-100 mt-2">{editingId ? 'Update the support details below' : 'Fill in the support details below'}</p>
+            </div>
+
+            {/* Form */}
+            <form id="coSupportForm" onSubmit={handleSubmit} className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Address
-                  </label>
-                  <textarea
-                    name="address"
-                    value={formData.address}
-                    onChange={handleFormChange}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Purpose of Support
+                    Support Given To (Name) *
                   </label>
                   <input
                     type="text"
-                    name="purpose"
-                    value={formData.purpose}
+                    name="name"
+                    value={formData.name}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    required
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Details
+                    Aadhar Number *
                   </label>
-                  <textarea
-                    name="details"
-                    value={formData.details}
+                  <input
+                    type="text"
+                    name="aadhar"
+                    value={formData.aadhar}
                     onChange={handleFormChange}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00b4d8]"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    required
                   />
                 </div>
                 
-                <div className="flex justify-end space-x-4 pt-4">
-                  <button
-                    type="button"
-                    onClick={closeForm}
-                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2 bg-[#00b4d8] text-white rounded-md hover:bg-[#0099c3] transition-colors"
-                  >
-                    {editingId ? 'Update' : 'Save'}
-                  </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Mobile Number *
+                  </label>
+                  <input
+                    type="text"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleFormChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    required
+                  />
                 </div>
-              </form>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Family Head Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="familyHead"
+                    value={formData.familyHead}
+                    onChange={handleFormChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Number of Children *
+                  </label>
+                  <input
+                    type="number"
+                    name="children"
+                    value={formData.children}
+                    onChange={handleFormChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Amount (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleFormChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Address
+                </label>
+                <textarea
+                  name="address"
+                  value={formData.address}
+                  onChange={handleFormChange}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all resize-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Purpose of Support
+                </label>
+                <input
+                  type="text"
+                  name="purpose"
+                  value={formData.purpose}
+                  onChange={handleFormChange}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Details
+                </label>
+                <textarea
+                  name="details"
+                  value={formData.details}
+                  onChange={handleFormChange}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all resize-none"
+                />
+              </div>
+            </form>
+
+            {/* Footer Buttons */}
+            <div className="flex gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+              <button
+                type="button"
+                onClick={closeForm}
+                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                form="coSupportForm"
+                className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors"
+              >
+                {editingId ? 'Update' : 'Save'}
+              </button>
             </div>
           </div>
         </div>
