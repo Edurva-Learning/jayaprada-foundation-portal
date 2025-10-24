@@ -913,10 +913,26 @@ export default function WomenEmpowerment() {
                         }}
                         onFocus={() => setShowParticipantSuggestions(true)}
                         onBlur={() => setTimeout(() => setShowParticipantSuggestions(false), 120)}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                        placeholder="Type to search participant by name"
+                        className="w-full border border-gray-300 rounded-lg pl-4 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                        placeholder="Search participant by name"
                         required
                       />
+
+                      {participantQuery && (
+                        <button
+                          type="button"
+                          aria-label="Clear participant"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 rounded"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setParticipantQuery('');
+                            setRecordForm(prev => ({ ...prev, participant: '' }));
+                            setShowParticipantSuggestions(false);
+                          }}
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
 
                       {showParticipantSuggestions && (
                         <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
