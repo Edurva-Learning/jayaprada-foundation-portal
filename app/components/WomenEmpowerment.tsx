@@ -5,6 +5,8 @@ import { Search, User, Phone, IdCard, Download, Eye, MapPin, Users, Calendar, X,
 
 export default function WomenEmpowerment() {
   const [activeTab, setActiveTab] = useState<'participants' | 'records'>('participants');
+  // Common field style to keep all boxes consistent in size and look
+  const fieldBase = "w-full h-12 border border-gray-300 rounded-lg px-4 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all";
   // Lightweight inline toast/notice (non-blocking replacement for alert)
   const [notice, setNotice] = useState<null | { type: 'success' | 'error' | 'info'; message: string }>(null);
   const [filters, setFilters] = useState({
@@ -913,7 +915,7 @@ export default function WomenEmpowerment() {
                         }}
                         onFocus={() => setShowParticipantSuggestions(true)}
                         onBlur={() => setTimeout(() => setShowParticipantSuggestions(false), 120)}
-                        className="w-full border border-gray-300 rounded-lg pl-4 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                        className={`${fieldBase} pr-10`}
                         placeholder="Search participant by name"
                         required
                       />
@@ -973,7 +975,7 @@ export default function WomenEmpowerment() {
                       name="trainingType"
                       value={recordForm.trainingType}
                       onChange={handleRecordFormChange}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                      className={fieldBase}
                       required
                     >
                       <option value="">Select Training Type</option>
@@ -995,7 +997,7 @@ export default function WomenEmpowerment() {
                       name="workshopAttended"
                       value={recordForm.workshopAttended}
                       onChange={handleRecordFormChange}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                      className={fieldBase}
                     >
                       <option value="">Select Option</option>
                       <option value="yes">Yes</option>
@@ -1013,7 +1015,7 @@ export default function WomenEmpowerment() {
                       name="counsellingDone"
                       value={recordForm.counsellingDone}
                       onChange={handleRecordFormChange}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                      className={fieldBase}
                     >
                       <option value="">Select Option</option>
                       <option value="yes">Yes</option>
@@ -1031,7 +1033,7 @@ export default function WomenEmpowerment() {
                       name="employmentStatus"
                       value={recordForm.employmentStatus}
                       onChange={handleRecordFormChange}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                      className={fieldBase}
                     >
                       <option value="">Select Status</option>
                       <option value="self-employed">Self-employed</option>
@@ -1052,11 +1054,11 @@ export default function WomenEmpowerment() {
                       name="photo"
                       onChange={handleRecordFormChange}
                       accept=".jpg,.jpeg,.png"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#00b4d8] file:text-white hover:file:bg-[#0096c7]"
+                      className={`${fieldBase} text-sm file:mr-3 file:px-4 file:h-8 file:my-1 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#00b4d8] file:text-white hover:file:bg-[#0096c7]`}
                     />
-                    <p className="text-xs text-gray-500">
-                      {recordForm.photo ? `Selected: ${recordForm.photo.name}` : 'No file chosen'}
-                    </p>
+                    {recordForm.photo && (
+                      <p className="text-xs text-gray-500">Selected: {recordForm.photo.name}</p>
+                    )}
                   </div>
 
                   {/* ID Proof (Max 200KB, JPG/PNG) */}
@@ -1070,11 +1072,11 @@ export default function WomenEmpowerment() {
                       name="idProof"
                       onChange={handleRecordFormChange}
                       accept=".jpg,.jpeg,.png"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#00b4d8] file:text-white hover:file:bg-[#0096c7]"
+                      className={`${fieldBase} text-sm file:mr-3 file:px-4 file:h-8 file:my-1 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#00b4d8] file:text-white hover:file:bg-[#0096c7]`}
                     />
-                    <p className="text-xs text-gray-500">
-                      {recordForm.idProof ? `Selected: ${recordForm.idProof.name}` : 'No file chosen'}
-                    </p>
+                    {recordForm.idProof && (
+                      <p className="text-xs text-gray-500">Selected: {recordForm.idProof.name}</p>
+                    )}
                   </div>
                 </div>
               </div>
