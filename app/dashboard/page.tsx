@@ -1,7 +1,7 @@
 
 'use client'
 import React, { useState, useEffect } from "react";
-import { Home, Shield, Users, Calendar, FileText, Heart, GraduationCap, User, Sprout, HandHeart, Settings, Menu } from "lucide-react";
+import { Home, Shield, Users, Calendar, FileText, Heart, GraduationCap, User, Sprout, HandHeart, Settings, Menu, IndianRupee } from "lucide-react";
 import Dashboard from "@/app/components/Dashboard" // Adjust path as needed
 import UserManagement from "@/app/admin/UserManagement";
 import CampManagement from "@/app/admin/CampManagement";
@@ -59,7 +59,7 @@ const sidebarItems = [
   },
   {
     label: "Finance And Audit",
-    icon: Sprout,
+    icon: IndianRupee,
     subItems: [],
   },
   {
