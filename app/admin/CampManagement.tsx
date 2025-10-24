@@ -391,33 +391,33 @@ const CampManagement: React.FC = () => {
       </div>
 
       {/* Camps Table */}
-      <div className="overflow-x-auto bg-white rounded-xl shadow-sm border">
-        <table className="min-w-full border-collapse text-sm">
+      <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6">
+        <table className="w-full text-left">
           <thead className="bg-gray-100 text-gray-700 text-left">
-            <tr>
-              <th className="px-4 py-3 border-b font-semibold">ID</th>
-              <th className="px-4 py-3 border-b font-semibold">Name</th>
-              <th className="px-4 py-3 border-b font-semibold">Date</th>
-              <th className="px-4 py-3 border-b font-semibold">Location</th>
-              <th className="px-4 py-3 border-b font-semibold">Services</th>
-              <th className="px-4 py-3 border-b font-semibold">Status</th>
-              <th className="px-4 py-3 border-b font-semibold">Actions</th>
+            <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
+              <th className="p-3 font-semibold">ID</th>
+              <th className="p-3 font-semibold">Name</th>
+              <th className="p-3 font-semibold">Date</th>
+              <th className="p-3 font-semibold">Location</th>
+              <th className="p-3 font-semibold">Services</th>
+              <th className="p-3 font-semibold">Status</th>
+              <th className="p-3 font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody>
             {camps.map((camp) => (
               <tr key={camp.id} className="hover:bg-gray-50 transition">
-                <td className="px-4 py-3 border-b">{camp.id}</td>
-                <td className="px-4 py-3 border-b text-blue-700 hover:underline cursor-pointer">{camp.camp_name}</td>
-                <td className="px-4 py-3 border-b">{camp.date}</td>
-                <td className="px-4 py-3 border-b">{camp.location}</td>
-                <td className="px-4 py-3 border-b">{camp.services}</td>
-                <td className="px-4 py-3 border-b">
+                <td className="px-4 py-3 ">{camp.id}</td>
+                <td className="px-4 py-3 text-blue-700 hover:underline cursor-pointer">{camp.camp_name}</td>
+                <td className="px-4 py-3 ">{camp.date}</td>
+                <td className="px-4 py-3 ">{camp.location}</td>
+                <td className="px-4 py-3 ">{camp.services}</td>
+                <td className="px-4 py-3 ">
                   <span className={`text-xs font-semibold px-3 py-1 rounded-full ${camp.status === 'Active' ? 'bg-cyan-100 text-cyan-700' : 'bg-emerald-100 text-emerald-700'}`}>
                     {camp.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 border-b flex items-center gap-3">
+                <td className="px-4 py-3 flex items-center gap-3">
                   <button onClick={() => handleEdit(camp)} className="text-gray-600 hover:text-blue-500">
                     <Pencil size={18} />
                   </button>

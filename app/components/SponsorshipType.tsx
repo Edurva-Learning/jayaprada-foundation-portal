@@ -89,7 +89,7 @@ export default function SponsorshipTypes() {
         <h2 className="text-xl font-semibold text-gray-800">Sponsorship Types</h2>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-md font-medium flex items-center shadow-sm transition-colors"
+          className="bg-[#00b4d8] hover:bg-cyan-700 text-white px-4 py-2 rounded-md font-medium flex items-center shadow-sm transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Type
@@ -100,15 +100,15 @@ export default function SponsorshipTypes() {
       {error && <p className="text-red-500">{error}</p>}
 
       {!loading && !error && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6">
+          <table className="w-full text-left">
             <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+              <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
+                <th className="p-3 font-semibold">ID</th>
+                <th className="p-3 font-semibold">Name</th>
+                <th className="p-3 font-semibold">Description</th>
+                <th className="p-3 font-semibold">Status</th>
+                <th className="p-3 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
