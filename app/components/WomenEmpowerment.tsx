@@ -41,6 +41,41 @@ export default function WomenEmpowerment() {
     return labelMap[key] ?? key;
   };
 
+  // Normalize stored tokens/variants to the exact select option labels
+  const toSelectValue = (
+    field: 'trainingType' | 'workshopAttended' | 'counsellingDone' | 'employmentStatus',
+    v: any
+  ): string => {
+    const s = String(v ?? '').trim();
+    const n = norm(s);
+    if (!s) return '';
+    switch (field) {
+      case 'trainingType': {
+        if (isOneOf(s, ['Sewing Machine', 'sewing-machine'])) return 'Sewing Machine';
+        if (isOneOf(s, ['Computer Training', 'computer-training'])) return 'Computer Training';
+        if (isOneOf(s, ['Beauty Parlor', 'beauty-parlor'])) return 'Beauty Parlor';
+        if (isOneOf(s, ['Handicrafts', 'handicrafts'])) return 'Handicrafts';
+        if (isOneOf(s, ['Other', 'other'])) return 'Other';
+        return s; // fallback
+      }
+      case 'workshopAttended':
+      case 'counsellingDone': {
+        if (isOneOf(s, ['Yes', 'yes'])) return 'Yes';
+        if (isOneOf(s, ['No', 'no'])) return 'No';
+        return s;
+      }
+      case 'employmentStatus': {
+        if (isOneOf(s, ['Self-employed', 'self-employed'])) return 'Self-employed';
+        if (isOneOf(s, ['Employed', 'employed'])) return 'Employed';
+        if (isOneOf(s, ['Unemployed', 'unemployed'])) return 'Unemployed';
+        if (isOneOf(s, ['Seeking Employment', 'seeking-employment'])) return 'Seeking Employment';
+        return s;
+      }
+      default:
+        return s;
+    }
+  };
+
   // Normalization helpers for comparisons when counting stats
   const norm = (v: any) => String(v ?? '').toLowerCase().replace(/[-_]/g, ' ').trim();
   const isOneOf = (v: any, targets: string[]) => targets.some(t => norm(v) === norm(t));
@@ -95,6 +130,7 @@ export default function WomenEmpowerment() {
   const [loading, setLoading] = useState<boolean>(true);
   const [records, setRecords] = useState<any[]>([]);
   const [recordsLoading, setRecordsLoading] = useState<boolean>(false);
+  const [editingRecordId, setEditingRecordId] = useState<number | null>(null);
   // Records filters are applied only when user presses Apply Filters
   const [appliedRecordsFilters, setAppliedRecordsFilters] = useState({
     trainingType: 'All Training Types',
@@ -312,7 +348,7 @@ export default function WomenEmpowerment() {
   };
 
   const handleSaveRecord = () => {
-    console.log("Saving record:", recordForm);
+    console.log("Saving record:", recordForm, editingRecordId ? `(editing id ${editingRecordId})` : '(new)');
     // Validate required fields
     if (!recordForm.participantId || !recordForm.trainingType) {
       showNotice('Participant and Training Type are required', 'error');
@@ -340,8 +376,11 @@ export default function WomenEmpowerment() {
       idProofUrl: null,
     };
 
-    fetch(`${API_WE_BASE}/records`, {
-      method: 'POST',
+    const url = editingRecordId ? `${API_WE_BASE}/records/${editingRecordId}` : `${API_WE_BASE}/records`;
+    const method = editingRecordId ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
@@ -366,8 +405,9 @@ export default function WomenEmpowerment() {
           idProof: null
         });
         setParticipantQuery('');
+        setEditingRecordId(null);
         setShowRecordForm(false);
-        showNotice('Record saved successfully', 'success');
+        showNotice(editingRecordId ? 'Record updated successfully' : 'Record saved successfully', 'success');
       })
       .catch((e:any) => {
         console.error('Save record failed:', e);
@@ -400,20 +440,44 @@ export default function WomenEmpowerment() {
       photo: null,
       idProof: null
     });
+    setEditingRecordId(null);
     setShowRecordForm(false);
   };
 
-  // Placeholder actions for records table – backend edit/delete not implemented yet
+  // View action placeholder
   const handleViewRecord = (record: any) => {
     showNotice(`View record #${record?.id} – feature coming soon`, 'info');
   };
   const handleEditRecord = (record: any) => {
-    showNotice(`Edit record #${record?.id} – feature coming soon`, 'info');
+    setRecordForm({
+      participantId: Number(record?.participantId) || null,
+      participant: record?.participant || '',
+      trainingType: toSelectValue('trainingType', record?.trainingType),
+      workshopAttended: toSelectValue('workshopAttended', record?.workshopAttended),
+      counsellingDone: toSelectValue('counsellingDone', record?.counsellingDone),
+      employmentStatus: toSelectValue('employmentStatus', record?.employmentStatus),
+      photo: null,
+      idProof: null,
+    });
+    setParticipantQuery(record?.participant || '');
+    setEditingRecordId(Number(record?.id) || null);
+    setShowRecordForm(true);
   };
   const handleDeleteRecord = async (record: any) => {
-    const ok = window.confirm('Delete this record?');
+    const ok = window.confirm('Delete this record? This cannot be undone.');
     if (!ok) return;
-    showNotice('Delete record is not available yet', 'info');
+    try {
+      const res = await fetch(`${API_WE_BASE}/records/${record?.id}`, { method: 'DELETE' });
+      if (!res.ok && res.status !== 204) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as any).error || 'Failed to delete record');
+      }
+      await fetchRecords();
+      showNotice('Record deleted successfully', 'success');
+    } catch (e: any) {
+      console.error('Delete record failed:', e);
+      showNotice(e.message || 'Failed to delete record', 'error');
+    }
   };
 
   const handleAddRecord = (participantId: number, participantName: string) => {
@@ -1075,7 +1139,7 @@ export default function WomenEmpowerment() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <FileText size={24} />
-                    <h2 className="text-2xl font-bold">Add Empowerment Record</h2>
+                    <h2 className="text-2xl font-bold">{editingRecordId ? 'Edit Empowerment Record' : 'Add Empowerment Record'}</h2>
                   </div>
                   <button 
                     onClick={handleCloseRecordForm}
@@ -1288,7 +1352,7 @@ export default function WomenEmpowerment() {
                   className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center justify-center gap-2"
                 >
                   <FileText size={18} />
-                  Save Record
+                  {editingRecordId ? 'Update Record' : 'Save Record'}
                 </button>
               </div>
             </div>
