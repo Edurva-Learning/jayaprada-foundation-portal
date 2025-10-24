@@ -233,33 +233,33 @@ const ParticipantManagement: React.FC = () => {
         </>
       )}
 
-      <div className="overflow-x-auto bg-white rounded-xl shadow-sm border">
-        <table className="min-w-full border-collapse text-sm">
+      <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm">
+        <table className="w-full text-left">
           <thead className="bg-gray-100 text-gray-700 text-left">
-            <tr>
-              <th className="px-4 py-3 border-b">ID</th>
-              <th className="px-4 py-3 border-b">Name</th>
-              <th className="px-4 py-3 border-b">Age</th>
-              <th className="px-4 py-3 border-b">Gender</th>
-              <th className="px-4 py-3 border-b">Phone</th>
-              <th className="px-4 py-3 border-b">Aadhar</th>
-              <th className="px-4 py-3 border-b">Registration Source</th>
-              <th className="px-4 py-3 border-b">Created At</th>
-              <th className="px-4 py-3 border-b">Actions</th>
+            <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
+              <th className="px-4 py-3 ">ID</th>
+              <th className="px-4 py-3 ">Name</th>
+              <th className="px-4 py-3 ">Age</th>
+              <th className="px-4 py-3 ">Gender</th>
+              <th className="px-4 py-3 ">Phone</th>
+              <th className="px-4 py-3 ">Aadhar</th>
+              <th className="px-4 py-3 ">Registration Source</th>
+              <th className="px-4 py-3 ">Created At</th>
+              <th className="px-4 py-3 ">Actions</th>
             </tr>
           </thead>
           <tbody>
             {participants.map((p) => (
               <tr key={p.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 border-b">{p.id}</td>
-                <td className="px-4 py-3 border-b font-medium text-gray-800">{p.name}</td>
-                <td className="px-4 py-3 border-b">{p.age}</td>
-                <td className="px-4 py-3 border-b">{p.gender}</td>
-                <td className="px-4 py-3 border-b">{p.phone}</td>
-                <td className="px-4 py-3 border-b">{p.aadhar}</td>
-                <td className="px-4 py-3 border-b text-gray-700">{p.registrationSource}</td>
-                <td className="px-4 py-3 border-b">{p.createdAt}</td>
-                <td className="px-4 py-3 border-b flex items-center gap-3">
+                <td className="px-4 py-3 ">{p.id}</td>
+                <td className="px-4 py-3 font-medium text-gray-800">{p.name}</td>
+                <td className="px-4 py-3 ">{p.age}</td>
+                <td className="px-4 py-3 ">{p.gender}</td>
+                <td className="px-4 py-3 ">{p.phone}</td>
+                <td className="px-4 py-3 ">{p.aadhar}</td>
+                <td className="px-4 py-3  text-gray-700">{p.registrationSource}</td>
+                <td className="px-4 py-3 ">{p.createdAt}</td>
+                <td className="px-4 py-3 flex items-center gap-3">
                   <button className="text-gray-600 hover:text-blue-500">
                     <Eye size={18} />
                   </button>

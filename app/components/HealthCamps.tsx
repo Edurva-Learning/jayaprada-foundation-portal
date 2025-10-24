@@ -56,6 +56,20 @@ export default function HealthCampPage() {
     surgeryRequired: ""
   });
 
+  // Camp Participants State
+  const [campParticipants, setCampParticipants] = useState<any[]>([]);
+  const [campFilters, setCampFilters] = useState({
+    camp: "",
+    treatmentRequired: "",
+    surgeryRequired: "",
+    followUpNeeded: "",
+    allCamps: "",
+    surgeryDateFrom: "",
+    followUpDateFrom: "",
+    surgerySuggested: "",
+    servicesPerformed: ""
+  });
+
   const campOptions = [
     "Cancer Screening",
     "Eye Camp",
@@ -71,56 +85,7 @@ export default function HealthCampPage() {
     "Cancer Screening"
   ];
 
-  // Camp Participants State
-  const [campFilters, setCampFilters] = useState({
-    camp: "",
-    treatmentRequired: "",
-    surgeryRequired: "",
-    followUpNeeded: "",
-    allCamps: "",
-    surgeryDateFrom: "",
-    followUpDateFrom: "",
-    surgerySuggested: "",
-    servicesPerformed: ""
-  });
-
-  const campParticipantsData = [
-    {
-      id: 3,
-      participant: "Health3",
-      camp: "Eye Camp",
-      services: "Eye Check",
-      treatment: "No",
-      surgery: "Yes",
-      followUp: "No",
-      createdAt: "Sep 20, 2025",
-      actions: "💬️"
-    },
-    {
-      id: 2,
-      participant: "Health1",
-      camp: "Dental Check-up",
-      services: "Dental Check",
-      treatment: "No",
-      surgery: "No",
-      followUp: "No",
-      createdAt: "Sep 20, 2025",
-      actions: "💬️"
-    },
-    {
-      id: 1,
-      participant: "Health2",
-      camp: "Eye Camp",
-      services: "Eye Check",
-      treatment: "No",
-      surgery: "Yes",
-      followUp: "No",
-      createdAt: "Sep 20, 2025",
-      actions: "💬️"
-    }
-  ];
-
-  // API Calls
+  // API Calls for Participants
   const fetchParticipants = async () => {
     try {
       setLoading(true);
@@ -161,10 +126,57 @@ export default function HealthCampPage() {
     }
   };
 
-  // Load participants on component mount
+  // API Calls for Camp Details
+  const fetchCampDetails = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/campdetails');
+      if (!response.ok) {
+        throw new Error('Failed to fetch camp details');
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching camp details:', error);
+      throw error;
+    }
+  };
+
+  const createCampDetail = async (campData: any) => {
+    try {
+      const response = await fetch('http://localhost:5000/campdetails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(campData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create camp detail');
+      }
+
+      const newCampDetail = await response.json();
+      return newCampDetail;
+    } catch (error) {
+      console.error('Error creating camp detail:', error);
+      throw error;
+    }
+  };
+
+  // Load participants and camp details on component mount
   useEffect(() => {
     fetchParticipants();
+    loadCampDetails();
   }, []);
+
+  const loadCampDetails = async () => {
+    try {
+      const data = await fetchCampDetails();
+      setCampParticipants(data);
+    } catch (error) {
+      console.error('Error loading camp details:', error);
+    }
+  };
 
   // Participants Page Functions
   const handleSearch = () => {
@@ -278,8 +290,37 @@ export default function HealthCampPage() {
     }
   };
 
-  const handleSaveCamp = () => {
-    console.log("Saving camp data:", campFormData);
+  const handleSaveCamp = async () => {
+  try {
+    // Validate required fields
+    if (!campFormData.participant || !campFormData.campName || !campFormData.followUpNeeded || 
+        !campFormData.treatmentRequired || !campFormData.surgeryRequired || 
+        campFormData.servicesPerformed.length === 0) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    // Prepare data for backend - send services_performed as array
+    const campData = {
+      participant_id: parseInt(campFormData.participant),
+      surgery_suggested: campFormData.surgerySuggested,
+      camp_name: campFormData.campName,
+      followup_needed: campFormData.followUpNeeded,
+      treatment_required: campFormData.treatmentRequired,
+      surgery_required: campFormData.surgeryRequired,
+      followup_date: campFormData.followUpDate,
+      services_performed: campFormData.servicesPerformed, // Send as array, not string
+      remarks: campFormData.remarks,
+    };
+
+    console.log("Sending camp data:", campData);
+
+    const newCampDetail = await createCampDetail(campData);
+    
+    // Update camp participants list
+    setCampParticipants(prev => [newCampDetail, ...prev]);
+    
+    // Reset form and close modal
     setCampFormData({
       participant: "",
       surgerySuggested: "",
@@ -292,7 +333,13 @@ export default function HealthCampPage() {
       surgeryRequired: ""
     });
     setShowCampForm(false);
-  };
+    
+    alert("Camp details saved successfully!");
+  } catch (error) {
+    console.error("Error saving camp details:", error);
+    alert("Failed to save camp details. Please try again.");
+  }
+};
 
   const handleCloseForm = () => {
     setFormData({
@@ -345,16 +392,17 @@ export default function HealthCampPage() {
   };
 
   const serviceData = [
-    { label: "Eye Check", value: 2, icon: EyeIcon },
+    { label: "Eye Check", value: 0, icon: EyeIcon },
     { label: "Hemoglobin Test", value: 0, icon: TestTube },
     { label: "Anemia Test", value: 0, icon: Heart },
-    { label: "Dental Check", value: 1, icon: Pill },
+    { label: "Dental Check", value: 0, icon: Pill },
     { label: "Ear Check", value: 0, icon: Ear },
     { label: "Cancer Screening", value: 0, icon: Activity },
   ];
 
   // Format date for display
   const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       year: 'numeric', 
@@ -553,16 +601,16 @@ export default function HealthCampPage() {
               </tr>
             </thead>
             <tbody>
-              {campParticipantsData.map((participant) => (
-                <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
+              {campParticipants.map((participant) => (
+                <tr key={participant.participant_id} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="p-3">{participant.id}</td>
-                  <td className="p-3">{participant.participant}</td>
-                  <td className="p-3">{participant.camp}</td>
-                  <td className="p-3">{participant.services}</td>
-                  <td className="p-3">{participant.treatment}</td>
-                  <td className="p-3">{participant.surgery}</td>
-                  <td className="p-3">{participant.followUp}</td>
-                  <td className="p-3">{participant.createdAt}</td>
+                  <td className="p-3">{participant.participant_id}</td>
+                  <td className="p-3">{participant.camp_name}</td>
+                  <td className="p-3">{participant.services_performed}</td>
+                  <td className="p-3">{participant.treatment_required}</td>
+                  <td className="p-3">{participant.surgery_required}</td>
+                  <td className="p-3">{participant.followup_needed}</td>
+                  <td className="p-3">{formatDate(participant.created_at)}</td>
                   <td className="p-3">
                     <div className="flex space-x-2">
                       <button className="text-blue-600 hover:text-blue-800 transition-colors">
@@ -616,13 +664,13 @@ export default function HealthCampPage() {
         <div className="grid grid-cols-4 gap-4 mb-8">
           {[
             { label: "Total Participants", value: participants.length },
-            { label: "Health Camps Conducted", value: 3 },
-            { label: "Total Health Checks", value: 3 },
+            { label: "Health Camps Conducted", value: 0 },
+            { label: "Total Health Checks", value: 0 },
             { label: "Treatment Required", value: 0 },
-            { label: "Surgery Required", value: 2 },
+            { label: "Surgery Required", value: 0 },
             { label: "Follow-up Required", value: 0 },
-            { label: "Services Performed", value: 2 },
-            { label: "Participants with Surgery", value: 2 },
+            { label: "Services Performed", value: 0 },
+            { label: "Participants with Surgery", value: 0 },
           ].map((stat, i) => (
             <div
               key={i}
@@ -747,7 +795,7 @@ export default function HealthCampPage() {
                           >
                             + Add Camp
                           </button>
-                          <button className="bg-[#00b4d8] hover:bg-[#0096c7] text-white p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors">
+                          <button className="bg-orange-300 hover:bg-[#0096c7] text-black p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors">
                             <Eye size={16} />
                           </button>
                         </div>

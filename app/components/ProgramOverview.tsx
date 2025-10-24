@@ -172,7 +172,7 @@ export default function ProgramOverview() {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center py-20 text-gray-600">
+      <div className="flex justify-center items-center py-20 text-gray-600 ">
         <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading program overview...
       </div>
     );
@@ -183,8 +183,9 @@ export default function ProgramOverview() {
     );
 
   return (
+    
     <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
         <StatCard
           title="Total Sponsorships"
           value={stats.totalSponsorships}

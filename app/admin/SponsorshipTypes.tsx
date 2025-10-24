@@ -219,7 +219,7 @@ const SponsorshipTypes: React.FC = () => {
       )}
 
       {/* Sponsorship Table / Skeleton */}
-      <div className="overflow-x-auto bg-white rounded-xl shadow-sm border">
+      <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm">
         {loading ? (
           <div className="p-4 space-y-3">
             {[1, 2, 3, 4].map((n) => (
@@ -227,34 +227,34 @@ const SponsorshipTypes: React.FC = () => {
             ))}
           </div>
         ) : (
-          <table className="min-w-full border-collapse text-sm">
+          <table className="w-full text-lef">
             <thead className="bg-gray-100 text-gray-700 text-left">
-              <tr>
-                <th className="px-4 py-3 border-b">ID</th>
-                <th className="px-4 py-3 border-b">Name</th>
-                <th className="px-4 py-3 border-b">Description</th>
-                <th className="px-4 py-3 border-b">Created By</th>
-                <th className="px-4 py-3 border-b">Created At</th>
-                <th className="px-4 py-3 border-b">Status</th>
-                <th className="px-4 py-3 border-b text-center">Actions</th>
+              <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
+                <th className="px-4 py-3 ">ID</th>
+                <th className="px-4 py-3 ">Name</th>
+                <th className="px-4 py-3 ">Description</th>
+                <th className="px-4 py-3 ">Created By</th>
+                <th className="px-4 py-3 ">Created At</th>
+                <th className="px-4 py-3 ">Status</th>
+                <th className="px-4 py-3  text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {sponsorships.map((s) => (
                 <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 border-b">{s.id}</td>
-                  <td className="px-4 py-3 border-b font-medium text-gray-800">{s.name}</td>
-                  <td className="px-4 py-3 border-b text-gray-700">{s.description}</td>
-                  <td className="px-4 py-3 border-b">{s.created_by}</td>
-                  <td className="px-4 py-3 border-b">
+                  <td className="px-4 py-3 ">{s.id}</td>
+                  <td className="px-4 py-3  font-medium text-gray-800">{s.name}</td>
+                  <td className="px-4 py-3 text-gray-700">{s.description}</td>
+                  <td className="px-4 py-3 ">{s.created_by}</td>
+                  <td className="px-4 py-3 ">
                     {new Date(s.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-3 border-b">
+                  <td className="px-4 py-3">
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-700">
                       {s.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 border-b flex justify-center gap-3">
+                  <td className="px-4 py-3 flex justify-center gap-3">
                     <button
                       onClick={() => handleOpenModal(s)}
                       className="text-gray-600 hover:text-blue-500"

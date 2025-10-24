@@ -419,7 +419,7 @@ const UserManagement: React.FC = () => {
       )}
 
       {/* Users Table */}
-      <div className="overflow-x-auto bg-white rounded-xl shadow-sm border">
+      <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6">
         {loadingUsers ? (
           <div className="p-4 space-y-2">
             {[...Array(5)].map((_, i) => (
@@ -427,25 +427,25 @@ const UserManagement: React.FC = () => {
             ))}
           </div>
         ) : (
-          <table className="min-w-full border-collapse text-sm">
+          <table className="w-full text-left">
             <thead className="bg-gray-100 text-gray-700 text-left">
-              <tr>
-                <th className="px-4 py-3 border-b">ID</th>
-                <th className="px-4 py-3 border-b">Username</th>
-                <th className="px-4 py-3 border-b">Name</th>
-                <th className="px-4 py-3 border-b">Role</th>
-                <th className="px-4 py-3 border-b">Created At</th>
-                <th className="px-4 py-3 border-b">Status</th>
-                <th className="px-4 py-3 border-b">Actions</th>
+              <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
+                <th className="px-4 py-3">ID</th>
+                <th className="px-4 py-3">Username</th>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3 ">Role</th>
+                <th className="px-4 py-3 ">Created At</th>
+                <th className="px-4 py-3 ">Status</th>
+                <th className="px-4 py-3 ">Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 border-b">{user.id}</td>
-                  <td className="px-4 py-3 border-b">{user.username}</td>
-                  <td className="px-4 py-3 border-b">{user.name}</td>
-                  <td className="px-4 py-3 border-b">
+                  <td className="px-4 py-3 ">{user.id}</td>
+                  <td className="px-4 py-3 ">{user.username}</td>
+                  <td className="px-4 py-3 ">{user.name}</td>
+                  <td className="px-4 py-3 ">
                     <span
                       className={`text-xs font-semibold px-3 py-1 rounded-full ${
                         user.role === 'Admin'
@@ -456,13 +456,13 @@ const UserManagement: React.FC = () => {
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-4 py-3 border-b">{user.created_at.split('T')[0]}</td>
-                  <td className="px-4 py-3 border-b">
+                  <td className="px-4 py-3 ">{user.created_at.split('T')[0]}</td>
+                  <td className="px-4 py-3 ">
                     <span className="text-xs font-semibold px-3 py-1 rounded-full bg-cyan-100 text-cyan-700">
                       {user.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 border-b flex items-center gap-3">
+                  <td className="px-4 py-3  flex items-center gap-3">
                     <button
                       className="text-gray-600 hover:text-blue-500"
                       onClick={() => handleEdit(user)}
