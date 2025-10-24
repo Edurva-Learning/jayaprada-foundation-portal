@@ -340,6 +340,18 @@ export default function CommunityPage() {
 
   useEffect(() => { fetchParticipants(); }, []);
 
+  // Close Add/Edit modal via Escape key
+  useEffect(() => {
+    if (!isFormOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        closeForm();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isFormOpen]);
+
   // Normalize numeric strings for phone/aadhar
   const digitsOnly = (v: any) => String(v ?? '').replace(/\D/g, '');
 

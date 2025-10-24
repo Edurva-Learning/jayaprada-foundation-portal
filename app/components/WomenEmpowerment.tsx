@@ -218,6 +218,20 @@ export default function WomenEmpowerment() {
 
   useEffect(() => { fetchParticipants(); fetchRecords(); }, []);
 
+  // Close open modals when pressing Escape
+  useEffect(() => {
+    if (!showParticipantForm && !showRecordForm) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        // Prefer using the same close handlers for consistent reset behavior
+        if (showParticipantForm) handleCloseParticipantForm();
+        if (showRecordForm) handleCloseRecordForm();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [showParticipantForm, showRecordForm]);
+
   // Client-side filtering for records based on applied filters
   // Always display empowerment records in ascending order of ID
   const filteredRecords = [...records]

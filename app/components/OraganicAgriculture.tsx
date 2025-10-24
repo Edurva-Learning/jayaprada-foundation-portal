@@ -258,6 +258,18 @@ export default function OrganicAgricultureParticipants() {
 
   useEffect(() => { fetchParticipants(); }, []);
 
+  // Close Add/Edit modal via Escape key
+  useEffect(() => {
+    if (!showAddForm) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        handleCloseForm();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [showAddForm]);
+
   const handleAddParticipant = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newParticipant.name) {
