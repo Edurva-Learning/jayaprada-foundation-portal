@@ -987,7 +987,7 @@ export default function WomenEmpowerment() {
         {/* Add Participant Form Modal */}
         {showParticipantForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col">
               {/* Header */}
               <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
                 <div className="flex items-center justify-between">
@@ -1006,7 +1006,7 @@ export default function WomenEmpowerment() {
               </div>
 
               {/* Form */}
-              <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="p-6 flex-1 overflow-y-auto">
                 <div className="grid grid-cols-2 gap-6">
                   {/* Name */}
                   <div className="space-y-2">
@@ -1168,7 +1168,7 @@ export default function WomenEmpowerment() {
         {/* Add Record Form Modal */}
         {showRecordForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col">
               {/* Header */}
               <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
                 <div className="flex items-center justify-between">
@@ -1187,7 +1187,7 @@ export default function WomenEmpowerment() {
               </div>
 
               {/* Form */}
-              <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="p-6 flex-1 overflow-y-auto">
                 <div className="grid grid-cols-2 gap-6">
                   {/* Participant * (Typeahead) */}
                   <div className="space-y-2">
@@ -1405,7 +1405,7 @@ export default function WomenEmpowerment() {
         {/* View Participant Modal */}
         {viewParticipant && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col">
               <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -1417,7 +1417,7 @@ export default function WomenEmpowerment() {
                   </button>
                 </div>
               </div>
-              <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="p-6 flex-1 overflow-y-auto">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="text-xs text-gray-500">ID</div>
@@ -1467,7 +1467,7 @@ export default function WomenEmpowerment() {
         {/* View Empowerment Record Modal */}
         {viewRecord && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col">
               <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -1479,7 +1479,7 @@ export default function WomenEmpowerment() {
                   </button>
                 </div>
               </div>
-              <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="p-6 flex-1 overflow-y-auto">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="text-xs text-gray-500">ID</div>

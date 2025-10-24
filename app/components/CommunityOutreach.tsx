@@ -762,7 +762,7 @@ export default function CommunityPage() {
       {/* Add Community Support Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col">
             {/* Header */}
             <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
               <div className="flex items-center justify-between">
@@ -781,7 +781,7 @@ export default function CommunityPage() {
             </div>
 
             {/* Form */}
-            <form id="coSupportForm" onSubmit={handleSubmit} className="p-6">
+            <form id="coSupportForm" onSubmit={handleSubmit} className="p-6 flex-1 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -936,7 +936,7 @@ export default function CommunityPage() {
       {/* View Community Support Modal */}
       {viewRecord && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col">
             <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -948,7 +948,7 @@ export default function CommunityPage() {
                 </button>
               </div>
             </div>
-            <div className="p-6 max-h-[70vh] overflow-y-auto">
+            <div className="p-6 flex-1 overflow-y-auto">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-xs text-gray-500">ID</div>
