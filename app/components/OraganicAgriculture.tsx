@@ -591,7 +591,7 @@ export default function OrganicAgricultureParticipants() {
               </div>
 
               {/* Form */}
-              <form onSubmit={handleAddParticipant} className="p-6 max-h-[70vh] overflow-y-auto">
+              <form id="oaAddParticipantForm" onSubmit={handleAddParticipant} className="p-6">
                 <div className="grid grid-cols-2 gap-6">
                   {/* Name * */}
                   <div className="space-y-2">
@@ -734,24 +734,26 @@ export default function OrganicAgricultureParticipants() {
                   </div>
                 </div>
 
-                {/* Footer Buttons */}
-                <div className="flex gap-4 mt-8 pt-6 border-t border-gray-200">
-                  <button
-                    type="button"
-                    onClick={handleCloseForm}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center justify-center gap-2"
-                  >
-                    <User size={18} />
-                    {editId ? 'Update Participant' : 'Save Participant'}
-                  </button>
-                </div>
               </form>
+
+              {/* Footer Buttons */}
+              <div className="flex gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+                <button
+                  type="button"
+                  onClick={handleCloseForm}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  form="oaAddParticipantForm"
+                  className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center justify-center gap-2"
+                >
+                  <User size={18} />
+                  {editId ? 'Update Participant' : 'Save Participant'}
+                </button>
+              </div>
             </div>
           </div>
         )}
