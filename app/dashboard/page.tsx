@@ -15,6 +15,8 @@ import ProgramOverview from "../components/ProgramOverview";
 import SponsorshipsList from "../components/SponsorshipsList";
 import SponsorshipType from "../components/SponsorshipType";
 import FinancePage from "../components/FinancePage";
+import EducationSponsorshipProgram from "../components/EducationSponsorshipProgram";
+
 // Import other components as needed (e.g., HealthCamps, EducationSponsorship)
 
 const sidebarItems = [
@@ -84,13 +86,13 @@ export default function DashboardLayout() {
 
     const clickedItem = sidebarItems.find((item) => item.label === label);
 
-      if (!clickedItem) return;
+    if (!clickedItem) return;
 
-  if (clickedItem.subItems.length === 0) {
-    // Direct item — select it
-    setSelected({ group: label, sub: label });
-    setOpenGroup(null);
-  } else if (label === "Dashboard") {
+    if (clickedItem.subItems.length === 0) {
+      // Direct item — select it
+      setSelected({ group: label, sub: label });
+      setOpenGroup(null);
+    } else if (label === "Dashboard") {
       setSelected({ group: label, sub: label });
       setOpenGroup(null);
     } else {
@@ -128,11 +130,11 @@ export default function DashboardLayout() {
         if(selected.sub === "Health Camps") return <HealthCampPage />
         return <div className="p-6"><h1>Health Camps Content</h1></div>; // Placeholder—replace with component
       case "Education Sponsorship":
-        if (selected.sub === "Program Statistics") return <ProgramOverview/>
-        if (selected.sub === "Sponsorships") return <SponsorshipsList/> ;
-        if (selected.sub === "Sponsorship Types") return <SponsorshipType/>;
-
-        return <div className="p-6"><h1>Education Sponsorship Overview</h1></div>;
+        if (selected.sub === "Program Statistics") return <EducationSponsorshipProgram initialTab="Program Statistics" />;
+        if (selected.sub === "Sponsorships") return <EducationSponsorshipProgram initialTab="Sponsorships" />;
+        if (selected.sub === "Sponsorship Types") return <EducationSponsorshipProgram initialTab="Sponsorship Types" />;
+        // Default to Program Statistics if no sub-item is selected
+        return <EducationSponsorshipProgram initialTab="Program Statistics" />;
       // ... Add similar for Women Empowerment, etc.
       case "Organic Agriculture" :
         if(selected.sub === "Organic Agriculture") return <OrganicAgriculture />
@@ -207,7 +209,8 @@ export default function DashboardLayout() {
                         </span>
                       </span>
                       {!isCollapsed && hasSubs && (
-                        <span className="ml-2 shrink-0 flex items-center justify-center">
+                      <span className="text-xs transform transition-transform">
+
                           {showSubs ? (
                             <ChevronUp className="w-4 h-4 text-current" />
                           ) : (
