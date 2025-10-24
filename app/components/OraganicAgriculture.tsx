@@ -212,6 +212,7 @@ export default function OrganicAgricultureParticipants() {
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [viewParticipant, setViewParticipant] = useState<any | null>(null);
 
   const API_OA_BASE = 'http://localhost:5000/organic-agriculture';
 
@@ -258,17 +259,18 @@ export default function OrganicAgricultureParticipants() {
 
   useEffect(() => { fetchParticipants(); }, []);
 
-  // Close Add/Edit modal via Escape key
+  // Close Add/Edit or View modal via Escape key
   useEffect(() => {
-    if (!showAddForm) return;
+    if (!showAddForm && !viewParticipant) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Esc') {
-        handleCloseForm();
+        if (showAddForm) handleCloseForm();
+        if (viewParticipant) setViewParticipant(null);
       }
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [showAddForm]);
+  }, [showAddForm, viewParticipant]);
 
   const handleAddParticipant = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -546,6 +548,7 @@ export default function OrganicAgricultureParticipants() {
                     <td className="p-3">
                       <div className="flex items-center gap-3">
                         <button
+                          onClick={() => setViewParticipant(participant)}
                           className="text-[#00b4d8] hover:text-[#0096c7] p-2 rounded-lg transition-colors"
                           aria-label="View"
                           title="View"
@@ -780,6 +783,63 @@ export default function OrganicAgricultureParticipants() {
                     <><User size={18} /> {editId ? 'Update Participant' : 'Save Participant'}</>
                   )}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* View Participant Modal */}
+        {viewParticipant && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+              <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <User size={24} />
+                    <h2 className="text-2xl font-bold">Participant Details</h2>
+                  </div>
+                  <button onClick={() => setViewParticipant(null)} className="p-2 hover:bg-[#0096c7] rounded-full transition-colors" aria-label="Close">
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+              <div className="p-6 max-h-[70vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs text-gray-500">ID</div>
+                    <div className="font-medium">{viewParticipant.id}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Created At</div>
+                    <div className="font-medium">{formatDate(viewParticipant.created_at)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Name</div>
+                    <div className="font-medium">{viewParticipant.name || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Age</div>
+                    <div className="font-medium">{viewParticipant.age || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Gender</div>
+                    <div className="font-medium">{viewParticipant.gender || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Phone</div>
+                    <div className="font-medium">{viewParticipant.phone || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Aadhar</div>
+                    <div className="font-medium">{viewParticipant.aadhar || '-'}</div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="text-xs text-gray-500">Address</div>
+                    <div className="font-medium">{viewParticipant.address || '-'}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+                <button onClick={() => setViewParticipant(null)} className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors">Close</button>
               </div>
             </div>
           </div>

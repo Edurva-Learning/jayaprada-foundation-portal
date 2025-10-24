@@ -260,6 +260,7 @@ export default function CommunityPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [viewRecord, setViewRecord] = useState<any | null>(null);
 
   const API_CO_BASE = 'http://localhost:5000/community-outreach';
 
@@ -268,9 +269,14 @@ export default function CommunityPage() {
     setTimeout(() => setNotice(null), 3000);
   };
 
-  // Action handlers (stubs for now)
+  // Action handlers
   const handleView = (id: number) => {
-    showNotice(`View details for record #${id}`, 'info');
+    const rec = participants.find(p => p.id === id);
+    if (!rec) {
+      showNotice('Record not found', 'error');
+      return;
+    }
+    setViewRecord(rec);
   };
   const handleEdit = (id: number) => {
     const rec = participants.find(p => p.id === id);
@@ -340,17 +346,18 @@ export default function CommunityPage() {
 
   useEffect(() => { fetchParticipants(); }, []);
 
-  // Close Add/Edit modal via Escape key
+  // Close Add/Edit or View modal via Escape key
   useEffect(() => {
-    if (!isFormOpen) return;
+    if (!isFormOpen && !viewRecord) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Esc') {
-        closeForm();
+        if (isFormOpen) closeForm();
+        if (viewRecord) setViewRecord(null);
       }
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [isFormOpen]);
+  }, [isFormOpen, viewRecord]);
 
   // Normalize numeric strings for phone/aadhar
   const digitsOnly = (v: any) => String(v ?? '').replace(/\D/g, '');
@@ -922,6 +929,75 @@ export default function CommunityPage() {
                   <>{editingId ? 'Update' : 'Save'}</>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* View Community Support Modal */}
+      {viewRecord && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+            <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <User size={24} />
+                  <h2 className="text-2xl font-bold">Community Support Details</h2>
+                </div>
+                <button onClick={() => setViewRecord(null)} className="p-2 hover:bg-[#0096c7] rounded-full transition-colors" aria-label="Close">
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-xs text-gray-500">ID</div>
+                  <div className="font-medium">{viewRecord.id}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Created At</div>
+                  <div className="font-medium">{formatDate(viewRecord.created_at || viewRecord.createdAt)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Beneficiary</div>
+                  <div className="font-medium">{viewRecord.name || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Aadhar</div>
+                  <div className="font-medium">{viewRecord.aadhar || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Mobile</div>
+                  <div className="font-medium">{viewRecord.mobile || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Family Head</div>
+                  <div className="font-medium">{viewRecord.familyHead || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Children</div>
+                  <div className="font-medium">{viewRecord.children ?? '-'}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Amount (₹)</div>
+                  <div className="font-medium">{formatAmount(viewRecord.amount)}</div>
+                </div>
+                <div className="col-span-2">
+                  <div className="text-xs text-gray-500">Address</div>
+                  <div className="font-medium">{viewRecord.address || '-'}</div>
+                </div>
+                <div className="col-span-2">
+                  <div className="text-xs text-gray-500">Purpose</div>
+                  <div className="font-medium">{viewRecord.purpose || '-'}</div>
+                </div>
+                <div className="col-span-2">
+                  <div className="text-xs text-gray-500">Details</div>
+                  <div className="font-medium">{viewRecord.details || '-'}</div>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+              <button onClick={() => setViewRecord(null)} className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors">Close</button>
             </div>
           </div>
         </div>

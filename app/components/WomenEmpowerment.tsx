@@ -97,6 +97,9 @@ export default function WomenEmpowerment() {
 
   const [showParticipantForm, setShowParticipantForm] = useState(false);
   const [showRecordForm, setShowRecordForm] = useState(false);
+  // View modals
+  const [viewParticipant, setViewParticipant] = useState<any | null>(null);
+  const [viewRecord, setViewRecord] = useState<any | null>(null);
 
   // Participant Form state
   const [participantForm, setParticipantForm] = useState({
@@ -220,17 +223,19 @@ export default function WomenEmpowerment() {
 
   // Close open modals when pressing Escape
   useEffect(() => {
-    if (!showParticipantForm && !showRecordForm) return;
+    if (!showParticipantForm && !showRecordForm && !viewParticipant && !viewRecord) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Esc') {
         // Prefer using the same close handlers for consistent reset behavior
         if (showParticipantForm) handleCloseParticipantForm();
         if (showRecordForm) handleCloseRecordForm();
+        if (viewParticipant) setViewParticipant(null);
+        if (viewRecord) setViewRecord(null);
       }
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [showParticipantForm, showRecordForm]);
+  }, [showParticipantForm, showRecordForm, viewParticipant, viewRecord]);
 
   // Client-side filtering for records based on applied filters
   // Always display empowerment records in ascending order of ID
@@ -465,9 +470,9 @@ export default function WomenEmpowerment() {
     setShowRecordForm(false);
   };
 
-  // View action placeholder
+  // View action
   const handleViewRecord = (record: any) => {
-    showNotice(`View record #${record?.id} – feature coming soon`, 'info');
+    setViewRecord(record || null);
   };
   const handleEditRecord = (record: any) => {
     setRecordForm({
@@ -742,7 +747,12 @@ export default function WomenEmpowerment() {
                             >
                               + Add Record
                             </button>
-                            <button className="bg-[#00b4d8] hover:bg-[#0096c7] text-white p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors">
+                            <button
+                              onClick={() => setViewParticipant(participant)}
+                              className="bg-[#00b4d8] hover:bg-[#0096c7] text-white p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors"
+                              aria-label="View"
+                              title="View"
+                            >
                               <Eye size={16} />
                             </button>
                           </div>
@@ -1387,6 +1397,122 @@ export default function WomenEmpowerment() {
                     </>
                   )}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* View Participant Modal */}
+        {viewParticipant && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+              <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <User size={24} />
+                    <h2 className="text-2xl font-bold">Participant Details</h2>
+                  </div>
+                  <button onClick={() => setViewParticipant(null)} className="p-2 hover:bg-[#0096c7] rounded-full transition-colors" aria-label="Close">
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+              <div className="p-6 max-h-[70vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs text-gray-500">ID</div>
+                    <div className="font-medium">{viewParticipant.id}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Created At</div>
+                    <div className="font-medium">{formatDate(viewParticipant.created_at)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Name</div>
+                    <div className="font-medium">{viewParticipant.name || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Age</div>
+                    <div className="font-medium">{viewParticipant.age || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Gender</div>
+                    <div className="font-medium">{displayLabel(viewParticipant.gender) || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Phone</div>
+                    <div className="font-medium">{viewParticipant.phone || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Aadhar</div>
+                    <div className="font-medium">{viewParticipant.aadhar || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Registered Through</div>
+                    <div className="font-medium">{viewParticipant.registeredThrough || '-'}</div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="text-xs text-gray-500">Address</div>
+                    <div className="font-medium">{viewParticipant.address || '-'}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+                <button onClick={() => setViewParticipant(null)} className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors">Close</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* View Empowerment Record Modal */}
+        {viewRecord && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all">
+              <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FileText size={24} />
+                    <h2 className="text-2xl font-bold">Empowerment Record</h2>
+                  </div>
+                  <button onClick={() => setViewRecord(null)} className="p-2 hover:bg-[#0096c7] rounded-full transition-colors" aria-label="Close">
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+              <div className="p-6 max-h-[70vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs text-gray-500">ID</div>
+                    <div className="font-medium">{viewRecord.id}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Created At</div>
+                    <div className="font-medium">{formatDate(viewRecord.created_at || viewRecord.createdAt)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Participant</div>
+                    <div className="font-medium">{viewRecord.participant || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Training Type</div>
+                    <div className="font-medium">{displayLabel(viewRecord.trainingType) || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Workshop Attended</div>
+                    <div className="font-medium">{displayLabel(viewRecord.workshopAttended) || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Counselling Done</div>
+                    <div className="font-medium">{displayLabel(viewRecord.counsellingDone) || '-'}</div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="text-xs text-gray-500">Employment Status</div>
+                    <div className="font-medium">{displayLabel(viewRecord.employmentStatus) || '-'}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+                <button onClick={() => setViewRecord(null)} className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors">Close</button>
               </div>
             </div>
           </div>
