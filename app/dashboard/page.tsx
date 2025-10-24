@@ -1,7 +1,7 @@
 
 'use client'
 import React, { useState, useEffect } from "react";
-import { Home, Shield, Users, Calendar, FileText, Heart, GraduationCap, User, Sprout, HandHeart, Settings, Menu, IndianRupee } from "lucide-react";
+import { Home, Shield, Users, Calendar, FileText, Heart, GraduationCap, User, Sprout, HandHeart, Settings, Menu, IndianRupee, ChevronLeft, ChevronRight } from "lucide-react";
 import Dashboard from "@/app/components/Dashboard" // Adjust path as needed
 import UserManagement from "@/app/admin/UserManagement";
 import CampManagement from "@/app/admin/CampManagement";
@@ -76,6 +76,9 @@ export default function DashboardLayout() {
     sub: "Dashboard", // Default to Dashboard content
   });
   const [isCollapsed, setIsCollapsed] = useState(false); // Collapsed state
+  // Sidebar widths in pixels for smooth transitions
+  const SIDEBAR_EXPANDED = 256; // 16rem
+  const SIDEBAR_COLLAPSED = 64; // 4rem
 
   const handleGroupClick = (label: string) => {
 
@@ -172,11 +175,10 @@ export default function DashboardLayout() {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside
-          className={`bg-white text-gray-900 flex flex-col border-r border-gray-200 transition-all duration-300 z-10 ${
-            isCollapsed ? 'w-16' : 'w-64'
-          }`}
+          className={`bg-white text-gray-900 flex flex-col border-r border-gray-200 z-10 overflow-hidden flex-shrink-0`}
+          style={{ width: isCollapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED, transition: 'width 250ms ease-in-out' }}
         >
-          <nav className="flex-1 overflow-y-auto py-6 px-4">
+          <nav className="flex-1 overflow-y-auto overflow-x-hidden py-6 px-4">
             <ul className="space-y-2">
               {sidebarItems.map((item) => {
                 const Icon = item.icon;
@@ -187,19 +189,25 @@ export default function DashboardLayout() {
                 return (
                   <li key={item.label}>
                     <div
-                      className={`flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer font-medium transition-colors ${
+                      className={`flex items-center py-3 px-3 rounded-lg cursor-pointer font-medium transition-colors ${
                         isSelectedGroup || openGroup === item.label
                           ? "bg-cyan-50 text-cyan-700 border border-cyan-200" 
                           : "text-gray-700 hover:bg-gray-100"
                       }`}
                       onClick={() => handleGroupClick(item.label)}
                     >
-                      <span className="flex items-center">
+                      <span className="flex items-center min-w-0">
                         <Icon className="w-5 h-5 mr-3 text-current flex-shrink-0" />
-                        {!isCollapsed && <span className="text-current">{item.label}</span>}
+                        <span
+                          className={`text-current whitespace-nowrap transition-opacity duration-200 ${
+                            isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                          }`}
+                        >
+                          {item.label}
+                        </span>
                       </span>
                       {!isCollapsed && hasSubs && (
-                        <span className="ml-2 text-xs transform transition-transform">
+                        <span className="ml-auto text-xs transform transition-transform">
                           {showSubs ? "▲" : "▼"}
                         </span>
                       )}
@@ -229,6 +237,20 @@ export default function DashboardLayout() {
               })}
             </ul>
           </nav>
+          {/* Collapse/Expand control at the bottom of sidebar */}
+          <div className="px-3 pb-3 border-t border-gray-200">
+            <button
+              onClick={toggleCollapse}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              className="w-full p-2 mt-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center justify-center"
+            >
+              {isCollapsed ? (
+                <ChevronRight className="w-5 h-5" />
+              ) : (
+                <ChevronLeft className="w-5 h-5" />
+              )}
+            </button>
+          </div>
           {/* User Profile - Bottom of Sidebar - Hidden when collapsed */}
           {!isCollapsed && (
             <div className="mt-auto pt-6 border-t border-gray-200 px-3 pb-6">
