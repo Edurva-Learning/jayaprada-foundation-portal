@@ -42,6 +42,7 @@ export default function WomenEmpowerment() {
 
   // Record Form state
   const [recordForm, setRecordForm] = useState({
+    participantId: null as number | null,
     participant: '',
     trainingType: '',
     workshopAttended: '',
@@ -57,6 +58,8 @@ export default function WomenEmpowerment() {
 
   const [participants, setParticipants] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [records, setRecords] = useState<any[]>([]);
+  const [recordsLoading, setRecordsLoading] = useState<boolean>(false);
 
   // Always display participants in ascending order of ID
   const sortedParticipants = [...participants].sort((a, b) => {
@@ -104,6 +107,20 @@ export default function WomenEmpowerment() {
     }
   };
 
+  const fetchRecords = async () => {
+    try {
+      setRecordsLoading(true);
+      const res = await fetch(`${API_WE_BASE}/records`);
+      if (!res.ok) throw new Error('Failed to load records');
+      const data = await res.json();
+      setRecords(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching records:', err);
+    } finally {
+      setRecordsLoading(false);
+    }
+  };
+
   const formatDate = (d?: string) => {
     if (!d) return '';
     const date = new Date(d);
@@ -111,7 +128,7 @@ export default function WomenEmpowerment() {
     return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
   };
 
-  useEffect(() => { fetchParticipants(); }, []);
+  useEffect(() => { fetchParticipants(); fetchRecords(); }, []);
 
   // Keep the typeahead input in sync when the modal opens/closes
   useEffect(() => {
@@ -219,34 +236,65 @@ export default function WomenEmpowerment() {
   const handleSaveRecord = () => {
     console.log("Saving record:", recordForm);
     // Validate required fields
-    if (!recordForm.participant || !recordForm.trainingType) {
-      showNotice('Please fill in all required fields', 'error');
+    if (!recordForm.participantId || !recordForm.trainingType) {
+      showNotice('Participant and Training Type are required', 'error');
       return;
     }
-    
-    // Validate file sizes if files are selected
+
+    // Validate file sizes if files are selected (uploads not yet implemented)
     if (recordForm.photo && recordForm.photo.size > 100 * 1024) {
       showNotice('Photo size should be less than 100KB', 'error');
       return;
     }
-    
     if (recordForm.idProof && recordForm.idProof.size > 200 * 1024) {
       showNotice('ID Proof size should be less than 200KB', 'error');
       return;
     }
-    
-    // Save logic here
-    setRecordForm({
-      participant: '',
-      trainingType: '',
-      workshopAttended: '',
-      counsellingDone: '',
-      employmentStatus: '',
-      photo: null,
-      idProof: null
-    });
-    setShowRecordForm(false);
-    showNotice('Record saved', 'success');
+
+    const payload = {
+      participantId: recordForm.participantId,
+      trainingType: recordForm.trainingType,
+      workshopAttended: recordForm.workshopAttended || null,
+      counsellingDone: recordForm.counsellingDone || null,
+      employmentStatus: recordForm.employmentStatus || null,
+      // File uploads are not yet handled; placeholders for future
+      photoUrl: null,
+      idProofUrl: null,
+    };
+
+    fetch(`${API_WE_BASE}/records`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({} as any));
+          throw new Error((err as any).error || 'Failed to save record');
+        }
+        return res.json();
+      })
+      .then(() => {
+        // Refresh lists and reset form
+        fetchRecords();
+        setRecordForm({
+          participantId: null,
+          participant: '',
+          trainingType: '',
+          workshopAttended: '',
+          counsellingDone: '',
+          employmentStatus: '',
+          photo: null,
+          idProof: null
+        });
+        setParticipantQuery('');
+        setShowRecordForm(false);
+        showNotice('Record saved successfully', 'success');
+      })
+      .catch((e:any) => {
+        console.error('Save record failed:', e);
+        showNotice(e.message || 'Failed to save record', 'error');
+      });
   };
 
   const handleCloseParticipantForm = () => {
@@ -265,6 +313,7 @@ export default function WomenEmpowerment() {
 
   const handleCloseRecordForm = () => {
     setRecordForm({
+      participantId: null,
       participant: '',
       trainingType: '',
       workshopAttended: '',
@@ -279,6 +328,7 @@ export default function WomenEmpowerment() {
   const handleAddRecord = (participantId: number, participantName: string) => {
     setRecordForm(prev => ({
       ...prev,
+      participantId,
       participant: participantName
     }));
     setParticipantQuery(participantName || '');
@@ -663,15 +713,30 @@ export default function WomenEmpowerment() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recordsData.map((record) => (
+                    {recordsLoading && (
+                      <tr>
+                        <td colSpan={8} className="p-6">
+                          <div className="flex items-center justify-center gap-3 text-[#0077b6]">
+                            <Loader2 className="animate-spin" size={20} />
+                            <span className="font-medium">Loading records...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {!recordsLoading && records.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="p-6 text-center text-gray-600">No records found</td>
+                      </tr>
+                    )}
+                    {!recordsLoading && records.map((record:any) => (
                       <tr key={record.id} className="border-b border-gray-200 hover:bg-gray-50">
                         <td className="p-3">{record.id}</td>
-                        <td className="p-3">{record.participant}</td>
+                        <td className="p-3">{record.participant || '-'}</td>
                         <td className="p-3">{record.trainingType}</td>
-                        <td className="p-3">{record.workshop}</td>
-                        <td className="p-3">{record.counselling}</td>
-                        <td className="p-3">{record.employmentStatus}</td>
-                        <td className="p-3">{record.createdAt}</td>
+                        <td className="p-3">{record.workshopAttended || '-'}</td>
+                        <td className="p-3">{record.counsellingDone || '-'}</td>
+                        <td className="p-3">{record.employmentStatus || '-'}</td>
+                        <td className="p-3">{formatDate(record.created_at || record.createdAt)}</td>
                         <td className="p-3">
                           <div className="flex gap-2">
                             <button className="text-gray-600 hover:text-[#00b4d8] transition-colors text-lg">
@@ -950,7 +1015,7 @@ export default function WomenEmpowerment() {
                                 onClick={() => {
                                   const name = (p?.name && String(p.name).trim()) || 'Unnamed participant';
                                   setParticipantQuery(name);
-                                  setRecordForm(prev => ({ ...prev, participant: name }));
+                                  setRecordForm(prev => ({ ...prev, participant: name, participantId: Number(p.id) || null }));
                                   setShowParticipantSuggestions(false);
                                 }}
                               >
