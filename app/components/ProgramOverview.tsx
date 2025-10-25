@@ -212,8 +212,8 @@ export default function ProgramOverview() {
         />
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-300 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-gray-900">
             Sponsorship Type Breakdown
           </h2>

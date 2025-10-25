@@ -233,21 +233,21 @@ const FinancePage: React.FC = () => {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+            <div className="p-4 border border-[#90e0ef] rounded-lg bg-[#caf0f8] text-center shadow-sm">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Total Expenses</h3>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600">
+              <p className="text-xl sm:text-2xl font-bold text-[#00b4d8]">
                 {formatCurrency(totalExpenses)}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+            <div className="p-4 border border-[#90e0ef] rounded-lg bg-[#caf0f8] text-center shadow-sm">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Community Outreach</h3>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600">
+              <p className="text-xl sm:text-2xl font-bold text-[#00b4d8]">
                 {formatCurrency(expenseTypeTotals['Community Outreach'] || 0)}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+            <div className="p-4 border border-[#90e0ef] rounded-lg bg-[#caf0f8] text-center shadow-sm">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Education Sponsorship</h3>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600">
+              <p className="text-xl sm:text-2xl font-bold text-[#00b4d8]">
                 {formatCurrency(expenseTypeTotals['Education Sponsorship'] || 0)}
               </p>
             </div>
@@ -331,7 +331,7 @@ const FinancePage: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 mt-6">
               <button 
-                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#00b4d8] hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 onClick={() => fetchExpenses()}
               >
                 <Filter className="h-4 w-4 mr-2" />
@@ -347,11 +347,11 @@ const FinancePage: React.FC = () => {
           </div>
 
           {/* Expense Records */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm">
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <h2 className="text-lg font-semibold text-gray-900">Expense Records</h2>
               <button 
-                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto"
+                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#00b4d8] hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto"
                 onClick={() => {
                   resetForm();
                   setShowExpenseForm(true);
@@ -369,17 +369,17 @@ const FinancePage: React.FC = () => {
             ) : (
               <div className="overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="w-full text-left">
+                    <thead className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="p-3 font-semibold">ID</th>
+                        <th className="p-3 font-semibold">Type</th>
+                        <th className="p-3 font-semibold">Description</th>
+                        <th className="p-3 font-semibold">Amount</th>
+                        <th className="p-3 font-semibold">Date</th>
+                        <th className="p-3 font-semibold">Details</th>
+                        <th className="p-3 font-semibold">Created</th>
+                        <th className="p-3 font-semibold">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
