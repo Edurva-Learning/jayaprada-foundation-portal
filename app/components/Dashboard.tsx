@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Heart, GraduationCap, UserPlus, DollarSign, Calendar, ChevronRight, Activity } from 'lucide-react';
+import Link from 'next/link';
 
 const Dashboard: React.FC = () => {
   return (
@@ -40,14 +41,14 @@ const Dashboard: React.FC = () => {
           <div className="text-xs text-green-600 font-medium">+15%</div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        {/* <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-gray-500">Total Funding</h3>
             <DollarSign className="w-5 h-5 text-cyan-500" />
           </div>
           <div className="text-2xl font-bold text-gray-900 mb-1">₹38.5L</div>
           <div className="text-xs text-green-600 font-medium">+1%</div>
-        </div>
+        </div> */}
       </div>
 
       {/* Main Content - Recent Activity and Quick Actions */}
@@ -58,36 +59,36 @@ const Dashboard: React.FC = () => {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                 <Activity className="w-5 h-5 text-cyan-500" />
-                Recent Activity
+              Activities Included
               </h2>
               <a href="#" className="text-sm text-cyan-600 hover:text-cyan-700 font-medium">View All</a>
             </div>
             <ul className="space-y-4">
               <li className="flex justify-between items-start">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">New health camp registered</p>
-                  <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
+                  <p className="text-sm font-medium text-gray-900">Health camp Programs</p>
+                  {/* <p className="text-xs text-gray-500 mt-1">2 hours ago</p> */}
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
               </li>
               <li className="flex justify-between items-start">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Education sponsorship approved</p>
-                  <p className="text-xs text-gray-500 mt-1">5 hours ago</p>
+                  <p className="text-sm font-medium text-gray-900">Education sponsorships</p>
+                  {/* <p className="text-xs text-gray-500 mt-1">5 hours ago</p> */}
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
               </li>
-              <li className="flex justify-between items-start">
+              {/* <li className="flex justify-between items-start">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">25 participants added</p>
+                  <p className="text-sm font-medium text-gray-900"> participant Managements</p>
                   <p className="text-xs text-gray-500 mt-1">1 day ago</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
-              </li>
+              </li> */}
               <li className="flex justify-between items-start">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Women empowerment program started</p>
-                  <p className="text-xs text-gray-500 mt-1">2 days ago</p>
+                  <p className="text-sm font-medium text-gray-900">Women empowerment programs </p>
+                  {/* <p className="text-xs text-gray-500 mt-1">2 days ago</p> */}
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
               </li>
@@ -100,34 +101,45 @@ const Dashboard: React.FC = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
             <div className="space-y-3">
-              <button className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Heart className="w-5 h-5 text-cyan-500" />
-                  <span className="text-sm font-medium text-gray-900">Add Health Camp</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <GraduationCap className="w-5 h-5 text-cyan-500" />
-                  <span className="text-sm font-medium text-gray-900">New Sponsorship</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <UserPlus className="w-5 h-5 text-cyan-500" />
-                  <span className="text-sm font-medium text-gray-900">Add Participant</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+               {/* ✅ Add Health Camp (Linked to /users) */}
+          <Link
+            href="/users"
+            className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Heart className="w-5 h-5 text-cyan-500" />
+              <span className="text-sm font-medium text-gray-900">Add Users</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </Link>
+          <Link
+            href="/sponsorships"
+            className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Heart className="w-5 h-5 text-cyan-500" />
+              <span className="text-sm font-medium text-gray-900">Add Sponsorships</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </Link>
+              
+                <Link
+            href="/participants"
+            className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Heart className="w-5 h-5 text-cyan-500" />
+              <span className="text-sm font-medium text-gray-900">Add Particpants</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </Link>
+              {/* <button className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-3">
                   <Calendar className="w-5 h-5 text-cyan-500" />
                   <span className="text-sm font-medium text-gray-900">Schedule Event</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

@@ -159,8 +159,8 @@ export default function DashboardLayout() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 overflow-x-hidden overflow-y-auto">
       {/* Top Bar - Always Visible */}
-      <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+      {/* <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between"> */}
+        {/* <div className="flex items-center space-x-2">
           <button
             onClick={toggleCollapse}
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
@@ -170,16 +170,30 @@ export default function DashboardLayout() {
           </button>
           <div className="text-xl font-bold text-cyan-600">Jayaprada</div>
           <div className="text-sm text-gray-600">Foundation Portal</div>
-        </div>
+        </div> */}
         {/* Optional: Add user info or other top bar elements here */}
-      </header>
+      {/* </header> */}
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside
+
           className={`bg-white text-gray-900 flex flex-col border-r border-gray-200 z-10 overflow-hidden flex-shrink-0`}
           style={{ width: isCollapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED, transition: 'width 250ms ease-in-out' }}
         >
+             <div className="mt-auto px-3 pb-3 border-t border-gray-200">
+            <button
+              onClick={toggleCollapse}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              className="w-full p-2 mt-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center justify-center"
+            >
+              {isCollapsed ? (
+                <ChevronRight className="w-5 h-5" />
+              ) : (
+                <ChevronLeft className="w-5 h-5" />
+              )}
+            </button>
+          </div>
           <nav className="flex-1 overflow-y-auto overflow-x-hidden py-6 px-4">
             <ul className="space-y-2">
               {sidebarItems.map((item) => {
@@ -259,7 +273,7 @@ export default function DashboardLayout() {
             </div>
           )}
           {/* Collapse/Expand control pinned to the bottom of sidebar */}
-          <div className="mt-auto px-3 pb-3 border-t border-gray-200">
+          {/* <div className="mt-auto px-3 pb-3 border-t border-gray-200">
             <button
               onClick={toggleCollapse}
               aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -271,7 +285,7 @@ export default function DashboardLayout() {
                 <ChevronLeft className="w-5 h-5" />
               )}
             </button>
-          </div>
+          </div> */}
         </aside>
 
         {/* Main Content */}

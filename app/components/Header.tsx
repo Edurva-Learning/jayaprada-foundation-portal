@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useUser } from '../context/UserContext';
 
 const Header = () => {
@@ -26,16 +27,19 @@ const Header = () => {
 
   return (
     <header className="bg-[#00b4d8] text-white px-6 py-4 flex justify-between items-center">
-      <img
-        src="/logo/Jayaprada Foundation Logo (1).png"
-        alt="Logo"
-        className="h-19"
-      />
+            {/* ✅ Clickable logo that redirects to Dashboard */}
+      <Link href="/dashboard">
+        <img
+          src="/logo/Jayaprada Foundation Logo (1).png"
+          alt="Jayaprada Foundation Logo"
+          className="h-16 cursor-pointer"
+        />
+      </Link>
 
       <nav className="flex items-center space-x-6">
         {user ? (
           <>
-            <span className="text-sm">Welcome, {user.name || user.username || 'User'}</span>
+            <span className="text-sm">Welcome {user.name || user.username || 'User'}</span>
             <a href="/profile" className="text-sm hover:underline">
               Profile
             </a>

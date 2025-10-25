@@ -86,7 +86,7 @@ const ParticipantManagement: React.FC = () => {
 
   return (
     <div>
-       <div className="mb-6">
+         <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Participant Management</h1>
       </div>
       <div className="flex justify-end mb-4">
