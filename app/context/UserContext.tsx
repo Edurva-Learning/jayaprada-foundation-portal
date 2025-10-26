@@ -36,7 +36,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`http://localhost:5000/users/${userId}`);
+      const response = await fetch(`https://api.jpf-portal-api.com/users/${userId}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch user data: ${response.status}`);

@@ -129,7 +129,7 @@ export default function HealthCampPage() {
   // API Calls for Camp Details
   const fetchCampDetails = async () => {
     try {
-      const response = await fetch('http://localhost:5000/campdetails');
+      const response = await fetch('https://api.jpf-portal-api.com/campdetails');
       if (!response.ok) {
         throw new Error('Failed to fetch camp details');
       }
@@ -143,7 +143,7 @@ export default function HealthCampPage() {
 
   const createCampDetail = async (campData: any) => {
     try {
-      const response = await fetch('http://localhost:5000/campdetails', {
+      const response = await fetch('https://api.jpf-portal-api.com/campdetails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

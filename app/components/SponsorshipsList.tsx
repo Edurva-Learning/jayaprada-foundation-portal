@@ -148,8 +148,8 @@ const SponsorshipsList: React.FC = () => {
     setSaving(true);
     try {
       const url = editingId 
-        ? `http://localhost:5000/edu-sponsorships/${editingId}`
-        : 'http://localhost:5000/edu-sponsorships';
+        ? `https://api.jpf-portal-api.com/edu-sponsorships/${editingId}`
+        : 'https://api.jpf-portal-api.com/edu-sponsorships';
       
       const method = editingId ? 'PUT' : 'POST';
 
@@ -207,7 +207,7 @@ const SponsorshipsList: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/edu-sponsorships/${id}`, {
+      const res = await fetch(`https://api.jpf-portal-api.com/edu-sponsorships/${id}`, {
         method: 'DELETE',
       });
 

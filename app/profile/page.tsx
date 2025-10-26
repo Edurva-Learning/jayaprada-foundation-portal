@@ -71,7 +71,7 @@ const ProfilePage = () => {
     setFeedback(null);
 
     try {
-      const res = await fetch(`http://localhost:5000/users/${user.id}`, {
+      const res = await fetch(`https://api.jpf-portal-api.com/users/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
