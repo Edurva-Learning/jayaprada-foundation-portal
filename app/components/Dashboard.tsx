@@ -1,209 +1,528 @@
+// 'use client';
+// import React from 'react';
+// import {
+//   Users, UserPlus, Activity, GraduationCap, DollarSign, Heart, BookOpen, Leaf
+// } from 'lucide-react';
+// import {
+//   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Label
+// } from 'recharts';
+
+// const Dashboard: React.FC = () => {
+//   // --- Static demo data ---
+//   const totalBeneficiaries = 9500;
+//   const newParticipants = 47;
+//   const activeCamps = 12;
+//   const totalSponsorships = 3250;
+
+//   const barData = [
+//     { name: 'Health Camp', value: 2840, color: '#3B82F6' },
+//     { name: 'Education Sponsorship', value: 3250, color: '#10B981' },
+//     { name: 'Women Empowerment', value: 1890, color: '#8B5CF6' },
+//     { name: 'Organic Agriculture', value: 1520, color: '#6EE7B7' },
+//     { name: 'Girl Child Support', value: 1350, color: '#EF4444' },
+//     { name: 'Covid Relief', value: 650, color: '#60A5FA' },
+//   ];
+
+//   const pieData = [
+//     { name: 'Eye Camps', value: 840, color: '#3B82F6' },
+//     { name: 'Dental Camps', value: 650, color: '#22C55E' },
+//     { name: 'General Health', value: 980, color: '#A855F7' },
+//     { name: 'Cancer Screening', value: 370, color: '#F97316' },
+//   ];
+
+//   const trendData = [
+//     { month: 'Jan', Health: 230, Education: 270, Women: 150, Agriculture: 110, GirlChild: 90, Covid: 70 },
+//     { month: 'Feb', Health: 220, Education: 260, Women: 140, Agriculture: 115, GirlChild: 95, Covid: 65 },
+//     { month: 'Mar', Health: 225, Education: 280, Women: 145, Agriculture: 118, GirlChild: 100, Covid: 60 },
+//     { month: 'Apr', Health: 230, Education: 275, Women: 148, Agriculture: 120, GirlChild: 102, Covid: 58 },
+//     { month: 'May', Health: 228, Education: 272, Women: 147, Agriculture: 117, GirlChild: 98, Covid: 55 },
+//     { month: 'Jun', Health: 230, Education: 274, Women: 149, Agriculture: 119, GirlChild: 99, Covid: 53 },
+//     { month: 'Jul', Health: 233, Education: 277, Women: 150, Agriculture: 120, GirlChild: 100, Covid: 52 },
+//     { month: 'Aug', Health: 235, Education: 278, Women: 151, Agriculture: 121, GirlChild: 101, Covid: 50 },
+//     { month: 'Sep', Health: 232, Education: 276, Women: 150, Agriculture: 119, GirlChild: 99, Covid: 48 },
+//     { month: 'Oct', Health: 234, Education: 279, Women: 152, Agriculture: 120, GirlChild: 101, Covid: 47 },
+//     { month: 'Nov', Health: 237, Education: 270, Women: 158, Agriculture: 126, GirlChild: 109, Covid: 42 },
+//     { month: 'Dec', Health: 270, Education: 280, Women: 158, Agriculture: 126, GirlChild: 109, Covid: 40 },
+//   ];
+
+//   const recentActivity = [
+//     { icon: <DollarSign className="text-orange-500 w-5 h-5" />, text: 'Donation Received: $500 from Sarah M.', time: '2 min ago' },
+//     { icon: <Heart className="text-blue-500 w-5 h-5" />, text: 'Health Camp completed in Riverside Village, 150 people served.', time: '15 min ago' },
+//     { icon: <Users className="text-purple-500 w-5 h-5" />, text: '25 new women joined the Empowerment program.', time: '1 hour ago' },
+//     { icon: <BookOpen className="text-green-500 w-5 h-5" />, text: 'New Education Sponsorship for student in Metro City.', time: '2 hours ago' },
+//     { icon: <Leaf className="text-lime-600 w-5 h-5" />, text: 'Organic Agriculture training workshop completed in Green Valley.', time: '3 hours ago' },
+//   ];
+
+//   const totalPie = pieData.reduce((acc, item) => acc + item.value, 0);
+
+//   return (
+//     <div className="p-6 space-y-8">
+//       {/* Header */}
+//       <div>
+//         <h1 className="text-3xl font-bold text-gray-900 mb-1">Welcome back, Admin</h1>
+//         <p className="text-gray-500">Here's what's happening with your foundation today</p>
+//       </div>
+
+//       {/* Top Stats */}
+//       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+//         {/* Total Beneficiaries */}
+//         <div className="rounded-xl p-6 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
+//           <div className="flex justify-between items-center">
+//             <h3 className="text-sm font-medium text-gray-600">Total Beneficiaries</h3>
+//             <Users className="w-6 h-6 text-blue-600" />
+//           </div>
+//           <div className="text-3xl font-bold mt-2 text-gray-900">{totalBeneficiaries.toLocaleString()}</div>
+//           <p className="text-sm text-green-600 mt-1">↑ 5.2% this month</p>
+//         </div>
+
+//         {/* New Participants */}
+//         <div className="rounded-xl p-6 shadow-sm bg-gradient-to-br from-green-50 to-green-100 border border-green-200">
+//           <div className="flex justify-between items-center">
+//             <h3 className="text-sm font-medium text-gray-600">New Participants Today</h3>
+//             <UserPlus className="w-6 h-6 text-green-600" />
+//           </div>
+//           <div className="text-3xl font-bold mt-2 text-gray-900">{newParticipants}</div>
+//           <p className="text-sm text-green-600 mt-1">↑ 12.5% vs yesterday</p>
+//         </div>
+
+//         {/* Active Health Camps */}
+//         <div className="rounded-xl p-6 shadow-sm bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200">
+//           <div className="flex justify-between items-center">
+//             <h3 className="text-sm font-medium text-gray-600">Active Health Camps</h3>
+//             <Activity className="w-6 h-6 text-orange-500" />
+//           </div>
+//           <div className="text-3xl font-bold mt-2 text-gray-900">{activeCamps}</div>
+//           <p className="text-sm text-green-600 mt-1">↑ 3% vs last week</p>
+//         </div>
+
+//         {/* Total Sponsorships */}
+//         <div className="rounded-xl p-6 shadow-sm bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200">
+//           <div className="flex justify-between items-center">
+//             <h3 className="text-sm font-medium text-gray-600">Total Sponsorships</h3>
+//             <GraduationCap className="w-6 h-6 text-indigo-500" />
+//           </div>
+//           <div className="text-3xl font-bold mt-2 text-gray-900">{totalSponsorships.toLocaleString()}</div>
+//           <p className="text-sm text-green-600 mt-1">↑ 7.8% this quarter</p>
+//         </div>
+//       </div>
+
+//       {/* Charts Row */}
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+//         {/* Bar Chart */}
+//         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+//           <h2 className="text-lg font-semibold text-gray-900 mb-4">Beneficiaries by Program</h2>
+//           <ResponsiveContainer width="100%" height={300}>
+//             <BarChart data={barData} layout="vertical">
+//               <XAxis type="number" hide />
+//               <YAxis dataKey="name" type="category" width={160} tick={{ fontSize: 13, fill: '#4B5563' }} />
+//               <Tooltip />
+//               <Bar dataKey="value" radius={[4, 4, 4, 4]}>
+//                 {barData.map((entry, index) => (
+//                   <Cell key={`cell-${index}`} fill={entry.color} />
+//                 ))}
+//               </Bar>
+//             </BarChart>
+//           </ResponsiveContainer>
+
+//           {/* Data under chart */}
+//           <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-y-2 text-sm text-gray-700">
+//             {barData.map((item, i) => (
+//               <div key={i} className="flex items-center gap-2">
+//                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+//                 <span>{item.name}: </span>
+//                 <span className="font-semibold">{item.value.toLocaleString()}</span>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         {/* Pie Chart */}
+//         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+//           <h2 className="text-lg font-semibold text-gray-900 mb-4">Health Camp Types Distribution</h2>
+//           <ResponsiveContainer width="100%" height={300}>
+//             <PieChart>
+//               <Pie data={pieData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} dataKey="value" paddingAngle={3}>
+//                 {pieData.map((entry, index) => (
+//                   <Cell key={`cell-${index}`} fill={entry.color} />
+//                 ))}
+//                 <Label position="center" content={() => (
+//                   <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-800">
+//                     {totalPie.toLocaleString()}
+//                   </text>
+//                 )} />
+//               </Pie>
+//               <Tooltip />
+//             </PieChart>
+//           </ResponsiveContainer>
+
+//           {/* Legends below chart */}
+//           <div className="mt-6 grid grid-cols-2 md:grid-cols-2 gap-y-2 text-sm text-gray-700">
+//             {pieData.map((item, i) => (
+//               <div key={i} className="flex items-center gap-2">
+//                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+//                 <span>{item.name}: </span>
+//                 <span className="font-semibold">{item.value.toLocaleString()} ({((item.value / totalPie) * 100).toFixed(1)}%)</span>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Program Participation & Recent Activity */}
+//       <div className="space-y-8">
+//         {/* Program Participation Trend */}
+//         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+//           <h2 className="text-lg font-semibold text-gray-900 mb-4">
+//             Program Participation Trend (Last 12 Months)
+//           </h2>
+//           <ResponsiveContainer width="100%" height={300}>
+//             <BarChart data={trendData}>
+//               <XAxis dataKey="month" />
+//               <YAxis />
+//               <Tooltip />
+//               <Bar dataKey="Health" fill="#3B82F6" />
+//               <Bar dataKey="Education" fill="#10B981" />
+//               <Bar dataKey="Women" fill="#8B5CF6" />
+//               <Bar dataKey="Agriculture" fill="#6EE7B7" />
+//               <Bar dataKey="GirlChild" fill="#EF4444" />
+//               <Bar dataKey="Covid" fill="#60A5FA" />
+//             </BarChart>
+//           </ResponsiveContainer>
+//         </div>
+
+//         {/* Recent Activity */}
+//         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+//           <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+//           <div className="space-y-4">
+//             {recentActivity.map((item, index) => (
+//               <div
+//                 key={index}
+//                 className="flex items-start gap-3 border-b pb-3 last:border-none"
+//               >
+//                 <div className="mt-1">{item.icon}</div>
+//                 <div>
+//                   <p className="text-gray-800 font-medium">{item.text}</p>
+//                   <p className="text-sm text-gray-500">{item.time}</p>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Dashboard;
 'use client';
 import React from 'react';
-import { Heart, GraduationCap, UserPlus, DollarSign, Calendar, ChevronRight, Activity } from 'lucide-react';
-import Link from 'next/link';
+import {
+  Users,
+  UserPlus,
+  Activity,
+  GraduationCap,
+  DollarSign,
+  Heart,
+  BookOpen,
+  Leaf,
+} from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Label,
+} from 'recharts';
 
 const Dashboard: React.FC = () => {
+  // --- Static demo data ---
+  const totalBeneficiaries = 9500;
+  const newParticipants = 47;
+  const activeCamps = 12;
+  const totalSponsorships = 3250;
+
+  const barData = [
+    { name: 'Health Camp', value: 2840, color: '#3B82F6' },
+    { name: 'Education Sponsorship', value: 3250, color: '#10B981' },
+    { name: 'Women Empowerment', value: 1890, color: '#8B5CF6' },
+    { name: 'Organic Agriculture', value: 1520, color: '#6EE7B7' },
+    { name: 'Girl Child Support', value: 1350, color: '#EF4444' },
+    { name: 'Covid Relief', value: 650, color: '#60A5FA' },
+  ];
+
+  const pieData = [
+    { name: 'Eye Camps', value: 840, color: '#3B82F6' },
+    { name: 'Dental Camps', value: 650, color: '#22C55E' },
+    { name: 'General Health', value: 980, color: '#A855F7' },
+    { name: 'Cancer Screening', value: 370, color: '#F97316' },
+  ];
+
+  const trendData = [
+    { month: 'Jan', Health: 230, Education: 270, Women: 150, Agriculture: 110, GirlChild: 90, Covid: 70 },
+    { month: 'Feb', Health: 220, Education: 260, Women: 140, Agriculture: 115, GirlChild: 95, Covid: 65 },
+    { month: 'Mar', Health: 225, Education: 280, Women: 145, Agriculture: 118, GirlChild: 100, Covid: 60 },
+    { month: 'Apr', Health: 230, Education: 275, Women: 148, Agriculture: 120, GirlChild: 102, Covid: 58 },
+    { month: 'May', Health: 228, Education: 272, Women: 147, Agriculture: 117, GirlChild: 98, Covid: 55 },
+    { month: 'Jun', Health: 230, Education: 274, Women: 149, Agriculture: 119, GirlChild: 99, Covid: 53 },
+    { month: 'Jul', Health: 233, Education: 277, Women: 150, Agriculture: 120, GirlChild: 100, Covid: 52 },
+    { month: 'Aug', Health: 235, Education: 278, Women: 151, Agriculture: 121, GirlChild: 101, Covid: 50 },
+    { month: 'Sep', Health: 232, Education: 276, Women: 150, Agriculture: 119, GirlChild: 99, Covid: 48 },
+    { month: 'Oct', Health: 234, Education: 279, Women: 152, Agriculture: 120, GirlChild: 101, Covid: 47 },
+    { month: 'Nov', Health: 237, Education: 270, Women: 158, Agriculture: 126, GirlChild: 109, Covid: 42 },
+    { month: 'Dec', Health: 270, Education: 280, Women: 158, Agriculture: 126, GirlChild: 109, Covid: 40 },
+  ];
+
+  const recentActivity = [
+    {
+      icon: <DollarSign className="text-orange-500 w-5 h-5" />,
+      text: 'Donation Received: $500 from Sarah M.',
+      time: '2 min ago',
+    },
+    {
+      icon: <Heart className="text-blue-500 w-5 h-5" />,
+      text: 'Health Camp completed in Riverside Village, 150 people served.',
+      time: '15 min ago',
+    },
+    {
+      icon: <Users className="text-purple-500 w-5 h-5" />,
+      text: '25 new women joined the Empowerment program.',
+      time: '1 hour ago',
+    },
+    {
+      icon: <BookOpen className="text-green-500 w-5 h-5" />,
+      text: 'New Education Sponsorship for student in Metro City.',
+      time: '2 hours ago',
+    },
+    {
+      icon: <Leaf className="text-lime-600 w-5 h-5" />,
+      text: 'Organic Agriculture training workshop completed in Green Valley.',
+      time: '3 hours ago',
+    },
+  ];
+
+  const totalPie = pieData.reduce((acc, item) => acc + item.value, 0);
+
   return (
-    <>
+    <div className="p-6 space-y-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">Welcome back, Admin</h1>
-        <p className="text-gray-500">Here's what's happening with your foundation today</p>
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-1">
+          Welcome back, Admin
+        </h1>
+        <p className="text-gray-500">
+          Here's what's happening with your foundation today
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Active Health Camps</h3>
-            <Heart className="w-5 h-5 text-cyan-500" />
+      {/* Top Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Total Beneficiaries */}
+        <div className="rounded-xl p-6 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-600">
+              Total Beneficiaries
+            </h3>
+            <Users className="w-6 h-6 text-blue-600" />
           </div>
-          <div className="text-2xl font-bold text-gray-900 mb-1">3</div>
-          <div className="text-xs text-green-600 font-medium">+1%</div>
+          <div className="text-3xl font-bold mt-2 text-gray-900">
+            {totalBeneficiaries.toLocaleString()}
+          </div>
+          <p className="text-sm text-green-600 mt-1">↑ 5.2% this month</p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Total Sponsorships</h3>
-            <GraduationCap className="w-5 h-5 text-cyan-500" />
+        {/* New Participants */}
+        <div className="rounded-xl p-6 shadow-sm bg-gradient-to-br from-green-50 to-green-100 border border-green-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-600">
+              New Participants Today
+            </h3>
+            <UserPlus className="w-6 h-6 text-green-600" />
           </div>
-          <div className="text-2xl font-bold text-gray-900 mb-1">156</div>
-          <div className="text-xs text-green-600 font-medium">+1%</div>
+          <div className="text-3xl font-bold mt-2 text-gray-900">
+            {newParticipants}
+          </div>
+          <p className="text-sm text-green-600 mt-1">
+            ↑ 12.5% vs yesterday
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">New Participants</h3>
-            <UserPlus className="w-5 h-5 text-cyan-500" />
+        {/* Active Health Camps */}
+        <div className="rounded-xl p-6 shadow-sm bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-600">
+              Active Health Camps
+            </h3>
+            <Activity className="w-6 h-6 text-orange-500" />
           </div>
-          <div className="text-2xl font-bold text-gray-900 mb-1">28</div>
-          <div className="text-xs text-green-600 font-medium">+15%</div>
+          <div className="text-3xl font-bold mt-2 text-gray-900">
+            {activeCamps}
+          </div>
+          <p className="text-sm text-green-600 mt-1">↑ 3% vs last week</p>
         </div>
 
-        {/* <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Total Funding</h3>
-            <DollarSign className="w-5 h-5 text-cyan-500" />
+        {/* Total Sponsorships */}
+        <div className="rounded-xl p-6 shadow-sm bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-600">
+              Total Sponsorships
+            </h3>
+            <GraduationCap className="w-6 h-6 text-indigo-500" />
           </div>
-          <div className="text-2xl font-bold text-gray-900 mb-1">₹38.5L</div>
-          <div className="text-xs text-green-600 font-medium">+1%</div>
-        </div> */}
+          <div className="text-3xl font-bold mt-2 text-gray-900">
+            {totalSponsorships.toLocaleString()}
+          </div>
+          <p className="text-sm text-green-600 mt-1">↑ 7.8% this quarter</p>
+        </div>
       </div>
 
-      {/* Main Content - Recent Activity and Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Bar Chart */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Beneficiaries by Program
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={barData} layout="vertical">
+              <XAxis type="number" hide />
+              <YAxis
+                dataKey="name"
+                type="category"
+                width={160}
+                tick={{ fontSize: 13, fill: '#4B5563' }}
+              />
+              <Tooltip />
+              <Bar dataKey="value" radius={[4, 4, 4, 4]}>
+                {barData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+
+          {/* Data under chart */}
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-y-4 text-sm text-gray-700">
+            {barData.map((item, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span>{item.name}: </span>
+                <span className="font-semibold">
+                  {item.value.toLocaleString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pie Chart */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Health Camp Types Distribution
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                innerRadius={70}
+                outerRadius={100}
+                dataKey="value"
+                paddingAngle={3}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+                <Label
+                  position="center"
+                  content={() => (
+                    <text
+                      x="50%"
+                      y="50%"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className="text-2xl font-bold fill-gray-800"
+                    >
+                      {totalPie.toLocaleString()}
+                    </text>
+                  )}
+                />
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+
+          {/* Legends below chart */}
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-2 gap-y-2 text-sm text-gray-700">
+            {pieData.map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span>{item.name}: </span>
+                <span className="font-semibold">
+                  {item.value.toLocaleString()} (
+                  {((item.value / totalPie) * 100).toFixed(1)}%)
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Program Participation & Recent Activity */}
+      <div className="space-y-8">
+        {/* Program Participation Trend */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Program Participation Trend (Last 12 Months)
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={trendData}>
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="Health" fill="#3B82F6" />
+              <Bar dataKey="Education" fill="#10B981" />
+              <Bar dataKey="Women" fill="#8B5CF6" />
+              <Bar dataKey="Agriculture" fill="#6EE7B7" />
+              <Bar dataKey="GirlChild" fill="#EF4444" />
+              <Bar dataKey="Covid" fill="#60A5FA" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
         {/* Recent Activity */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-cyan-500" />
-              Activities Included
-              </h2>
-              <a href="#" className="text-sm text-cyan-600 hover:text-cyan-700 font-medium">View All</a>
-            </div>
-            <ul className="space-y-4">
-              <li className="flex justify-between items-start">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Health camp Programs</p>
-                  {/* <p className="text-xs text-gray-500 mt-1">2 hours ago</p> */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Recent Activity
+          </h2>
+          <div className="space-y-4">
+            {recentActivity.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-3 border-b pb-3 last:border-none"
+              >
+                <div className="mt-1">{item.icon}</div>
+                <div>
+                  <p className="text-gray-800 font-medium">{item.text}</p>
+                  <p className="text-sm text-gray-500">{item.time}</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
-              </li>
-              <li className="flex justify-between items-start">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Education sponsorships</p>
-                  {/* <p className="text-xs text-gray-500 mt-1">5 hours ago</p> */}
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
-              </li>
-              {/* <li className="flex justify-between items-start">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900"> participant Managements</p>
-                  <p className="text-xs text-gray-500 mt-1">1 day ago</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
-              </li> */}
-              <li className="flex justify-between items-start">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Women empowerment programs </p>
-                  {/* <p className="text-xs text-gray-500 mt-1">2 days ago</p> */}
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 ml-4" />
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
-            <div className="space-y-3">
-               {/* ✅ Add Health Camp (Linked to /users) */}
-          <Link
-            href="/users"
-            className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Heart className="w-5 h-5 text-cyan-500" />
-              <span className="text-sm font-medium text-gray-900">Add Users</span>
-            </div>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-          </Link>
-          <Link
-            href="/sponsorships"
-            className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Heart className="w-5 h-5 text-cyan-500" />
-              <span className="text-sm font-medium text-gray-900">Add Sponsorships</span>
-            </div>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-          </Link>
-              
-                <Link
-            href="/participants"
-            className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Heart className="w-5 h-5 text-cyan-500" />
-              <span className="text-sm font-medium text-gray-900">Add Particpants</span>
-            </div>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-          </Link>
-              {/* <button className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-cyan-500" />
-                  <span className="text-sm font-medium text-gray-900">Schedule Event</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button> */}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-
-      {/* March Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Health Camps Card */}
-        <div className="bg-cyan-50 rounded-2xl p-6 border border-cyan-200">
-          <div className="flex items-start gap-3 mb-4">
-            <Heart className="w-8 h-8 text-cyan-500 mt-1 flex-shrink-0" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Health Camps</h3>
-              <p className="text-sm text-gray-500">March Overview</p>
-            </div>
-          </div>
-          <div className="space-y-3 mb-6">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Total Camps</span>
-              <span className="font-semibold text-gray-900">8</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Beneficiaries</span>
-              <span className="font-semibold text-gray-900">1,247</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Services Provided</span>
-              <span className="font-semibold text-gray-900">3,892</span>
-            </div>
-          </div>
-          <button className="w-full bg-cyan-500 text-white py-3 rounded-xl font-medium hover:bg-cyan-600 transition-colors">
-            View Details
-          </button>
-        </div>
-
-        {/* Education Program Card */}
-        <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-200">
-          <div className="flex items-start gap-3 mb-4">
-            <GraduationCap className="w-8 h-8 text-emerald-500 mt-1 flex-shrink-0" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Education Program</h3>
-              <p className="text-sm text-gray-500">March Overview</p>
-            </div>
-          </div>
-          <div className="space-y-3 mb-6">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Active Sponsorships</span>
-              <span className="font-semibold text-gray-900">142</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Amount Disbursed</span>
-              <span className="font-semibold text-gray-900">₹22.5L</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Students Helped</span>
-              <span className="font-semibold text-gray-900">156</span>
-            </div>
-          </div>
-          <button className="w-full bg-emerald-500 text-white py-3 rounded-xl font-medium hover:bg-emerald-600 transition-colors">
-            View Details
-          </button>
-        </div>
-      </div>
-    </>
+    </div>
   );
 };
 
