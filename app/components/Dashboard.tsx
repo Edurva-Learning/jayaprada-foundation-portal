@@ -285,7 +285,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
   const fetchParticipants = async () => {
     try {
-      const res = await fetch('http://api.jpf-portal-api.com/participants');
+      const res = await fetch('https://api.jpf-portal-api.com/participants');
       const data = await res.json();
 
       setParticipants(data);

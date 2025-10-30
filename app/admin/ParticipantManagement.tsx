@@ -1201,7 +1201,7 @@ const ParticipantManagement: React.FC = () => {
     treatment_required: ''
   });
 
-  const API_BASE_URL = 'http://api.jpf-portal-api.com';
+  const API_BASE_URL = 'https://api.jpf-portal-api.com';
 
   // Show success message
   const showSuccess = (message: string) => {
