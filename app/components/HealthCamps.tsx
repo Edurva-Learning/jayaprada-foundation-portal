@@ -1,12 +1,7 @@
-
-
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, Eye, EyeIcon, TestTube, Heart, Pill, Ear, Activity, X, User, IdCard, Calendar, MapPin, Phone, Users, CalendarIcon, Stethoscope, Filter, Download, Edit, Trash2 } from "lucide-react";
-
-type View = 'participants' | 'campParticipants';
+import { Search, Eye, TestTube, Heart, Pill, Ear, Activity, X, User, IdCard, Calendar, MapPin, Phone, Users, CalendarIcon, Stethoscope, Edit } from "lucide-react";
 
 interface Participant {
   id: number;
@@ -18,7 +13,6 @@ interface Participant {
   registration_source: string;
   address: string;
   created_at: string;
-  // New fields from participant table
   blood_checkup: boolean;
   medicine_required: string;
   medicine_name: string;
@@ -27,15 +21,12 @@ interface Participant {
 }
 
 export default function HealthCampPage() {
-  const [currentView, setCurrentView] = useState<View>('participants');
-  
   // Participants Page State
   const [searchName, setSearchName] = useState("");
   const [searchAadhar, setSearchAadhar] = useState("");
   const [searchPhone, setSearchPhone] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [showParticipantForm, setShowParticipantForm] = useState(false);
-  const [showCampForm, setShowCampForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showViewForm, setShowViewForm] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -45,8 +36,6 @@ export default function HealthCampPage() {
 
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
-   const campTypes = ["Eye Camps", "Dental Camps", "General Health", "Cancer Screening"];
 
   // Participant Form state
   const [formData, setFormData] = useState({
@@ -59,20 +48,7 @@ export default function HealthCampPage() {
     address: ""
   });
 
-  // Camp Form state
-  const [campFormData, setCampFormData] = useState({
-    participant: "",
-    surgerySuggested: "",
-    campName: "",
-    remarks: "",
-    servicesPerformed: [] as string[],
-    followUpNeeded: "",
-    treatmentRequired: "",
-    followUpDate: "",
-    surgeryRequired: ""
-  });
-
-  // Edit Form state - Updated to include fields from participant table
+  // Edit Form state
   const [editFormData, setEditFormData] = useState({
     name: "",
     id: 0, 
@@ -93,7 +69,6 @@ export default function HealthCampPage() {
     bloodCheckup: false,
     medicineRequired: "",
     medicineName: "",
-    // New fields from participant table
     blood_checkup: false,
     medicine_required: "",
     medicine_name: "",
@@ -101,7 +76,7 @@ export default function HealthCampPage() {
     surgery_required: ""
   });
 
-  // View Form state - Updated to include fields from participant table
+  // View Form state
   const [viewFormData, setViewFormData] = useState({
     name: "",
     campName: "",
@@ -121,7 +96,6 @@ export default function HealthCampPage() {
     bloodCheckup: false,
     medicineRequired: "",
     medicineName: "",
-    // New fields from participant table
     blood_checkup: false,
     medicine_required: "",
     medicine_name: "",
@@ -129,37 +103,7 @@ export default function HealthCampPage() {
     surgery_required: ""
   });
 
-  // Camp Participants State
-  const [campParticipants, setCampParticipants] = useState<any[]>([]);
-  const [campFilters, setCampFilters] = useState({
-    camp: "",
-    treatmentRequired: "",
-    surgeryRequired: "",
-    followUpNeeded: "",
-    allCamps: "",
-    surgeryDateFrom: "",
-    followUpDateFrom: "",
-    surgerySuggested: "",
-    servicesPerformed: ""
-  });
-
-  const campOptions = [
-    "Cancer Screening",
-    "Eye Camp",
-    "Dental Check Up"
-  ];
-
-  const serviceOptions = [
-    "Eye Check",
-    "Hemoglobin Test",
-    "Anemia Test",
-    "Dental Check",
-    "Ear Check",
-    "Cancer Screening"
-  ];
-
   const API_BASE_URL = "https://api.jpf-portal-api.com";
-  // const API_BASE_URL = "http://localhost:5000";
 
   // API Calls for Participants
   const fetchParticipants = async () => {
@@ -174,13 +118,12 @@ export default function HealthCampPage() {
       setFilteredParticipants(data);
     } catch (error) {
       console.error('Error fetching participants:', error);
-      alert('Failed to fetch participants');
+      setErrorMessage('Failed to fetch participants');
     } finally {
       setLoading(false);
     }
   };
 
-  
   const createParticipant = async (participantData: any) => {
     try {
       const response = await fetch(`${API_BASE_URL}/camp-participants`, {
@@ -204,58 +147,10 @@ export default function HealthCampPage() {
     }
   };
 
-  // API Calls for Camp Details
-  const fetchCampDetails = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/campdetails`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch camp details');
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error fetching camp details:', error);
-      throw error;
-    }
-  };
-
-  const createCampDetail = async (campData: any) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/campdetails`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(campData)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to create camp detail: ${errorText}`);
-      }
-
-      const newCampDetail = await response.json();
-      return newCampDetail;
-    } catch (error) {
-      console.error('Error creating camp detail:', error);
-      throw error;
-    }
-  };
-
-  // Load participants and camp details on component mount
+  // Load participants on component mount
   useEffect(() => {
     fetchParticipants();
-    loadCampDetails();
   }, []);
-
-  const loadCampDetails = async () => {
-    try {
-      const data = await fetchCampDetails();
-      setCampParticipants(data);
-    } catch (error) {
-      console.error('Error loading camp details:', error);
-    }
-  };
 
   // Participants Page Functions
   const handleSearch = () => {
@@ -295,14 +190,6 @@ export default function HealthCampPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleCampInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setCampFormData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -366,95 +253,76 @@ export default function HealthCampPage() {
     }
   };
 
-  const handleServiceCheckboxChange = (service: string) => {
-    setCampFormData(prev => ({
-      ...prev,
-      servicesPerformed: prev.servicesPerformed.includes(service)
-        ? prev.servicesPerformed.filter(s => s !== service)
-        : [...prev.servicesPerformed, service]
-    }));
-  };
+  const handleUpdateParticipant = async (editFormData: any) => {
+    try {
+      const updateData = {
+        blood_checkup: editFormData.bloodCheckup,
+        medicine_required: editFormData.medicineRequired,
+        medicine_name: editFormData.medicineName,
+        treatment_required: editFormData.treatmentRequired,
+        surgery_required: editFormData.surgeryRequired,
+      };
+      const id = editFormData.id;
 
-  const handleUpdateParticipant = async ( editFormData: any) => {
-  try {
-    const updateData = {
-      blood_checkup: editFormData.bloodCheckup,
-      medicine_required: editFormData.medicineRequired,
-      medicine_name: editFormData.medicineName,
-      treatment_required: editFormData.treatmentRequired,
-      surgery_required: editFormData.surgeryRequired,
-    };
-    const id = editFormData.id;
+      console.log("Updating participant with data:", updateData);
 
-    console.log("Updating participant with data:", updateData);
+      const response = await fetch(`${API_BASE_URL}/participants/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData)
+      });
 
-    const response = await fetch(`${API_BASE_URL}/participants/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updateData)
-    });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update participant: ${errorText}`);
+      }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to update participant: ${errorText}`);
+      const updatedParticipant = await response.json();
+      
+      setParticipants(prev => 
+        prev.map(p => p.id === id ? { ...p, ...updateData } : p)
+      );
+      setFilteredParticipants(prev => 
+        prev.map(p => p.id === id ? { ...p, ...updateData } : p)
+      );
+
+      return updatedParticipant;
+    } catch (error) {
+      console.error('Error updating participant:', error);
+      throw error;
     }
-
-    const updatedParticipant = await response.json();
-    
-    // Update the participants list with the updated participant
-    setParticipants(prev => 
-      prev.map(p => p.id === id ? { ...p, ...updateData } : p)
-    );
-    setFilteredParticipants(prev => 
-      prev.map(p => p.id === id ? { ...p, ...updateData } : p)
-    );
-
-    return updatedParticipant;
-  } catch (error) {
-    console.error('Error updating participant:', error);
-    throw error;
-  }
-};
-
-
-
+  };
 
   const handleSaveParticipant = async () => {
     try {
-      // Validate required fields
       if (!formData.full_name || !formData.aadhar_number || !formData.age || !formData.gender || !formData.phone_number || !formData.registration_source || !formData.address ) {
-        alert("Please fill in all required fields");
+        setErrorMessage("Please fill in all required fields");
         return;
       }
 
-      // Validate Aadhar number (12 digits)
       if (formData.aadhar_number.length !== 12 || !/^\d+$/.test(formData.aadhar_number)) {
-        alert("Please enter a valid 12-digit Aadhar number");
+        setErrorMessage("Please enter a valid 12-digit Aadhar number");
         return;
       }
 
-      // Validate phone number (10 digits)
       if (formData.phone_number.length !== 10 || !/^\d+$/.test(formData.phone_number)) {
-        alert("Please enter a valid 10-digit phone number");
+        setErrorMessage("Please enter a valid 10-digit phone number");
         return;
       }
 
-      // Validate age
       const age = parseInt(formData.age);
       if (age < 1 || age > 120) {
-        alert("Please enter a valid age");
+        setErrorMessage("Please enter a valid age");
         return;
       }
 
       const newParticipant = await createParticipant(formData);
       
-      // Update the participants list with the new participant
       setParticipants(prev => [newParticipant, ...prev]);
       setFilteredParticipants(prev => [newParticipant, ...prev]);
       
-      // Reset form and close modal
       setFormData({
         full_name: "",
         aadhar_number: "",
@@ -466,111 +334,53 @@ export default function HealthCampPage() {
       });
       setShowParticipantForm(false);
       
-      alert("Participant added successfully!");
+      setSuccessMessage("Participant added successfully!");
     } catch (error) {
       console.error("Error saving participant:", error);
-      alert("Failed to save participant. Please try again.");
-    }
-  };
-
-  const handleSaveCamp = async () => {
-    try {
-      // Validate required fields
-      if (!campFormData.participant || !campFormData.campName || !campFormData.followUpNeeded || 
-          !campFormData.treatmentRequired || !campFormData.surgeryRequired || 
-          campFormData.servicesPerformed.length === 0) {
-        alert("Please fill in all required fields");
-        return;
-      }
-
-      // Prepare data for backend - send services_performed as array
-      const campData = {
-        participant_id: parseInt(campFormData.participant),
-        surgery_suggested: campFormData.surgerySuggested,
-        camp_name: campFormData.campName,
-        followup_needed: campFormData.followUpNeeded,
-        treatment_required: campFormData.treatmentRequired,
-        surgery_required: campFormData.surgeryRequired,
-        followup_date: campFormData.followUpDate,
-        services_performed: campFormData.servicesPerformed, // Send as array, not string
-        remarks: campFormData.remarks,
-      };
-
-      console.log("Sending camp data:", campData);
-
-      const newCampDetail = await createCampDetail(campData);
-      
-      // Update camp participants list
-      setCampParticipants(prev => [newCampDetail, ...prev]);
-      
-      // Reset form and close modal
-      setCampFormData({
-        participant: "",
-        surgerySuggested: "",
-        campName: "",
-        remarks: "",
-        servicesPerformed: [],
-        followUpNeeded: "",
-        treatmentRequired: "",
-        followUpDate: "",
-        surgeryRequired: ""
-      });
-      setShowCampForm(false);
-      
-      alert("Camp details saved successfully!");
-    } catch (error) {
-      console.error("Error saving camp details:", error);
-      alert("Failed to save camp details. Please try again.");
+      setErrorMessage("Failed to save participant. Please try again.");
     }
   };
 
   const handleSaveEditForm = async () => {
     try {
-      // Validate required fields
       if (!editFormData.treatmentRequired || !editFormData.surgeryRequired || !editFormData.medicineRequired) {
-        alert("Please fill in all required fields");
+        setErrorMessage("Please fill in all required fields");
         return;
       }
 
-      // If treatment required is yes, validate at least one treatment detail is selected
       if (editFormData.treatmentRequired === "yes" && 
           !editFormData.treatmentDetails.spectacles && 
           !editFormData.treatmentDetails.cataract && 
           !editFormData.treatmentDetails.other) {
-        alert("Please select at least one treatment detail");
+        setErrorMessage("Please select at least one treatment detail");
         return;
       }
 
-      // If treatment other is selected, validate other text
       if (editFormData.treatmentDetails.other && !editFormData.treatmentDetails.otherText) {
-        alert("Please specify the other treatment");
+        setErrorMessage("Please specify the other treatment");
         return;
       }
 
-      // If medicine required is yes, validate medicine name
       if (editFormData.medicineRequired === "yes" && !editFormData.medicineName) {
-        alert("Please enter medicine name");
+        setErrorMessage("Please enter medicine name");
         return;
       }
 
-      // If surgery done is checked, validate follow-up date
       if (editFormData.surgeryDetails.surgeryDone && !editFormData.surgeryDetails.followUpDate) {
-        alert("Please enter surgery follow-up date");
+        setErrorMessage("Please enter surgery follow-up date");
         return;
       }
 
-      // Save the data to view form state
       setViewFormData(editFormData);
 
-      const updateParticipant = await handleUpdateParticipant( editFormData );
+      const updateParticipant = await handleUpdateParticipant(editFormData);
       
-      // For now, just close the form and show success message
       setShowEditForm(false);
-      alert("Camp details updated successfully!");
+      setSuccessMessage("Camp details updated successfully!");
       
     } catch (error) {
       console.error("Error saving edit form:", error);
-      alert("Failed to save camp details. Please try again.");
+      setErrorMessage("Failed to save camp details. Please try again.");
     }
   };
 
@@ -585,21 +395,6 @@ export default function HealthCampPage() {
       address: ""
     });
     setShowParticipantForm(false);
-  };
-
-  const handleCloseCampForm = () => {
-    setCampFormData({
-      participant: "",
-      surgerySuggested: "",
-      campName: "",
-      remarks: "",
-      servicesPerformed: [],
-      followUpNeeded: "",
-      treatmentRequired: "",
-      followUpDate: "",
-      surgeryRequired: ""
-    });
-    setShowCampForm(false);
   };
 
   const handleCloseEditForm = () => {
@@ -623,7 +418,6 @@ export default function HealthCampPage() {
       bloodCheckup: false,
       medicineRequired: "",
       medicineName: "",
-      // New fields
       blood_checkup: false,
       medicine_required: "",
       medicine_name: "",
@@ -638,7 +432,6 @@ export default function HealthCampPage() {
   };
 
   const handleOpenEditForm = (participant: Participant) => {
-    // Pre-fill the form with participant data including new fields
     setEditFormData({
       name: participant.name,
       id:participant.id,
@@ -659,7 +452,6 @@ export default function HealthCampPage() {
       bloodCheckup: participant.blood_checkup || false,
       medicineRequired: participant.medicine_required || "",
       medicineName: participant.medicine_name || "",
-      // New fields from participant table
       blood_checkup: participant.blood_checkup || false,
       medicine_required: participant.medicine_required || "",
       medicine_name: participant.medicine_name || "",
@@ -670,7 +462,6 @@ export default function HealthCampPage() {
   };
 
   const handleOpenViewForm = (participant: Participant) => {
-    // Set view form data with the saved edit form data and participant data
     setViewFormData({
       name: participant.name,
       campName: "Health Camp",
@@ -682,7 +473,6 @@ export default function HealthCampPage() {
       bloodCheckup: editFormData.bloodCheckup || participant.blood_checkup || false,
       medicineRequired: editFormData.medicineRequired || participant.medicine_required || "no",
       medicineName: editFormData.medicineName || participant.medicine_name || "",
-      // New fields from participant table
       blood_checkup: participant.blood_checkup || false,
       medicine_required: participant.medicine_required || "",
       medicine_name: participant.medicine_name || "",
@@ -692,30 +482,8 @@ export default function HealthCampPage() {
     setShowViewForm(true);
   };
 
-  // Camp Participants Functions
-  const handleCampFilterChange = (name: string, value: string) => {
-    setCampFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleResetCampFilters = () => {
-    setCampFilters({
-      camp: "",
-      treatmentRequired: "",
-      surgeryRequired: "",
-      followUpNeeded: "",
-      allCamps: "",
-      surgeryDateFrom: "",
-      followUpDateFrom: "",
-      surgerySuggested: "",
-      servicesPerformed: ""
-    });
-  };
-
   const serviceData = [
-    { label: "Eye Check", value: 0, icon: EyeIcon },
+    { label: "Eye Check", value: 0, icon: Eye },
     { label: "Hemoglobin Test", value: 0, icon: TestTube },
     { label: "Anemia Test", value: 0, icon: Heart },
     { label: "Dental Check", value: 0, icon: Pill },
@@ -723,7 +491,6 @@ export default function HealthCampPage() {
     { label: "Cancer Screening", value: 0, icon: Activity },
   ];
 
-  // Format date for display
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -734,254 +501,33 @@ export default function HealthCampPage() {
     });
   };
 
-  // Render Camp Participants View
-  const renderCampParticipants = () => (
+  useEffect(() => {
+    if (successMessage || errorMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');
+        setErrorMessage('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, errorMessage]);
+
+  return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            {successMessage}
+          </div>
+        )}
+        {errorMessage && (
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {errorMessage}
+          </div>
+        )}
+
         {/* Header */}
         <h1 className="text-2xl font-bold mb-6 text-gray-800">Health Camp Program</h1>
-
-        {/* Tabs */}
-        <div className="flex mb-6 border-b border-gray-200">
-          <button 
-            onClick={() => setCurrentView('participants')}
-            className="px-6 py-3 text-gray-600 bg-gray-100 font-medium mr-2 rounded-t-lg hover:bg-[#00b4d8] hover:text-white transition-colors"
-          >
-            Participants
-          </button>
-          <button className="px-6 py-3 text-white bg-[#00b4d8] font-medium rounded-t-lg">
-            Camp Participants
-          </button>
-        </div>
-
-        {/* Filter Section */}
-        <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-[#0077b6] flex items-center gap-2">
-              <Filter size={20} />
-              Filter Camp Participants
-            </h2>
-          </div>
-
-          {/* Filters Grid */}
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            {/* Camp */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Camp</label>
-              <select
-                value={campFilters.camp}
-                onChange={(e) => handleCampFilterChange("camp", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-              >
-                <option value="">Select Camp</option>
-                <option value="eye-camp">Cancer Screening</option>
-                <option value="eye-camp">Eye Camp</option>
-                <option value="dental">Dental Check-up</option>
-              </select>
-            </div>
-
-            {/* Treatment Required */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Treatment Required</label>
-              <select
-                value={campFilters.treatmentRequired}
-                onChange={(e) => handleCampFilterChange("treatmentRequired", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-              >
-                <option value="">Select</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-                <option value="not applicable">Not Applicable</option>
-              </select>
-            </div>
-
-            {/* Surgery Required */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Surgery Required</label>
-              <select
-                value={campFilters.surgeryRequired}
-                onChange={(e) => handleCampFilterChange("surgeryRequired", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-              >
-                <option value="">Select</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-                <option value="not applicable">Not Applicable</option>
-              </select>
-            </div>
-
-            {/* Follow-up Needed */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Follow-up Needed</label>
-              <select
-                value={campFilters.followUpNeeded}
-                onChange={(e) => handleCampFilterChange("followUpNeeded", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-              >
-                <option value="">Select</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Second Row Filters */}
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            {/* Surgery Date From */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Surgery Date From</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={campFilters.surgeryDateFrom}
-                  onChange={(e) => handleCampFilterChange("surgeryDateFrom", e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-                  placeholder="dd-mm-yyyy"
-                />
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-              </div>
-            </div>
-
-            {/* Follow-up Date From */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Follow-up Date From</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={campFilters.followUpDateFrom}
-                  onChange={(e) => handleCampFilterChange("followUpDateFrom", e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-                  placeholder="dd-mm-yyyy"
-                />
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-              </div>
-            </div>
-
-            {/* Surgery Suggested */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Surgery Suggested</label>
-              <input
-                type="text"
-                placeholder="Search surgery suggestions"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          {/* Third Row Filters */}
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            {/* Services Performed */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Services Performed</label>
-              <select
-                value={campFilters.servicesPerformed}
-                onChange={(e) => handleCampFilterChange("servicesPerformed", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-              >
-                <option value="">All Services</option>
-                <option value="eye-check">Eye Check</option>
-                <option value="dental-check">Hemoglobin Test</option>
-                <option value="dental-check">Anemia Test</option>
-                <option value="dental-check">Dental Check</option>
-                <option value="dental-check">Ear Check</option>
-                <option value="dental-check">Cancer Screening</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-gray-200 mb-6"></div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-4">
-            <button className="bg-[#00b4d8] hover:bg-[#0096c7] text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
-              <Filter size={18} />
-              Apply Filters
-            </button>
-            <button 
-              onClick={handleResetCampFilters}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-
-        {/* Table Section */}
-        <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#caf0f8] text-[#0077b6] border-b border-[#90e0ef]">
-                <th className="p-3 font-semibold">ID</th>
-                <th className="p-3 font-semibold">Participant</th>
-                <th className="p-3 font-semibold">Camp</th>
-                <th className="p-3 font-semibold">Services</th>
-                <th className="p-3 font-semibold">Treatment</th>
-                <th className="p-3 font-semibold">Surgery</th>
-                <th className="p-3 font-semibold">Follow-up</th>
-                <th className="p-3 font-semibold">Created At</th>
-                <th className="p-3 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {campParticipants.map((participant) => (
-                <tr key={participant.participant_id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="p-3">{participant.id}</td>
-                  <td className="p-3">{participant.participant_id}</td>
-                  <td className="p-3">{participant.camp_name}</td>
-                  <td className="p-3">{participant.services_performed}</td>
-                  <td className="p-3">{participant.treatment_required}</td>
-                  <td className="p-3">{participant.surgery_required}</td>
-                  <td className="p-3">{participant.followup_needed}</td>
-                  <td className="p-3">{formatDate(participant.created_at)}</td>
-                  <td className="p-3">
-                    <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-800 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                        </svg>
-                      </button>
-                      <button className="text-green-600 hover:text-green-800 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                      </button>
-                      <button className="text-red-600 hover:text-red-800 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
-  // Render Participants View
-  const renderParticipants = () => (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Health Camp Program</h1>
-
-        {/* Tabs */}
-        <div className="flex mb-6 border-b border-gray-200">
-          <button className="px-6 py-3 text-white bg-[#00b4d8] font-medium mr-2 rounded-t-lg">
-            Participants
-          </button>
-          <button 
-            onClick={() => setCurrentView('campParticipants')}
-            className="px-6 py-3 text-gray-600 bg-gray-100 font-medium rounded-t-lg hover:bg-[#00b4d8] hover:text-white transition-colors"
-          >
-            Camp Participants
-          </button>
-        </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-4 gap-4 mb-8">
@@ -1095,8 +641,6 @@ export default function HealthCampPage() {
                   <th className="p-3 font-semibold">Gender</th>
                   <th className="p-3 font-semibold">Phone</th>
                   <th className="p-3 font-semibold">Aadhar</th>
-                  {/* <th className="p-3 font-semibold">Treatment</th>
-                  <th className="p-3 font-semibold">Surgery</th> */}
                   <th className="p-3 font-semibold">Created At</th>
                   <th className="p-3 font-semibold">Actions</th>
                 </tr>
@@ -1111,28 +655,6 @@ export default function HealthCampPage() {
                       <td className="p-3">{participant.gender}</td>
                       <td className="p-3">{participant.phone}</td>
                       <td className="p-3">{participant.aadhar}</td>
-                      {/* <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          participant.treatment_required === 'yes' 
-                            ? 'bg-orange-100 text-orange-800' 
-                            : participant.treatment_required === 'no'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {participant.treatment_required || 'Not specified'}
-                        </span>
-                      </td> */}
-                      {/* <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          participant.surgery_required === 'yes' 
-                            ? 'bg-orange-100 text-orange-800' 
-                            : participant.surgery_required === 'no'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {participant.surgery_required || 'Not specified'}
-                        </span>
-                      </td> */}
                       <td className="p-3">{formatDate(participant.created_at)}</td>
                       <td className="p-3">
                         <div className="flex gap-2">
@@ -1154,7 +676,7 @@ export default function HealthCampPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={10} className="p-3 text-center text-gray-500">
+                    <td colSpan={8} className="p-3 text-center text-gray-500">
                       No participants found
                     </td>
                   </tr>
@@ -1398,7 +920,6 @@ export default function HealthCampPage() {
                   </div>
                 </div>
                 
-
                 {/* Camp-specific Medical Information */}
                 <div className="col-span-2 border-t pt-4 mt-4">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Camp-specific Medical Information</h3>
@@ -1706,88 +1227,6 @@ export default function HealthCampPage() {
                   </div>
                 </div>
 
-                {/* Medical Information from Participant Record */}
-                {/* <div className="border-t pt-4 mt-4">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Medical Information from Participant Record</h3>
-                  
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                        <Activity size={16} className="text-[#00b4d8]" />
-                        Blood Checkup
-                      </div>
-                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
-                        viewFormData.blood_checkup 
-                          ? "bg-orange-100 text-orange-800" 
-                          : "bg-green-100 text-green-800"
-                      }`}>
-                        {viewFormData.blood_checkup ? "Yes" : "No"}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                        <Stethoscope size={16} className="text-[#00b4d8]" />
-                        Treatment Required
-                      </div>
-                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
-                        viewFormData.treatment_required === "yes" 
-                          ? "bg-orange-100 text-orange-800" 
-                          : viewFormData.treatment_required === "no"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}>
-                        {viewFormData.treatment_required || "Not specified"}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                        <Stethoscope size={16} className="text-[#00b4d8]" />
-                        Surgery Required
-                      </div>
-                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
-                        viewFormData.surgery_required === "yes" 
-                          ? "bg-orange-100 text-orange-800" 
-                          : viewFormData.surgery_required === "no"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}>
-                        {viewFormData.surgery_required || "Not specified"}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                        <Pill size={16} className="text-[#00b4d8]" />
-                        Medicine Required
-                      </div>
-                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
-                        viewFormData.medicine_required === "yes" 
-                          ? "bg-orange-100 text-orange-800" 
-                          : viewFormData.medicine_required === "no"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}>
-                        {viewFormData.medicine_required || "Not specified"}
-                      </div>
-                    </div>
-                  </div> */}
-
-                  {/* {viewFormData.medicine_name && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="text-sm font-medium text-gray-700 mb-2">Medicine Details from Participant Record:</div>
-                      <div className="flex items-center gap-2">
-                        <Pill size={16} className="text-[#00b4d8]" />
-                        <span className="text-sm text-gray-600">Medicine Name:</span>
-                        <span className="text-sm text-gray-800 font-medium ml-1">
-                          {viewFormData.medicine_name}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div> */}
-
                 {/* Camp-specific Medical Information */}
                 <div className="border-t pt-4 mt-4">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Camp-specific Medical Information</h3>
@@ -1928,11 +1367,4 @@ export default function HealthCampPage() {
       )}
     </div>
   );
-
-  // Return the appropriate view
-  if (currentView === 'campParticipants') {
-    return renderCampParticipants();
-  }
-
-  return renderParticipants();
 }
