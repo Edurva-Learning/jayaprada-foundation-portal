@@ -215,7 +215,7 @@
 
 // export default Dashboard;
 'use client';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Users,
   UserPlus,
@@ -240,26 +240,125 @@ import {
 } from 'recharts';
 
 const Dashboard: React.FC = () => {
+
+  const [stats, setStats] = useState({
+    total: 0,
+    todayCount: 0,
+    healthCampCount: 0,
+    eyeCamps: 0,
+    dentalCamps: 0,
+    generalHealth: 0,
+    cancerScreening: 0
+  });
+  const [participants, setParticipants] = useState<any[]>([]);
+
+  // useEffect(() => {
+  //   const fetchParticipants = async () => {
+  //     try {
+  //       const res = await fetch('http://localhost:5000/participants'); // ✅ your API endpoint
+  //       const data = await res.json();
+
+  //       setParticipants(data);
+
+  //       // ✅ Calculate stats
+  //       const total = data.length;
+
+  //       const today = new Date().toISOString().split('T')[0]; // "2025-10-29"
+  //       const todayCount = data.filter((p: any) =>
+  //         p.created_at?.startsWith(today)
+  //       ).length;
+
+  //       const healthCampCount = data.filter(
+  //         (p: any) => p.registration_source === 'Health Camp'
+  //       ).length;
+
+  //       setStats({ total, todayCount, healthCampCount });
+  //     } catch (err) {
+  //       console.error('Error fetching participants:', err);
+  //     }
+  //   };
+
+  //   fetchParticipants();
+  // }, []);
+
+
+  useEffect(() => {
+  const fetchParticipants = async () => {
+    try {
+      const res = await fetch('http://api.jpf-portal-api.com/participants');
+      const data = await res.json();
+
+      setParticipants(data);
+
+      // ✅ Calculate total participants
+      const total = data.length;
+
+      // ✅ Participants created today
+      const today = new Date().toISOString().split('T')[0];
+      const todayCount = data.filter((p: any) =>
+        p.created_at?.startsWith(today)
+      ).length;
+
+      // ✅ Participants registered in "Health Camp"
+      const healthCampCount = data.filter(
+        (p: any) => p.registration_source === 'Health Camp'
+      ).length;
+
+      // ✅ Now calculate camp-type-wise counts
+      const eyeCamps = data.filter(
+        (p: any) => p.campcategory === 'Eye CheckUp'
+      ).length;
+
+      const dentalCamps = data.filter(
+        (p: any) => p.campcategory === 'Dental CheckUp'
+      ).length;
+
+      const generalHealth = data.filter(
+        (p: any) => p.campcategory === 'General CheckUp'
+      ).length;
+
+      const cancerScreening = data.filter(
+        (p: any) => p.campcategory === 'Cancer Screening'
+      ).length;
+
+      // ✅ Store computed stats
+      setStats({
+        total,
+        todayCount,
+        healthCampCount,
+        eyeCamps,
+        dentalCamps,
+        generalHealth,
+        cancerScreening,
+      });
+    } catch (err) {
+      console.error('Error fetching participants:', err);
+    }
+  };
+
+  fetchParticipants();
+}, []);
+
   // --- Static demo data ---
-  const totalBeneficiaries = 9500;
-  const newParticipants = 47;
-  const activeCamps = 12;
-  const totalSponsorships = 3250;
+  const totalBeneficiaries = stats.total;
+  const newParticipants = stats.todayCount;
+  const activeCamps = 1;
+  const totalSponsorships = 0;
 
   const barData = [
-    { name: 'Health Camp', value: 2840, color: '#3B82F6' },
-    { name: 'Education Sponsorship', value: 3250, color: '#10B981' },
-    { name: 'Women Empowerment', value: 1890, color: '#8B5CF6' },
-    { name: 'Organic Agriculture', value: 1520, color: '#6EE7B7' },
-    { name: 'Girl Child Support', value: 1350, color: '#EF4444' },
-    { name: 'Covid Relief', value: 650, color: '#60A5FA' },
+    { name: 'Health Camp', value: stats.healthCampCount, color: '#3B82F6' },
+    { name: 'Education Sponsorship', value: 0, color: '#10B981' },
+    { name: 'Women Empowerment', value: 0, color: '#8B5CF6' },
+    { name: 'Organic Agriculture', value: 0, color: '#6EE7B7' },
+    { name: 'Girl Child Support', value: 0, color: '#EF4444' },
+    { name: 'Covid Relief', value: 0, color: '#60A5FA' },
   ];
 
   const pieData = [
-    { name: 'Eye Camps', value: 840, color: '#3B82F6' },
-    { name: 'Dental Camps', value: 650, color: '#22C55E' },
-    { name: 'General Health', value: 980, color: '#A855F7' },
-    { name: 'Cancer Screening', value: 370, color: '#F97316' },
+    { name: 'Eye CheckUps', value: stats.eyeCamps, color: '#3B82F6' },
+    { name: 'Dental CheckUps', value: stats.dentalCamps, color: '#22C55E' },
+    { name: 'General CheckUps', value: stats.generalHealth, color: '#A855F7' },
+    { name: 'Cancer Screening', value: stats.cancerScreening, color: '#F97316' },
   ];
 
   const trendData = [
@@ -276,6 +375,8 @@ const Dashboard: React.FC = () => {
     { month: 'Nov', Health: 237, Education: 270, Women: 158, Agriculture: 126, GirlChild: 109, Covid: 42 },
     { month: 'Dec', Health: 270, Education: 280, Women: 158, Agriculture: 126, GirlChild: 109, Covid: 40 },
   ];
+
+
 
   const recentActivity = [
     {
@@ -304,6 +405,8 @@ const Dashboard: React.FC = () => {
       time: '3 hours ago',
     },
   ];
+
+
 
   const totalPie = pieData.reduce((acc, item) => acc + item.value, 0);
 

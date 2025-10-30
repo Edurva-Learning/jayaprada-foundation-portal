@@ -1,20 +1,29 @@
+
+
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, Eye, EyeIcon, TestTube, Heart, Pill, Ear, Activity, X, User, IdCard, Calendar, MapPin, Phone, Users, CalendarIcon, Stethoscope, Filter, Download } from "lucide-react";
+import { Search, Eye, EyeIcon, TestTube, Heart, Pill, Ear, Activity, X, User, IdCard, Calendar, MapPin, Phone, Users, CalendarIcon, Stethoscope, Filter, Download, Edit, Trash2 } from "lucide-react";
 
 type View = 'participants' | 'campParticipants';
 
 interface Participant {
-  participant_id: number;
-  full_name: string;
-  aadhar_number: string;
+  id: number;
+  name: string;
+  aadhar: string;
   age: number;
   gender: string;
-  phone_number: string;
+  phone: string;
   registration_source: string;
   address: string;
   created_at: string;
+  // New fields from participant table
+  blood_checkup: boolean;
+  medicine_required: string;
+  medicine_name: string;
+  treatment_required: string;
+  surgery_required: string;
 }
 
 export default function HealthCampPage() {
@@ -27,10 +36,17 @@ export default function HealthCampPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [showParticipantForm, setShowParticipantForm] = useState(false);
   const [showCampForm, setShowCampForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [showViewForm, setShowViewForm] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [filteredParticipants, setFilteredParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(false);
   const participantsRef = useRef<HTMLDivElement>(null);
+
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+   const campTypes = ["Eye Camps", "Dental Camps", "General Health", "Cancer Screening"];
 
   // Participant Form state
   const [formData, setFormData] = useState({
@@ -54,6 +70,63 @@ export default function HealthCampPage() {
     treatmentRequired: "",
     followUpDate: "",
     surgeryRequired: ""
+  });
+
+  // Edit Form state - Updated to include fields from participant table
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    id: 0, 
+    campName: "",
+    campServices: [] as string[],
+    treatmentRequired: "",
+    treatmentDetails: {
+      spectacles: false,
+      cataract: false,
+      other: false,
+      otherText: ""
+    },
+    surgeryRequired: "",
+    surgeryDetails: {
+      surgeryDone: false,
+      followUpDate: ""
+    },
+    bloodCheckup: false,
+    medicineRequired: "",
+    medicineName: "",
+    // New fields from participant table
+    blood_checkup: false,
+    medicine_required: "",
+    medicine_name: "",
+    treatment_required: "",
+    surgery_required: ""
+  });
+
+  // View Form state - Updated to include fields from participant table
+  const [viewFormData, setViewFormData] = useState({
+    name: "",
+    campName: "",
+    campServices: [] as string[],
+    treatmentRequired: "",
+    treatmentDetails: {
+      spectacles: false,
+      cataract: false,
+      other: false,
+      otherText: ""
+    },
+    surgeryRequired: "",
+    surgeryDetails: {
+      surgeryDone: false,
+      followUpDate: ""
+    },
+    bloodCheckup: false,
+    medicineRequired: "",
+    medicineName: "",
+    // New fields from participant table
+    blood_checkup: false,
+    medicine_required: "",
+    medicine_name: "",
+    treatment_required: "",
+    surgery_required: ""
   });
 
   // Camp Participants State
@@ -85,11 +158,14 @@ export default function HealthCampPage() {
     "Cancer Screening"
   ];
 
+  const API_BASE_URL = "https://api.jpf-portal-api.com";
+  // const API_BASE_URL = "http://localhost:5000";
+
   // API Calls for Participants
   const fetchParticipants = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://api.jpf-portal-api.com/camp-participants');
+      const response = await fetch(`${API_BASE_URL}/participants`);
       if (!response.ok) {
         throw new Error('Failed to fetch participants');
       }
@@ -104,9 +180,10 @@ export default function HealthCampPage() {
     }
   };
 
+  
   const createParticipant = async (participantData: any) => {
     try {
-      const response = await fetch('https://api.jpf-portal-api.com/camp-participants', {
+      const response = await fetch(`${API_BASE_URL}/camp-participants`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +192,8 @@ export default function HealthCampPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create participant');
+        const errorText = await response.text();
+        throw new Error(`Failed to create participant: ${errorText}`);
       }
 
       const newParticipant = await response.json();
@@ -129,7 +207,7 @@ export default function HealthCampPage() {
   // API Calls for Camp Details
   const fetchCampDetails = async () => {
     try {
-      const response = await fetch('https://api.jpf-portal-api.com/campdetails');
+      const response = await fetch(`${API_BASE_URL}/campdetails`);
       if (!response.ok) {
         throw new Error('Failed to fetch camp details');
       }
@@ -143,7 +221,7 @@ export default function HealthCampPage() {
 
   const createCampDetail = async (campData: any) => {
     try {
-      const response = await fetch('https://api.jpf-portal-api.com/campdetails', {
+      const response = await fetch(`${API_BASE_URL}/campdetails`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -152,7 +230,8 @@ export default function HealthCampPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create camp detail');
+        const errorText = await response.text();
+        throw new Error(`Failed to create camp detail: ${errorText}`);
       }
 
       const newCampDetail = await response.json();
@@ -187,9 +266,9 @@ export default function HealthCampPage() {
     }
 
     const filtered = participants.filter(participant => {
-      const nameMatch = participant.full_name.toLowerCase().includes(searchName.toLowerCase());
-      const aadharMatch = participant.aadhar_number.includes(searchAadhar);
-      const phoneMatch = participant.phone_number.includes(searchPhone);
+      const nameMatch = participant.name.toLowerCase().includes(searchName.toLowerCase());
+      const aadharMatch = participant.aadhar.includes(searchAadhar);
+      const phoneMatch = participant.phone.includes(searchPhone);
       
       return (searchName === "" || nameMatch) && 
              (searchAadhar === "" || aadharMatch) && 
@@ -229,6 +308,64 @@ export default function HealthCampPage() {
     }));
   };
 
+  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      
+      if (name.startsWith('treatmentDetails.')) {
+        const field = name.split('.')[1];
+        setEditFormData(prev => ({
+          ...prev,
+          treatmentDetails: {
+            ...prev.treatmentDetails,
+            [field]: checked
+          }
+        }));
+      } else if (name.startsWith('surgeryDetails.')) {
+        const field = name.split('.')[1];
+        setEditFormData(prev => ({
+          ...prev,
+          surgeryDetails: {
+            ...prev.surgeryDetails,
+            [field]: checked
+          }
+        }));
+      } else {
+        setEditFormData(prev => ({
+          ...prev,
+          [name]: checked
+        }));
+      }
+    } else {
+      if (name.startsWith('treatmentDetails.')) {
+        const field = name.split('.')[1];
+        setEditFormData(prev => ({
+          ...prev,
+          treatmentDetails: {
+            ...prev.treatmentDetails,
+            [field]: value
+          }
+        }));
+      } else if (name.startsWith('surgeryDetails.')) {
+        const field = name.split('.')[1];
+        setEditFormData(prev => ({
+          ...prev,
+          surgeryDetails: {
+            ...prev.surgeryDetails,
+            [field]: value
+          }
+        }));
+      } else {
+        setEditFormData(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      }
+    }
+  };
+
   const handleServiceCheckboxChange = (service: string) => {
     setCampFormData(prev => ({
       ...prev,
@@ -238,10 +375,56 @@ export default function HealthCampPage() {
     }));
   };
 
+  const handleUpdateParticipant = async ( editFormData: any) => {
+  try {
+    const updateData = {
+      blood_checkup: editFormData.bloodCheckup,
+      medicine_required: editFormData.medicineRequired,
+      medicine_name: editFormData.medicineName,
+      treatment_required: editFormData.treatmentRequired,
+      surgery_required: editFormData.surgeryRequired,
+    };
+    const id = editFormData.id;
+
+    console.log("Updating participant with data:", updateData);
+
+    const response = await fetch(`${API_BASE_URL}/participants/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to update participant: ${errorText}`);
+    }
+
+    const updatedParticipant = await response.json();
+    
+    // Update the participants list with the updated participant
+    setParticipants(prev => 
+      prev.map(p => p.id === id ? { ...p, ...updateData } : p)
+    );
+    setFilteredParticipants(prev => 
+      prev.map(p => p.id === id ? { ...p, ...updateData } : p)
+    );
+
+    return updatedParticipant;
+  } catch (error) {
+    console.error('Error updating participant:', error);
+    throw error;
+  }
+};
+
+
+
+
   const handleSaveParticipant = async () => {
     try {
       // Validate required fields
-      if (!formData.full_name || !formData.aadhar_number || !formData.age || !formData.gender || !formData.phone_number || !formData.registration_source || !formData.address) {
+      if (!formData.full_name || !formData.aadhar_number || !formData.age || !formData.gender || !formData.phone_number || !formData.registration_source || !formData.address ) {
         alert("Please fill in all required fields");
         return;
       }
@@ -291,55 +474,105 @@ export default function HealthCampPage() {
   };
 
   const handleSaveCamp = async () => {
-  try {
-    // Validate required fields
-    if (!campFormData.participant || !campFormData.campName || !campFormData.followUpNeeded || 
-        !campFormData.treatmentRequired || !campFormData.surgeryRequired || 
-        campFormData.servicesPerformed.length === 0) {
-      alert("Please fill in all required fields");
-      return;
+    try {
+      // Validate required fields
+      if (!campFormData.participant || !campFormData.campName || !campFormData.followUpNeeded || 
+          !campFormData.treatmentRequired || !campFormData.surgeryRequired || 
+          campFormData.servicesPerformed.length === 0) {
+        alert("Please fill in all required fields");
+        return;
+      }
+
+      // Prepare data for backend - send services_performed as array
+      const campData = {
+        participant_id: parseInt(campFormData.participant),
+        surgery_suggested: campFormData.surgerySuggested,
+        camp_name: campFormData.campName,
+        followup_needed: campFormData.followUpNeeded,
+        treatment_required: campFormData.treatmentRequired,
+        surgery_required: campFormData.surgeryRequired,
+        followup_date: campFormData.followUpDate,
+        services_performed: campFormData.servicesPerformed, // Send as array, not string
+        remarks: campFormData.remarks,
+      };
+
+      console.log("Sending camp data:", campData);
+
+      const newCampDetail = await createCampDetail(campData);
+      
+      // Update camp participants list
+      setCampParticipants(prev => [newCampDetail, ...prev]);
+      
+      // Reset form and close modal
+      setCampFormData({
+        participant: "",
+        surgerySuggested: "",
+        campName: "",
+        remarks: "",
+        servicesPerformed: [],
+        followUpNeeded: "",
+        treatmentRequired: "",
+        followUpDate: "",
+        surgeryRequired: ""
+      });
+      setShowCampForm(false);
+      
+      alert("Camp details saved successfully!");
+    } catch (error) {
+      console.error("Error saving camp details:", error);
+      alert("Failed to save camp details. Please try again.");
     }
+  };
 
-    // Prepare data for backend - send services_performed as array
-    const campData = {
-      participant_id: parseInt(campFormData.participant),
-      surgery_suggested: campFormData.surgerySuggested,
-      camp_name: campFormData.campName,
-      followup_needed: campFormData.followUpNeeded,
-      treatment_required: campFormData.treatmentRequired,
-      surgery_required: campFormData.surgeryRequired,
-      followup_date: campFormData.followUpDate,
-      services_performed: campFormData.servicesPerformed, // Send as array, not string
-      remarks: campFormData.remarks,
-    };
+  const handleSaveEditForm = async () => {
+    try {
+      // Validate required fields
+      if (!editFormData.treatmentRequired || !editFormData.surgeryRequired || !editFormData.medicineRequired) {
+        alert("Please fill in all required fields");
+        return;
+      }
 
-    console.log("Sending camp data:", campData);
+      // If treatment required is yes, validate at least one treatment detail is selected
+      if (editFormData.treatmentRequired === "yes" && 
+          !editFormData.treatmentDetails.spectacles && 
+          !editFormData.treatmentDetails.cataract && 
+          !editFormData.treatmentDetails.other) {
+        alert("Please select at least one treatment detail");
+        return;
+      }
 
-    const newCampDetail = await createCampDetail(campData);
-    
-    // Update camp participants list
-    setCampParticipants(prev => [newCampDetail, ...prev]);
-    
-    // Reset form and close modal
-    setCampFormData({
-      participant: "",
-      surgerySuggested: "",
-      campName: "",
-      remarks: "",
-      servicesPerformed: [],
-      followUpNeeded: "",
-      treatmentRequired: "",
-      followUpDate: "",
-      surgeryRequired: ""
-    });
-    setShowCampForm(false);
-    
-    alert("Camp details saved successfully!");
-  } catch (error) {
-    console.error("Error saving camp details:", error);
-    alert("Failed to save camp details. Please try again.");
-  }
-};
+      // If treatment other is selected, validate other text
+      if (editFormData.treatmentDetails.other && !editFormData.treatmentDetails.otherText) {
+        alert("Please specify the other treatment");
+        return;
+      }
+
+      // If medicine required is yes, validate medicine name
+      if (editFormData.medicineRequired === "yes" && !editFormData.medicineName) {
+        alert("Please enter medicine name");
+        return;
+      }
+
+      // If surgery done is checked, validate follow-up date
+      if (editFormData.surgeryDetails.surgeryDone && !editFormData.surgeryDetails.followUpDate) {
+        alert("Please enter surgery follow-up date");
+        return;
+      }
+
+      // Save the data to view form state
+      setViewFormData(editFormData);
+
+      const updateParticipant = await handleUpdateParticipant( editFormData );
+      
+      // For now, just close the form and show success message
+      setShowEditForm(false);
+      alert("Camp details updated successfully!");
+      
+    } catch (error) {
+      console.error("Error saving edit form:", error);
+      alert("Failed to save camp details. Please try again.");
+    }
+  };
 
   const handleCloseForm = () => {
     setFormData({
@@ -367,6 +600,96 @@ export default function HealthCampPage() {
       surgeryRequired: ""
     });
     setShowCampForm(false);
+  };
+
+  const handleCloseEditForm = () => {
+    setEditFormData({
+      name: "",
+      id:0,
+      campName: "",
+      campServices: [],
+      treatmentRequired: "",
+      treatmentDetails: {
+        spectacles: false,
+        cataract: false,
+        other: false,
+        otherText: ""
+      },
+      surgeryRequired: "",
+      surgeryDetails: {
+        surgeryDone: false,
+        followUpDate: ""
+      },
+      bloodCheckup: false,
+      medicineRequired: "",
+      medicineName: "",
+      // New fields
+      blood_checkup: false,
+      medicine_required: "",
+      medicine_name: "",
+      treatment_required: "",
+      surgery_required: ""
+    });
+    setShowEditForm(false);
+  };
+
+  const handleCloseViewForm = () => {
+    setShowViewForm(false);
+  };
+
+  const handleOpenEditForm = (participant: Participant) => {
+    // Pre-fill the form with participant data including new fields
+    setEditFormData({
+      name: participant.name,
+      id:participant.id,
+      campName: "Health Camp",
+      campServices: ["General Checkup"],
+      treatmentRequired: participant.treatment_required || "",
+      treatmentDetails: {
+        spectacles: false,
+        cataract: false,
+        other: false,
+        otherText: ""
+      },
+      surgeryRequired: participant.surgery_required || "",
+      surgeryDetails: {
+        surgeryDone: false,
+        followUpDate: ""
+      },
+      bloodCheckup: participant.blood_checkup || false,
+      medicineRequired: participant.medicine_required || "",
+      medicineName: participant.medicine_name || "",
+      // New fields from participant table
+      blood_checkup: participant.blood_checkup || false,
+      medicine_required: participant.medicine_required || "",
+      medicine_name: participant.medicine_name || "",
+      treatment_required: participant.treatment_required || "",
+      surgery_required: participant.surgery_required || ""
+    });
+    setShowEditForm(true);
+  };
+
+  const handleOpenViewForm = (participant: Participant) => {
+    // Set view form data with the saved edit form data and participant data
+    setViewFormData({
+      name: participant.name,
+      campName: "Health Camp",
+      campServices: ["General Checkup"],
+      treatmentRequired: editFormData.treatmentRequired || participant.treatment_required || "no",
+      treatmentDetails: editFormData.treatmentDetails,
+      surgeryRequired: editFormData.surgeryRequired || participant.surgery_required || "no",
+      surgeryDetails: editFormData.surgeryDetails,
+      bloodCheckup: editFormData.bloodCheckup || participant.blood_checkup || false,
+      medicineRequired: editFormData.medicineRequired || participant.medicine_required || "no",
+      medicineName: editFormData.medicineName || participant.medicine_name || "",
+      // New fields from participant table
+      blood_checkup: participant.blood_checkup || false,
+      medicine_required: participant.medicine_required || "",
+      medicine_name: participant.medicine_name || "",
+      treatment_required: participant.treatment_required || "",
+      surgery_required: participant.surgery_required || ""
+    });
+    setShowViewForm(true);
   };
 
   // Camp Participants Functions
@@ -772,6 +1095,8 @@ export default function HealthCampPage() {
                   <th className="p-3 font-semibold">Gender</th>
                   <th className="p-3 font-semibold">Phone</th>
                   <th className="p-3 font-semibold">Aadhar</th>
+                  {/* <th className="p-3 font-semibold">Treatment</th>
+                  <th className="p-3 font-semibold">Surgery</th> */}
                   <th className="p-3 font-semibold">Created At</th>
                   <th className="p-3 font-semibold">Actions</th>
                 </tr>
@@ -779,24 +1104,49 @@ export default function HealthCampPage() {
               <tbody>
                 {filteredParticipants.length > 0 ? (
                   filteredParticipants.map((participant) => (
-                    <tr key={participant.participant_id} className="border-b border-gray-200 hover:bg-gray-50">
-                      <td className="p-3">{participant.participant_id}</td>
-                      <td className="p-3">{participant.full_name}</td>
+                    <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
+                      <td className="p-3">{participant.id}</td>
+                      <td className="p-3">{participant.name}</td>
                       <td className="p-3">{participant.age}</td>
                       <td className="p-3">{participant.gender}</td>
-                      <td className="p-3">{participant.phone_number}</td>
-                      <td className="p-3">{participant.aadhar_number}</td>
+                      <td className="p-3">{participant.phone}</td>
+                      <td className="p-3">{participant.aadhar}</td>
+                      {/* <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          participant.treatment_required === 'yes' 
+                            ? 'bg-orange-100 text-orange-800' 
+                            : participant.treatment_required === 'no'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {participant.treatment_required || 'Not specified'}
+                        </span>
+                      </td> */}
+                      {/* <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          participant.surgery_required === 'yes' 
+                            ? 'bg-orange-100 text-orange-800' 
+                            : participant.surgery_required === 'no'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {participant.surgery_required || 'Not specified'}
+                        </span>
+                      </td> */}
                       <td className="p-3">{formatDate(participant.created_at)}</td>
                       <td className="p-3">
                         <div className="flex gap-2">
                           <button 
-                            onClick={() => setShowCampForm(true)}
-                            className="bg-[#00b4d8] hover:bg-[#0096c7] text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
+                            onClick={() => handleOpenViewForm(participant)}
+                            className="bg-blue-300 hover:bg-blue-500 text-black p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors"
                           >
-                            + Add Camp
-                          </button>
-                          <button className="bg-orange-300 hover:bg-[#0096c7] text-black p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors">
                             <Eye size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleOpenEditForm(participant)}
+                            className="bg-orange-300 hover:bg-orange-500 text-black p-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors"
+                          >
+                            <Edit size={16} />
                           </button>
                         </div>
                       </td>
@@ -804,7 +1154,7 @@ export default function HealthCampPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="p-3 text-center text-gray-500">
+                    <td colSpan={10} className="p-3 text-center text-gray-500">
                       No participants found
                     </td>
                   </tr>
@@ -985,196 +1335,291 @@ export default function HealthCampPage() {
         </div>
       )}
 
-      {/* Add Camp Form Modal */}
-      {showCampForm && (
+      {/* Edit Form Modal */}
+      {showEditForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl transform transition-all">
             {/* Header */}
             <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Stethoscope size={24} />
-                  <h2 className="text-2xl font-bold">Add New Camp</h2>
+                  <Edit size={24} />
+                  <h2 className="text-2xl font-bold">Edit Camp Details</h2>
                 </div>
                 <button 
-                  onClick={handleCloseCampForm}
+                  onClick={handleCloseEditForm}
                   className="p-2 hover:bg-[#0096c7] rounded-full transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
-              <p className="text-blue-100 mt-2">Fill in the camp details below</p>
+              <p className="text-blue-100 mt-2">Update camp details for participant</p>
             </div>
 
             {/* Form */}
             <div className="p-6 max-h-[70vh] overflow-y-auto">
               <div className="grid grid-cols-2 gap-6">
-                {/* Participant */}
+                {/* Name - Non Editable */}
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <User size={16} className="text-[#00b4d8]" />
-                    Participant *
-                  </label>
-                  <select
-                    name="participant"
-                    value={campFormData.participant}
-                    onChange={handleCampInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                  >
-                    <option value="">Select Participant</option>
-                    {participants.map((participant) => (
-                      <option key={participant.participant_id} value={participant.participant_id}>
-                        {participant.full_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Surgery Suggested */}
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Stethoscope size={16} className="text-[#00b4d8]" />
-                    Surgery Suggested
+                    Name
                   </label>
                   <input
                     type="text"
-                    name="surgerySuggested"
-                    value={campFormData.surgerySuggested}
-                    onChange={handleCampInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                    placeholder="Enter surgery suggestions"
+                    value={editFormData.name}
+                    disabled
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-600 cursor-not-allowed"
                   />
                 </div>
 
-                {/* Camp Name */}
+                {/* Camp Name - Non Editable */}
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <Stethoscope size={16} className="text-[#00b4d8]" />
-                    Camp Name *
+                    Camp Name
                   </label>
-                  <select
-                    name="campName"
-                    value={campFormData.campName}
-                    onChange={handleCampInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                  >
-                    <option value="">Select Camp</option>
-                    <option value="cancer-screening">Cancer Screening</option>
-                    <option value="eye-camp">Eye Camp</option>
-                    <option value="dental-check-up">Dental Check Up</option>
-                  </select>
+                  <input
+                    type="text"
+                    value={editFormData.campName}
+                    disabled
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-600 cursor-not-allowed"
+                  />
                 </div>
 
-                {/* Follow-up Needed */}
-                <div className="space-y-2">
+                {/* Camp Services - Non Editable */}
+                <div className="col-span-2 space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Users size={16} className="text-[#00b4d8]" />
-                    Follow-up Needed *
+                    <Activity size={16} className="text-[#00b4d8]" />
+                    Camp Services
                   </label>
-                  <select
-                    name="followUpNeeded"
-                    value={campFormData.followUpNeeded}
-                    onChange={handleCampInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                  >
-                    <option value="">Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
+                  <div className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-600 cursor-not-allowed">
+                    {editFormData.campServices.join(", ")}
+                  </div>
+                </div>
+                
+
+                {/* Camp-specific Medical Information */}
+                <div className="col-span-2 border-t pt-4 mt-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Camp-specific Medical Information</h3>
                 </div>
 
                 {/* Treatment Required */}
-                <div className="space-y-2">
+                <div className="col-span-2 space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <Stethoscope size={16} className="text-[#00b4d8]" />
                     Treatment Required *
                   </label>
-                  <select
-                    name="treatmentRequired"
-                    value={campFormData.treatmentRequired}
-                    onChange={handleCampInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                  >
-                    <option value="">Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                    <option value="not-applicable">Not Applicable</option>
-                  </select>
+                  <div className="flex gap-6">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="treatmentRequired"
+                        value="yes"
+                        checked={editFormData.treatmentRequired === "yes"}
+                        onChange={handleEditInputChange}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="treatmentRequired"
+                        value="no"
+                        checked={editFormData.treatmentRequired === "no"}
+                        onChange={handleEditInputChange}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
+                  </div>
+
+                  {/* Treatment Details - Show only if treatment required is yes */}
+                  {editFormData.treatmentRequired === "yes" && (
+                    <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Treatment Details:</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            name="treatmentDetails.spectacles"
+                            checked={editFormData.treatmentDetails.spectacles}
+                            onChange={handleEditInputChange}
+                            className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                          />
+                          <span className="text-sm text-gray-700">Spectacles</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            name="treatmentDetails.cataract"
+                            checked={editFormData.treatmentDetails.cataract}
+                            onChange={handleEditInputChange}
+                            className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                          />
+                          <span className="text-sm text-gray-700">Cataract</span>
+                        </label>
+                        <label className="flex items-center gap-2 col-span-2">
+                          <input
+                            type="checkbox"
+                            name="treatmentDetails.other"
+                            checked={editFormData.treatmentDetails.other}
+                            onChange={handleEditInputChange}
+                            className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                          />
+                          <span className="text-sm text-gray-700 mr-2">Other:</span>
+                          <input
+                            type="text"
+                            name="treatmentDetails.otherText"
+                            value={editFormData.treatmentDetails.otherText}
+                            onChange={handleEditInputChange}
+                            disabled={!editFormData.treatmentDetails.other}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#00b4d8] focus:border-transparent disabled:bg-gray-100 disabled:text-gray-400"
+                            placeholder="Specify other treatment"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Surgery Required */}
-                <div className="space-y-2">
+                <div className="col-span-2 space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <Stethoscope size={16} className="text-[#00b4d8]" />
                     Surgery Required *
                   </label>
-                  <select
-                    name="surgeryRequired"
-                    value={campFormData.surgeryRequired}
-                    onChange={handleCampInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                  >
-                    <option value="">Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                    <option value="not-applicable">Not Applicable</option>
-                  </select>
-                </div>
-
-                {/* Follow-up Date */}
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <CalendarIcon size={16} className="text-[#00b4d8]" />
-                    Follow-up Date
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="followUpDate"
-                      value={campFormData.followUpDate}
-                      onChange={handleCampInputChange}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                      placeholder="dd-mm-yyyy"
-                    />
-                    <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <div className="flex gap-6">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="surgeryRequired"
+                        value="yes"
+                        checked={editFormData.surgeryRequired === "yes"}
+                        onChange={handleEditInputChange}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="surgeryRequired"
+                        value="no"
+                        checked={editFormData.surgeryRequired === "no"}
+                        onChange={handleEditInputChange}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
                   </div>
+
+                  {/* Surgery Details - Show only if surgery required is yes */}
+                  {editFormData.surgeryRequired === "yes" && (
+                    <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <div className="space-y-4">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            name="surgeryDetails.surgeryDone"
+                            checked={editFormData.surgeryDetails.surgeryDone}
+                            onChange={handleEditInputChange}
+                            className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                          />
+                          <span className="text-sm font-medium text-gray-700">Surgery Done</span>
+                        </label>
+
+                        {/* Surgery Follow-up Date - Show only if surgery done is checked */}
+                        {editFormData.surgeryDetails.surgeryDone && (
+                          <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                              <CalendarIcon size={16} className="text-[#00b4d8]" />
+                              Surgery Follow-up Date
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                name="surgeryDetails.followUpDate"
+                                value={editFormData.surgeryDetails.followUpDate}
+                                onChange={handleEditInputChange}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
+                                placeholder="dd-mm-yyyy"
+                              />
+                              <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Services Performed - Full Width */}
-                <div className="col-span-2 space-y-3">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Stethoscope size={16} className="text-[#00b4d8]" />
-                    Services Performed *
-                  </label>
-                  <div className="grid grid-cols-2 gap-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    {serviceOptions.map((service) => (
-                      <label key={service} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg transition-colors cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={campFormData.servicesPerformed.includes(service)}
-                          onChange={() => handleServiceCheckboxChange(service)}
-                          className="w-4 h-4 text-[#00b4d8] bg-gray-100 border-gray-300 rounded focus:ring-[#00b4d8] focus:ring-2"
-                        />
-                        <span className="text-sm text-gray-700">{service}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Remarks - Full Width */}
+                {/* Blood Checkup */}
                 <div className="col-span-2 space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Stethoscope size={16} className="text-[#00b4d8]" />
-                    Remarks
+                    <Activity size={16} className="text-[#00b4d8]" />
+                    Blood Checkup
                   </label>
-                  <textarea
-                    name="remarks"
-                    value={campFormData.remarks}
-                    onChange={handleCampInputChange}
-                    rows={3}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all resize-none"
-                    placeholder="Enter any additional remarks"
-                  />
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="bloodCheckup"
+                      checked={editFormData.bloodCheckup === true}
+                      onChange={handleEditInputChange}
+                      className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                    />
+                    <span className="text-sm text-gray-700">Blood Checkup Required</span>
+                  </label>
+                </div>
+
+                {/* Medicine Required */}
+                <div className="col-span-2 space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <Pill size={16} className="text-[#00b4d8]" />
+                    Medicine Required *
+                  </label>
+                  <div className="flex gap-6 mb-4">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="medicineRequired"
+                        value="yes"
+                        checked={editFormData.medicineRequired === "yes"}
+                        onChange={handleEditInputChange}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="medicineRequired"
+                        value="no"
+                        checked={editFormData.medicineRequired === "no"}
+                        onChange={handleEditInputChange}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
+                  </div>
+
+                  {/* Medicine Name - Show only if medicine required is yes */}
+                  {editFormData.medicineRequired === "yes" && (
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        Medicine Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="medicineName"
+                        value={editFormData.medicineName}
+                        onChange={handleEditInputChange}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                        placeholder="Enter medicine name"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1182,17 +1627,300 @@ export default function HealthCampPage() {
             {/* Footer Buttons */}
             <div className="flex gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
               <button
-                onClick={handleCloseCampForm}
+                onClick={handleCloseEditForm}
                 className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
               >
                 Close
               </button>
               <button
-                onClick={handleSaveCamp}
+                onClick={handleSaveEditForm}
                 className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors flex items-center justify-center gap-2"
               >
-                <Stethoscope size={18} />
-                Save Camp
+                <Edit size={18} />
+                Update Details
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Form Modal */}
+      {showViewForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl transform transition-all">
+            {/* Header */}
+            <div className="bg-[#00b4d8] rounded-t-2xl p-6 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Eye size={24} />
+                  <h2 className="text-2xl font-bold">Participant Details</h2>
+                </div>
+                <button 
+                  onClick={handleCloseViewForm}
+                  className="p-2 hover:bg-[#0096c7] rounded-full transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <p className="text-blue-100 mt-2">View complete details for {viewFormData.name}</p>
+            </div>
+
+            {/* Details */}
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="space-y-6">
+                {/* Basic Information */}
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                      <User size={16} className="text-[#00b4d8]" />
+                      Name
+                    </div>
+                    <div className="text-lg font-semibold text-gray-800 mt-1">
+                      {viewFormData.name}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                      <Stethoscope size={16} className="text-[#00b4d8]" />
+                      Camp Name
+                    </div>
+                    <div className="text-lg font-semibold text-gray-800 mt-1">
+                      {viewFormData.campName}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Camp Services */}
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                    <Activity size={16} className="text-[#00b4d8]" />
+                    Camp Services
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {viewFormData.campServices.map((service, index) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {service}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Medical Information from Participant Record */}
+                {/* <div className="border-t pt-4 mt-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Medical Information from Participant Record</h3>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                        <Activity size={16} className="text-[#00b4d8]" />
+                        Blood Checkup
+                      </div>
+                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                        viewFormData.blood_checkup 
+                          ? "bg-orange-100 text-orange-800" 
+                          : "bg-green-100 text-green-800"
+                      }`}>
+                        {viewFormData.blood_checkup ? "Yes" : "No"}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                        <Stethoscope size={16} className="text-[#00b4d8]" />
+                        Treatment Required
+                      </div>
+                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                        viewFormData.treatment_required === "yes" 
+                          ? "bg-orange-100 text-orange-800" 
+                          : viewFormData.treatment_required === "no"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}>
+                        {viewFormData.treatment_required || "Not specified"}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                        <Stethoscope size={16} className="text-[#00b4d8]" />
+                        Surgery Required
+                      </div>
+                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                        viewFormData.surgery_required === "yes" 
+                          ? "bg-orange-100 text-orange-800" 
+                          : viewFormData.surgery_required === "no"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}>
+                        {viewFormData.surgery_required || "Not specified"}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                        <Pill size={16} className="text-[#00b4d8]" />
+                        Medicine Required
+                      </div>
+                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                        viewFormData.medicine_required === "yes" 
+                          ? "bg-orange-100 text-orange-800" 
+                          : viewFormData.medicine_required === "no"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}>
+                        {viewFormData.medicine_required || "Not specified"}
+                      </div>
+                    </div>
+                  </div> */}
+
+                  {/* {viewFormData.medicine_name && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="text-sm font-medium text-gray-700 mb-2">Medicine Details from Participant Record:</div>
+                      <div className="flex items-center gap-2">
+                        <Pill size={16} className="text-[#00b4d8]" />
+                        <span className="text-sm text-gray-600">Medicine Name:</span>
+                        <span className="text-sm text-gray-800 font-medium ml-1">
+                          {viewFormData.medicine_name}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div> */}
+
+                {/* Camp-specific Medical Information */}
+                <div className="border-t pt-4 mt-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Camp-specific Medical Information</h3>
+
+                  {/* Treatment Required */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                      <Stethoscope size={16} className="text-[#00b4d8]" />
+                      Treatment Required
+                    </div>
+                    <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                      viewFormData.treatmentRequired === "yes" 
+                        ? "bg-orange-100 text-orange-800" 
+                        : "bg-green-100 text-green-800"
+                    }`}>
+                      {viewFormData.treatmentRequired === "yes" ? "Yes" : "No"}
+                    </div>
+
+                    {viewFormData.treatmentRequired === "yes" && viewFormData.treatmentDetails && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="text-sm font-medium text-gray-700 mb-3">Treatment Details:</div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${viewFormData.treatmentDetails.spectacles ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                            <span className="text-sm text-gray-600">Spectacles</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${viewFormData.treatmentDetails.cataract ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                            <span className="text-sm text-gray-600">Cataract</span>
+                          </div>
+                          {viewFormData.treatmentDetails.other && (
+                            <div className="flex items-center gap-2 col-span-2">
+                              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                              <span className="text-sm text-gray-600 mr-2">Other:</span>
+                              <span className="text-sm text-gray-800 font-medium">
+                                {viewFormData.treatmentDetails.otherText || "Not specified"}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Surgery Required */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                      <Stethoscope size={16} className="text-[#00b4d8]" />
+                      Surgery Required
+                    </div>
+                    <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                      viewFormData.surgeryRequired === "yes" 
+                        ? "bg-orange-100 text-orange-800" 
+                        : "bg-green-100 text-green-800"
+                    }`}>
+                      {viewFormData.surgeryRequired === "yes" ? "Yes" : "No"}
+                    </div>
+
+                    {viewFormData.surgeryRequired === "yes" && viewFormData.surgeryDetails && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="text-sm font-medium text-gray-700 mb-3">Surgery Details:</div>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${viewFormData.surgeryDetails.surgeryDone ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                            <span className="text-sm text-gray-600">Surgery Completed</span>
+                          </div>
+                          {viewFormData.surgeryDetails.followUpDate && (
+                            <div className="flex items-center gap-2">
+                              <CalendarIcon size={16} className="text-[#00b4d8]" />
+                              <span className="text-sm text-gray-600">Follow-up Date:</span>
+                              <span className="text-sm text-gray-800 font-medium ml-1">
+                                {viewFormData.surgeryDetails.followUpDate}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Blood Checkup */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                      <Activity size={16} className="text-[#00b4d8]" />
+                      Blood Checkup
+                    </div>
+                    <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                      viewFormData.bloodCheckup 
+                        ? "bg-orange-100 text-orange-800" 
+                        : "bg-green-100 text-green-800"
+                    }`}>
+                      {viewFormData.bloodCheckup ? "Required" : "Not Required"}
+                    </div>
+                  </div>
+
+                  {/* Medicine Required */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                      <Pill size={16} className="text-[#00b4d8]" />
+                      Medicine Required
+                    </div>
+                    <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                      viewFormData.medicineRequired === "yes" 
+                        ? "bg-orange-100 text-orange-800" 
+                        : "bg-green-100 text-green-800"
+                    }`}>
+                      {viewFormData.medicineRequired === "yes" ? "Yes" : "No"}
+                    </div>
+
+                    {viewFormData.medicineRequired === "yes" && viewFormData.medicineName && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="text-sm font-medium text-gray-700 mb-2">Medicine Details:</div>
+                        <div className="flex items-center gap-2">
+                          <Pill size={16} className="text-[#00b4d8]" />
+                          <span className="text-sm text-gray-600">Medicine Name:</span>
+                          <span className="text-sm text-gray-800 font-medium ml-1">
+                            {viewFormData.medicineName}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Button */}
+            <div className="flex gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+              <button
+                onClick={handleCloseViewForm}
+                className="flex-1 px-6 py-3 bg-[#00b4d8] text-white rounded-lg font-medium hover:bg-[#0096c7] transition-colors"
+              >
+                Close
               </button>
             </div>
           </div>
