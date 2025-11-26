@@ -20,6 +20,83 @@ interface Participant {
   surgery_required: string;
 }
 
+// Separate interfaces for each checkup type's treatment details
+interface EyeTreatmentDetails {
+  spectacles: boolean;
+  cataract: boolean;
+  pterygium: boolean;
+  other: boolean;
+  otherText: string;
+}
+
+interface DentalTreatmentDetails {
+  cleaning: boolean;
+  filling: boolean;
+  extraction: boolean;
+  rootCanal: boolean;
+  other: boolean;
+  otherText: string;
+}
+
+interface CancerTreatmentDetails {
+  oral: boolean;
+  breast: boolean;
+  cervical: boolean;
+  prostate: boolean;
+  other: boolean;
+  otherText: string;
+}
+
+interface GeneralTreatmentDetails {
+  bp: boolean;
+  sugar: boolean;
+  ecg: boolean;
+  xray: boolean;
+  other: boolean;
+  otherText: string;
+}
+
+// Base checkup data interface
+interface BaseCheckupData {
+  treatmentRequired: string;
+  surgeryRequired: string;
+  surgeryDetails: {
+    surgeryDone: boolean;
+    followUpDate: string;
+  };
+  bloodCheckup: boolean;
+  medicineRequired: string;
+  medicineName: string;
+}
+
+// Specific checkup data interfaces
+interface EyeCheckupData extends BaseCheckupData {
+  treatmentDetails: EyeTreatmentDetails;
+}
+
+interface DentalCheckupData extends BaseCheckupData {
+  treatmentDetails: DentalTreatmentDetails;
+}
+
+interface CancerCheckupData extends BaseCheckupData {
+  treatmentDetails: CancerTreatmentDetails;
+}
+
+interface GeneralCheckupData extends BaseCheckupData {
+  treatmentDetails: GeneralTreatmentDetails;
+}
+
+interface EditFormData {
+  name: string;
+  id: number;
+  campName: string;
+  activeTab: "eye" | "dental" | "cancer" | "general";
+  eyeCheckup: EyeCheckupData;
+  dentalCheckup: DentalCheckupData;
+  cancerCheckup: CancerCheckupData;
+  generalCheckup: GeneralCheckupData;
+}
+
 export default function HealthCampPage() {
   // Participants Page State
   const [searchName, setSearchName] = useState("");
@@ -48,16 +125,13 @@ export default function HealthCampPage() {
     address: ""
   });
 
-  // Edit Form state
-  const [editFormData, setEditFormData] = useState({
-    name: "",
-    id: 0, 
-    campName: "",
-    campServices: [] as string[],
+  // Initial checkup data templates for each type
+  const initialEyeCheckupData: EyeCheckupData = {
     treatmentRequired: "",
     treatmentDetails: {
       spectacles: false,
       cataract: false,
+      pterygium: false,
       other: false,
       otherText: ""
     },
@@ -68,34 +142,90 @@ export default function HealthCampPage() {
     },
     bloodCheckup: false,
     medicineRequired: "",
-    medicineName: "",
-    blood_checkup: false,
-    medicine_required: "",
-    medicine_name: "",
-    treatment_required: "",
-    surgery_required: ""
+    medicineName: ""
+  };
+
+  const initialDentalCheckupData: DentalCheckupData = {
+    treatmentRequired: "",
+    treatmentDetails: {
+      cleaning: false,
+      filling: false,
+      extraction: false,
+      rootCanal: false,
+      other: false,
+      otherText: ""
+    },
+    surgeryRequired: "",
+    surgeryDetails: {
+      surgeryDone: false,
+      followUpDate: ""
+    },
+    bloodCheckup: false,
+    medicineRequired: "",
+    medicineName: ""
+  };
+
+  const initialCancerCheckupData: CancerCheckupData = {
+    treatmentRequired: "",
+    treatmentDetails: {
+      oral: false,
+      breast: false,
+      cervical: false,
+      prostate: false,
+      other: false,
+      otherText: ""
+    },
+    surgeryRequired: "",
+    surgeryDetails: {
+      surgeryDone: false,
+      followUpDate: ""
+    },
+    bloodCheckup: false,
+    medicineRequired: "",
+    medicineName: ""
+  };
+
+  const initialGeneralCheckupData: GeneralCheckupData = {
+    treatmentRequired: "",
+    treatmentDetails: {
+      bp: false,
+      sugar: false,
+      ecg: false,
+      xray: false,
+      other: false,
+      otherText: ""
+    },
+    surgeryRequired: "",
+    surgeryDetails: {
+      surgeryDone: false,
+      followUpDate: ""
+    },
+    bloodCheckup: false,
+    medicineRequired: "",
+    medicineName: ""
+  };
+
+  // Edit Form state
+  const [editFormData, setEditFormData] = useState<EditFormData>({
+    name: "",
+    id: 0,
+    campName: "",
+    activeTab: "eye",
+    eyeCheckup: { ...initialEyeCheckupData },
+    dentalCheckup: { ...initialDentalCheckupData },
+    cancerCheckup: { ...initialCancerCheckupData },
+    generalCheckup: { ...initialGeneralCheckupData }
   });
 
   // View Form state
   const [viewFormData, setViewFormData] = useState({
     name: "",
     campName: "",
-    campServices: [] as string[],
-    treatmentRequired: "",
-    treatmentDetails: {
-      spectacles: false,
-      cataract: false,
-      other: false,
-      otherText: ""
-    },
-    surgeryRequired: "",
-    surgeryDetails: {
-      surgeryDone: false,
-      followUpDate: ""
-    },
-    bloodCheckup: false,
-    medicineRequired: "",
-    medicineName: "",
+    activeTab: "eye",
+    eyeCheckup: { ...initialEyeCheckupData },
+    dentalCheckup: { ...initialDentalCheckupData },
+    cancerCheckup: { ...initialCancerCheckupData },
+    generalCheckup: { ...initialGeneralCheckupData },
     blood_checkup: false,
     medicine_required: "",
     medicine_name: "",
@@ -197,74 +327,60 @@ export default function HealthCampPage() {
 
   const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
-    if (type === 'checkbox') {
-      const checked = (e.target as HTMLInputElement).checked;
+    const activeTab = editFormData.activeTab;
+
+    setEditFormData(prev => {
+      const updated = { ...prev };
       
-      if (name.startsWith('treatmentDetails.')) {
-        const field = name.split('.')[1];
-        setEditFormData(prev => ({
-          ...prev,
-          treatmentDetails: {
-            ...prev.treatmentDetails,
-            [field]: checked
+      if (type === 'checkbox') {
+        const checked = (e.target as HTMLInputElement).checked;
+        
+        if (name.includes('.')) {
+          const [parent, child] = name.split('.');
+          const currentTab = updated[`${activeTab}Checkup` as keyof EditFormData] as any;
+          if (currentTab && parent in currentTab && child in currentTab[parent]) {
+            currentTab[parent][child] = checked;
           }
-        }));
-      } else if (name.startsWith('surgeryDetails.')) {
-        const field = name.split('.')[1];
-        setEditFormData(prev => ({
-          ...prev,
-          surgeryDetails: {
-            ...prev.surgeryDetails,
-            [field]: checked
+        } else {
+          const currentTab = updated[`${activeTab}Checkup` as keyof EditFormData] as any;
+          if (currentTab && name in currentTab) {
+            currentTab[name] = checked;
           }
-        }));
+        }
       } else {
-        setEditFormData(prev => ({
-          ...prev,
-          [name]: checked
-        }));
-      }
-    } else {
-      if (name.startsWith('treatmentDetails.')) {
-        const field = name.split('.')[1];
-        setEditFormData(prev => ({
-          ...prev,
-          treatmentDetails: {
-            ...prev.treatmentDetails,
-            [field]: value
+        if (name.includes('.')) {
+          const [parent, child] = name.split('.');
+          const currentTab = updated[`${activeTab}Checkup` as keyof EditFormData] as any;
+          if (currentTab && parent in currentTab && child in currentTab[parent]) {
+            currentTab[parent][child] = value;
           }
-        }));
-      } else if (name.startsWith('surgeryDetails.')) {
-        const field = name.split('.')[1];
-        setEditFormData(prev => ({
-          ...prev,
-          surgeryDetails: {
-            ...prev.surgeryDetails,
-            [field]: value
+        } else if (name === 'activeTab') {
+          updated.activeTab = value as "eye" | "dental" | "cancer" | "general";
+        } else {
+          const currentTab = updated[`${activeTab}Checkup` as keyof EditFormData] as any;
+          if (currentTab && name in currentTab) {
+            currentTab[name] = value;
           }
-        }));
-      } else {
-        setEditFormData(prev => ({
-          ...prev,
-          [name]: value
-        }));
+        }
       }
-    }
+      
+      return updated;
+    });
   };
 
-  const handleUpdateParticipant = async (editFormData: any) => {
+  const handleUpdateParticipant = async (formData: EditFormData) => {
     try {
-      const updateData = {
-        blood_checkup: editFormData.bloodCheckup,
-        medicine_required: editFormData.medicineRequired,
-        medicine_name: editFormData.medicineName,
-        treatment_required: editFormData.treatmentRequired,
-        surgery_required: editFormData.surgeryRequired,
-      };
-      const id = editFormData.id;
+      const activeTab = formData.activeTab;
+      const currentTabData = formData[`${activeTab}Checkup` as keyof EditFormData] as any;
 
-      console.log("Updating participant with data:", updateData);
+      const updateData = {
+        blood_checkup: currentTabData.bloodCheckup,
+        medicine_required: currentTabData.medicineRequired,
+        medicine_name: currentTabData.medicineName,
+        treatment_required: currentTabData.treatmentRequired,
+        surgery_required: currentTabData.surgeryRequired,
+      };
+      const id = formData.id;
 
       const response = await fetch(`${API_BASE_URL}/participants/${id}`, {
         method: 'PUT',
@@ -343,37 +459,26 @@ export default function HealthCampPage() {
 
   const handleSaveEditForm = async () => {
     try {
-      if (!editFormData.treatmentRequired || !editFormData.surgeryRequired || !editFormData.medicineRequired) {
+      const activeTab = editFormData.activeTab;
+      const currentTabData = editFormData[`${activeTab}Checkup` as keyof EditFormData] as any;
+
+      // Validation
+      if (!currentTabData.treatmentRequired || !currentTabData.surgeryRequired || !currentTabData.medicineRequired) {
         setErrorMessage("Please fill in all required fields");
         return;
       }
 
-      if (editFormData.treatmentRequired === "yes" && 
-          !editFormData.treatmentDetails.spectacles && 
-          !editFormData.treatmentDetails.cataract && 
-          !editFormData.treatmentDetails.other) {
-        setErrorMessage("Please select at least one treatment detail");
-        return;
-      }
-
-      if (editFormData.treatmentDetails.other && !editFormData.treatmentDetails.otherText) {
-        setErrorMessage("Please specify the other treatment");
-        return;
-      }
-
-      if (editFormData.medicineRequired === "yes" && !editFormData.medicineName) {
+      if (currentTabData.medicineRequired === "yes" && !currentTabData.medicineName) {
         setErrorMessage("Please enter medicine name");
         return;
       }
 
-      if (editFormData.surgeryDetails.surgeryDone && !editFormData.surgeryDetails.followUpDate) {
+      if (currentTabData.surgeryDetails.surgeryDone && !currentTabData.surgeryDetails.followUpDate) {
         setErrorMessage("Please enter surgery follow-up date");
         return;
       }
 
-      setViewFormData(editFormData);
-
-      const updateParticipant = await handleUpdateParticipant(editFormData);
+      await handleUpdateParticipant(editFormData);
       
       setShowEditForm(false);
       setSuccessMessage("Camp details updated successfully!");
@@ -400,29 +505,13 @@ export default function HealthCampPage() {
   const handleCloseEditForm = () => {
     setEditFormData({
       name: "",
-      id:0,
+      id: 0,
       campName: "",
-      campServices: [],
-      treatmentRequired: "",
-      treatmentDetails: {
-        spectacles: false,
-        cataract: false,
-        other: false,
-        otherText: ""
-      },
-      surgeryRequired: "",
-      surgeryDetails: {
-        surgeryDone: false,
-        followUpDate: ""
-      },
-      bloodCheckup: false,
-      medicineRequired: "",
-      medicineName: "",
-      blood_checkup: false,
-      medicine_required: "",
-      medicine_name: "",
-      treatment_required: "",
-      surgery_required: ""
+      activeTab: "eye",
+      eyeCheckup: { ...initialEyeCheckupData },
+      dentalCheckup: { ...initialDentalCheckupData },
+      cancerCheckup: { ...initialCancerCheckupData },
+      generalCheckup: { ...initialGeneralCheckupData }
     });
     setShowEditForm(false);
   };
@@ -434,29 +523,84 @@ export default function HealthCampPage() {
   const handleOpenEditForm = (participant: Participant) => {
     setEditFormData({
       name: participant.name,
-      id:participant.id,
+      id: participant.id,
       campName: "Health Camp",
-      campServices: ["General Checkup"],
-      treatmentRequired: participant.treatment_required || "",
-      treatmentDetails: {
-        spectacles: false,
-        cataract: false,
-        other: false,
-        otherText: ""
+      activeTab: "eye",
+      eyeCheckup: {
+        treatmentRequired: participant.treatment_required || "",
+        treatmentDetails: {
+          spectacles: false,
+          cataract: false,
+          pterygium: false,
+          other: false,
+          otherText: ""
+        },
+        surgeryRequired: participant.surgery_required || "",
+        surgeryDetails: {
+          surgeryDone: false,
+          followUpDate: ""
+        },
+        bloodCheckup: participant.blood_checkup || false,
+        medicineRequired: participant.medicine_required || "",
+        medicineName: participant.medicine_name || ""
       },
-      surgeryRequired: participant.surgery_required || "",
-      surgeryDetails: {
-        surgeryDone: false,
-        followUpDate: ""
+      dentalCheckup: {
+        treatmentRequired: participant.treatment_required || "",
+        treatmentDetails: {
+          cleaning: false,
+          filling: false,
+          extraction: false,
+          rootCanal: false,
+          other: false,
+          otherText: ""
+        },
+        surgeryRequired: participant.surgery_required || "",
+        surgeryDetails: {
+          surgeryDone: false,
+          followUpDate: ""
+        },
+        bloodCheckup: participant.blood_checkup || false,
+        medicineRequired: participant.medicine_required || "",
+        medicineName: participant.medicine_name || ""
       },
-      bloodCheckup: participant.blood_checkup || false,
-      medicineRequired: participant.medicine_required || "",
-      medicineName: participant.medicine_name || "",
-      blood_checkup: participant.blood_checkup || false,
-      medicine_required: participant.medicine_required || "",
-      medicine_name: participant.medicine_name || "",
-      treatment_required: participant.treatment_required || "",
-      surgery_required: participant.surgery_required || ""
+      cancerCheckup: {
+        treatmentRequired: participant.treatment_required || "",
+        treatmentDetails: {
+          oral: false,
+          breast: false,
+          cervical: false,
+          prostate: false,
+          other: false,
+          otherText: ""
+        },
+        surgeryRequired: participant.surgery_required || "",
+        surgeryDetails: {
+          surgeryDone: false,
+          followUpDate: ""
+        },
+        bloodCheckup: participant.blood_checkup || false,
+        medicineRequired: participant.medicine_required || "",
+        medicineName: participant.medicine_name || ""
+      },
+      generalCheckup: {
+        treatmentRequired: participant.treatment_required || "",
+        treatmentDetails: {
+          bp: false,
+          sugar: false,
+          ecg: false,
+          xray: false,
+          other: false,
+          otherText: ""
+        },
+        surgeryRequired: participant.surgery_required || "",
+        surgeryDetails: {
+          surgeryDone: false,
+          followUpDate: ""
+        },
+        bloodCheckup: participant.blood_checkup || false,
+        medicineRequired: participant.medicine_required || "",
+        medicineName: participant.medicine_name || ""
+      }
     });
     setShowEditForm(true);
   };
@@ -465,14 +609,82 @@ export default function HealthCampPage() {
     setViewFormData({
       name: participant.name,
       campName: "Health Camp",
-      campServices: ["General Checkup"],
-      treatmentRequired: editFormData.treatmentRequired || participant.treatment_required || "no",
-      treatmentDetails: editFormData.treatmentDetails,
-      surgeryRequired: editFormData.surgeryRequired || participant.surgery_required || "no",
-      surgeryDetails: editFormData.surgeryDetails,
-      bloodCheckup: editFormData.bloodCheckup || participant.blood_checkup || false,
-      medicineRequired: editFormData.medicineRequired || participant.medicine_required || "no",
-      medicineName: editFormData.medicineName || participant.medicine_name || "",
+      activeTab: "eye",
+      eyeCheckup: {
+        treatmentRequired: participant.treatment_required || "",
+        treatmentDetails: {
+          spectacles: false,
+          cataract: false,
+          pterygium: false,
+          other: false,
+          otherText: ""
+        },
+        surgeryRequired: participant.surgery_required || "",
+        surgeryDetails: {
+          surgeryDone: false,
+          followUpDate: ""
+        },
+        bloodCheckup: participant.blood_checkup || false,
+        medicineRequired: participant.medicine_required || "",
+        medicineName: participant.medicine_name || ""
+      },
+      dentalCheckup: {
+        treatmentRequired: participant.treatment_required || "",
+        treatmentDetails: {
+          cleaning: false,
+          filling: false,
+          extraction: false,
+          rootCanal: false,
+          other: false,
+          otherText: ""
+        },
+        surgeryRequired: participant.surgery_required || "",
+        surgeryDetails: {
+          surgeryDone: false,
+          followUpDate: ""
+        },
+        bloodCheckup: participant.blood_checkup || false,
+        medicineRequired: participant.medicine_required || "",
+        medicineName: participant.medicine_name || ""
+      },
+      cancerCheckup: {
+        treatmentRequired: participant.treatment_required || "",
+        treatmentDetails: {
+          oral: false,
+          breast: false,
+          cervical: false,
+          prostate: false,
+          other: false,
+          otherText: ""
+        },
+        surgeryRequired: participant.surgery_required || "",
+        surgeryDetails: {
+          surgeryDone: false,
+          followUpDate: ""
+        },
+        bloodCheckup: participant.blood_checkup || false,
+        medicineRequired: participant.medicine_required || "",
+        medicineName: participant.medicine_name || ""
+      },
+      generalCheckup: {
+        treatmentRequired: participant.treatment_required || "",
+        treatmentDetails: {
+          bp: false,
+          sugar: false,
+          ecg: false,
+          xray: false,
+          other: false,
+          otherText: ""
+        },
+        surgeryRequired: participant.surgery_required || "",
+        surgeryDetails: {
+          surgeryDone: false,
+          followUpDate: ""
+        },
+        bloodCheckup: participant.blood_checkup || false,
+        medicineRequired: participant.medicine_required || "",
+        medicineName: participant.medicine_name || ""
+      },
       blood_checkup: participant.blood_checkup || false,
       medicine_required: participant.medicine_required || "",
       medicine_name: participant.medicine_name || "",
@@ -510,6 +722,452 @@ export default function HealthCampPage() {
       return () => clearTimeout(timer);
     }
   }, [successMessage, errorMessage]);
+
+  // Type-safe helper functions to get treatment details
+  const getEyeTreatmentDetails = (data: any): EyeTreatmentDetails => {
+    return data.treatmentDetails as EyeTreatmentDetails;
+  };
+
+  const getDentalTreatmentDetails = (data: any): DentalTreatmentDetails => {
+    return data.treatmentDetails as DentalTreatmentDetails;
+  };
+
+  const getCancerTreatmentDetails = (data: any): CancerTreatmentDetails => {
+    return data.treatmentDetails as CancerTreatmentDetails;
+  };
+
+  const getGeneralTreatmentDetails = (data: any): GeneralTreatmentDetails => {
+    return data.treatmentDetails as GeneralTreatmentDetails;
+  };
+
+  // Fixed radio button handler
+  const handleRadioChange = (field: string, value: string) => {
+    setEditFormData(prev => {
+      const updated = { ...prev };
+      const activeTab = updated.activeTab;
+      const currentTab = updated[`${activeTab}Checkup` as keyof EditFormData] as any;
+      
+      if (currentTab && field in currentTab) {
+        currentTab[field] = value;
+      }
+      
+      return updated;
+    });
+  };
+
+  // Fixed checkbox handler for treatment details
+  const handleTreatmentDetailChange = (field: string, checked: boolean) => {
+    setEditFormData(prev => {
+      const updated = { ...prev };
+      const activeTab = updated.activeTab;
+      const currentTab = updated[`${activeTab}Checkup` as keyof EditFormData] as any;
+      
+      if (currentTab && currentTab.treatmentDetails && field in currentTab.treatmentDetails) {
+        currentTab.treatmentDetails[field] = checked;
+      }
+      
+      return updated;
+    });
+  };
+
+  // Fixed text input handler for treatment details
+  const handleTreatmentDetailTextChange = (field: string, value: string) => {
+    setEditFormData(prev => {
+      const updated = { ...prev };
+      const activeTab = updated.activeTab;
+      const currentTab = updated[`${activeTab}Checkup` as keyof EditFormData] as any;
+      
+      if (currentTab && currentTab.treatmentDetails && field in currentTab.treatmentDetails) {
+        currentTab.treatmentDetails[field] = value;
+      }
+      
+      return updated;
+    });
+  };
+
+  // Render tab content based on active tab
+  const renderTabContent = () => {
+    const activeTab = editFormData.activeTab;
+    
+    let currentTabData;
+    switch (activeTab) {
+      case "eye":
+        currentTabData = editFormData.eyeCheckup;
+        break;
+      case "dental":
+        currentTabData = editFormData.dentalCheckup;
+        break;
+      case "cancer":
+        currentTabData = editFormData.cancerCheckup;
+        break;
+      case "general":
+        currentTabData = editFormData.generalCheckup;
+        break;
+      default:
+        currentTabData = null;
+    }
+
+    if (!currentTabData) {
+      return <div className="text-red-500 p-4">Error: Tab data not found for {activeTab} checkup</div>;
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Treatment Required */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <Stethoscope size={16} className="text-[#00b4d8]" />
+            Treatment Required *
+          </label>
+          <div className="flex gap-6">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`treatmentRequired-${activeTab}`}
+                value="yes"
+                checked={currentTabData.treatmentRequired === "yes"}
+                onChange={(e) => handleRadioChange('treatmentRequired', e.target.value)}
+                className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+              />
+              <span className="text-sm text-gray-700">Yes</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`treatmentRequired-${activeTab}`}
+                value="no"
+                checked={currentTabData.treatmentRequired === "no"}
+                onChange={(e) => handleRadioChange('treatmentRequired', e.target.value)}
+                className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+              />
+              <span className="text-sm text-gray-700">No</span>
+            </label>
+          </div>
+
+          {/* Treatment Details - Show only if treatment required is yes */}
+          {currentTabData.treatmentRequired === "yes" && (
+            <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                {activeTab === "eye" && "Eye Treatment Details:"}
+                {activeTab === "dental" && "Dental Treatment Details:"}
+                {activeTab === "cancer" && "Cancer Screening Details:"}
+                {activeTab === "general" && "General Checkup Details:"}
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                {activeTab === "eye" && (
+                  <>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getEyeTreatmentDetails(currentTabData).spectacles}
+                        onChange={(e) => handleTreatmentDetailChange('spectacles', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Spectacles</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getEyeTreatmentDetails(currentTabData).cataract}
+                        onChange={(e) => handleTreatmentDetailChange('cataract', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Cataract</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getEyeTreatmentDetails(currentTabData).pterygium}
+                        onChange={(e) => handleTreatmentDetailChange('pterygium', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Pterygium</span>
+                    </label>
+                  </>
+                )}
+                {activeTab === "dental" && (
+                  <>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getDentalTreatmentDetails(currentTabData).cleaning}
+                        onChange={(e) => handleTreatmentDetailChange('cleaning', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Cleaning</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getDentalTreatmentDetails(currentTabData).filling}
+                        onChange={(e) => handleTreatmentDetailChange('filling', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Filling</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getDentalTreatmentDetails(currentTabData).extraction}
+                        onChange={(e) => handleTreatmentDetailChange('extraction', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Extraction</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getDentalTreatmentDetails(currentTabData).rootCanal}
+                        onChange={(e) => handleTreatmentDetailChange('rootCanal', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Root Canal</span>
+                    </label>
+                  </>
+                )}
+
+                {activeTab === "cancer" && (
+                  <>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getCancerTreatmentDetails(currentTabData).oral}
+                        onChange={(e) => handleTreatmentDetailChange('oral', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Oral Cancer</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getCancerTreatmentDetails(currentTabData).breast}
+                        onChange={(e) => handleTreatmentDetailChange('breast', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Breast Cancer</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getCancerTreatmentDetails(currentTabData).cervical}
+                        onChange={(e) => handleTreatmentDetailChange('cervical', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Cervical Cancer</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getCancerTreatmentDetails(currentTabData).prostate}
+                        onChange={(e) => handleTreatmentDetailChange('prostate', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Prostate Cancer</span>
+                    </label>
+                  </>
+                )}
+                {activeTab === "general" && (
+                  <>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getGeneralTreatmentDetails(currentTabData).bp}
+                        onChange={(e) => handleTreatmentDetailChange('bp', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Blood Pressure</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getGeneralTreatmentDetails(currentTabData).sugar}
+                        onChange={(e) => handleTreatmentDetailChange('sugar', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">Sugar Test</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getGeneralTreatmentDetails(currentTabData).ecg}
+                        onChange={(e) => handleTreatmentDetailChange('ecg', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">ECG</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={getGeneralTreatmentDetails(currentTabData).xray}
+                        onChange={(e) => handleTreatmentDetailChange('xray', e.target.checked)}
+                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                      />
+                      <span className="text-sm text-gray-700">X-Ray</span>
+                    </label>
+                  </>
+                )}
+                <label className="flex items-center gap-2 col-span-2">
+                  <input
+                    type="checkbox"
+                    checked={currentTabData.treatmentDetails.other}
+                    onChange={(e) => handleTreatmentDetailChange('other', e.target.checked)}
+                    className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                  />
+                  <span className="text-sm text-gray-700 mr-2">Other:</span>
+                  <input
+                    type="text"
+                    value={currentTabData.treatmentDetails.otherText}
+                    onChange={(e) => handleTreatmentDetailTextChange('otherText', e.target.value)}
+                    disabled={!currentTabData.treatmentDetails.other}
+                    className="flex-1 border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#00b4d8] focus:border-transparent disabled:bg-gray-100 disabled:text-gray-400"
+                    placeholder="Specify other treatment"
+                  />
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Surgery Required */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <Stethoscope size={16} className="text-[#00b4d8]" />
+            Surgery Required *
+          </label>
+          <div className="flex gap-6">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`surgeryRequired-${activeTab}`}
+                value="yes"
+                checked={currentTabData.surgeryRequired === "yes"}
+                onChange={(e) => handleRadioChange('surgeryRequired', e.target.value)}
+                className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+              />
+              <span className="text-sm text-gray-700">Yes</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`surgeryRequired-${activeTab}`}
+                value="no"
+                checked={currentTabData.surgeryRequired === "no"}
+                onChange={(e) => handleRadioChange('surgeryRequired', e.target.value)}
+                className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+              />
+              <span className="text-sm text-gray-700">No</span>
+            </label>
+          </div>
+
+          {/* Surgery Details - Show only if surgery required is yes */}
+          {currentTabData.surgeryRequired === "yes" && (
+            <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <div className="space-y-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="surgeryDetails.surgeryDone"
+                    checked={currentTabData.surgeryDetails.surgeryDone}
+                    onChange={handleEditInputChange}
+                    className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Surgery Done</span>
+                </label>
+
+                {/* Surgery Follow-up Date - Show only if surgery done is checked */}
+                {currentTabData.surgeryDetails.surgeryDone && (
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <CalendarIcon size={16} className="text-[#00b4d8]" />
+                      Surgery Follow-up Date
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="surgeryDetails.followUpDate"
+                        value={currentTabData.surgeryDetails.followUpDate}
+                        onChange={handleEditInputChange}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
+                        placeholder="dd-mm-yyyy"
+                      />
+                      <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Blood Checkup */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <Activity size={16} className="text-[#00b4d8]" />
+            Blood Checkup
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="bloodCheckup"
+              checked={currentTabData.bloodCheckup == true}
+              onChange={handleEditInputChange}
+              className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+            />
+            <span className="text-sm text-gray-700">Blood Checkup Required</span>
+          </label>
+        </div>
+
+        {/* Medicine Required */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <Pill size={16} className="text-[#00b4d8]" />
+            Medicine Required *
+          </label>
+          <div className="flex gap-6 mb-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`medicineRequired-${activeTab}`}
+                value="yes"
+                checked={currentTabData.medicineRequired === "yes"}
+                onChange={(e) => handleRadioChange('medicineRequired', e.target.value)}
+                className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+              />
+              <span className="text-sm text-gray-700">Yes</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`medicineRequired-${activeTab}`}
+                value="no"
+                checked={currentTabData.medicineRequired === "no"}
+                onChange={(e) => handleRadioChange('medicineRequired', e.target.value)}
+                className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
+              />
+              <span className="text-sm text-gray-700">No</span>
+            </label>
+          </div>
+
+          {/* Medicine Name - Show only if medicine required is yes */}
+          {currentTabData.medicineRequired === "yes" && (
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                Medicine Name *
+              </label>
+              <input
+                type="text"
+                name="medicineName"
+                value={currentTabData.medicineName}
+                onChange={handleEditInputChange}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                placeholder="Enter medicine name"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -909,238 +1567,44 @@ export default function HealthCampPage() {
                   />
                 </div>
 
-                {/* Camp Services - Non Editable */}
+                {/* Tabs */}
                 <div className="col-span-2 space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <Activity size={16} className="text-[#00b4d8]" />
-                    Camp Services
+                    Checkup Type
                   </label>
-                  <div className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-600 cursor-not-allowed">
-                    {editFormData.campServices.join(", ")}
+                  <div className="flex border-b border-gray-200">
+                    {[
+                      { id: "eye", label: "Eye Checkup" },
+                      { id: "dental", label: "Dental Checkup" },
+                      { id: "cancer", label: "Cancer Screening" },
+                      { id: "general", label: "General Checkup" }
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setEditFormData(prev => ({ ...prev, activeTab: tab.id as any }))}
+                        className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+                          editFormData.activeTab === tab.id
+                            ? "border-b-2 border-[#00b4d8] text-[#00b4d8]"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 
-                {/* Camp-specific Medical Information */}
+                {/* Tab Content */}
                 <div className="col-span-2 border-t pt-4 mt-4">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Camp-specific Medical Information</h3>
-                </div>
-
-                {/* Treatment Required */}
-                <div className="col-span-2 space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Stethoscope size={16} className="text-[#00b4d8]" />
-                    Treatment Required *
-                  </label>
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="treatmentRequired"
-                        value="yes"
-                        checked={editFormData.treatmentRequired === "yes"}
-                        onChange={handleEditInputChange}
-                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                      />
-                      <span className="text-sm text-gray-700">Yes</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="treatmentRequired"
-                        value="no"
-                        checked={editFormData.treatmentRequired === "no"}
-                        onChange={handleEditInputChange}
-                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                      />
-                      <span className="text-sm text-gray-700">No</span>
-                    </label>
-                  </div>
-
-                  {/* Treatment Details - Show only if treatment required is yes */}
-                  {editFormData.treatmentRequired === "yes" && (
-                    <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Treatment Details:</label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            name="treatmentDetails.spectacles"
-                            checked={editFormData.treatmentDetails.spectacles}
-                            onChange={handleEditInputChange}
-                            className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                          />
-                          <span className="text-sm text-gray-700">Spectacles</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            name="treatmentDetails.cataract"
-                            checked={editFormData.treatmentDetails.cataract}
-                            onChange={handleEditInputChange}
-                            className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                          />
-                          <span className="text-sm text-gray-700">Cataract</span>
-                        </label>
-                        <label className="flex items-center gap-2 col-span-2">
-                          <input
-                            type="checkbox"
-                            name="treatmentDetails.other"
-                            checked={editFormData.treatmentDetails.other}
-                            onChange={handleEditInputChange}
-                            className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                          />
-                          <span className="text-sm text-gray-700 mr-2">Other:</span>
-                          <input
-                            type="text"
-                            name="treatmentDetails.otherText"
-                            value={editFormData.treatmentDetails.otherText}
-                            onChange={handleEditInputChange}
-                            disabled={!editFormData.treatmentDetails.other}
-                            className="flex-1 border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#00b4d8] focus:border-transparent disabled:bg-gray-100 disabled:text-gray-400"
-                            placeholder="Specify other treatment"
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Surgery Required */}
-                <div className="col-span-2 space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Stethoscope size={16} className="text-[#00b4d8]" />
-                    Surgery Required *
-                  </label>
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="surgeryRequired"
-                        value="yes"
-                        checked={editFormData.surgeryRequired === "yes"}
-                        onChange={handleEditInputChange}
-                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                      />
-                      <span className="text-sm text-gray-700">Yes</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="surgeryRequired"
-                        value="no"
-                        checked={editFormData.surgeryRequired === "no"}
-                        onChange={handleEditInputChange}
-                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                      />
-                      <span className="text-sm text-gray-700">No</span>
-                    </label>
-                  </div>
-
-                  {/* Surgery Details - Show only if surgery required is yes */}
-                  {editFormData.surgeryRequired === "yes" && (
-                    <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                      <div className="space-y-4">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            name="surgeryDetails.surgeryDone"
-                            checked={editFormData.surgeryDetails.surgeryDone}
-                            onChange={handleEditInputChange}
-                            className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                          />
-                          <span className="text-sm font-medium text-gray-700">Surgery Done</span>
-                        </label>
-
-                        {/* Surgery Follow-up Date - Show only if surgery done is checked */}
-                        {editFormData.surgeryDetails.surgeryDone && (
-                          <div className="space-y-2">
-                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                              <CalendarIcon size={16} className="text-[#00b4d8]" />
-                              Surgery Follow-up Date
-                            </label>
-                            <div className="relative">
-                              <input
-                                type="text"
-                                name="surgeryDetails.followUpDate"
-                                value={editFormData.surgeryDetails.followUpDate}
-                                onChange={handleEditInputChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent"
-                                placeholder="dd-mm-yyyy"
-                              />
-                              <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Blood Checkup */}
-                <div className="col-span-2 space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Activity size={16} className="text-[#00b4d8]" />
-                    Blood Checkup
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="bloodCheckup"
-                      checked={editFormData.bloodCheckup === true}
-                      onChange={handleEditInputChange}
-                      className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                    />
-                    <span className="text-sm text-gray-700">Blood Checkup Required</span>
-                  </label>
-                </div>
-
-                {/* Medicine Required */}
-                <div className="col-span-2 space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Pill size={16} className="text-[#00b4d8]" />
-                    Medicine Required *
-                  </label>
-                  <div className="flex gap-6 mb-4">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="medicineRequired"
-                        value="yes"
-                        checked={editFormData.medicineRequired === "yes"}
-                        onChange={handleEditInputChange}
-                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                      />
-                      <span className="text-sm text-gray-700">Yes</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="medicineRequired"
-                        value="no"
-                        checked={editFormData.medicineRequired === "no"}
-                        onChange={handleEditInputChange}
-                        className="w-4 h-4 text-[#00b4d8] focus:ring-[#00b4d8]"
-                      />
-                      <span className="text-sm text-gray-700">No</span>
-                    </label>
-                  </div>
-
-                  {/* Medicine Name - Show only if medicine required is yes */}
-                  {editFormData.medicineRequired === "yes" && (
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                        Medicine Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="medicineName"
-                        value={editFormData.medicineName}
-                        onChange={handleEditInputChange}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
-                        placeholder="Enter medicine name"
-                      />
-                    </div>
-                  )}
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                    {editFormData.activeTab === "eye" && "Eye Checkup Details"}
+                    {editFormData.activeTab === "dental" && "Dental Checkup Details"}
+                    {editFormData.activeTab === "cancer" && "Cancer Screening Details"}
+                    {editFormData.activeTab === "general" && "General Checkup Details"}
+                  </h3>
+                  {renderTabContent()}
                 </div>
               </div>
             </div>
@@ -1212,100 +1676,9 @@ export default function HealthCampPage() {
                   </div>
                 </div>
 
-                {/* Camp Services */}
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                    <Activity size={16} className="text-[#00b4d8]" />
-                    Camp Services
-                  </div>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {viewFormData.campServices.map((service, index) => (
-                      <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                        {service}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Camp-specific Medical Information */}
                 <div className="border-t pt-4 mt-4">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Camp-specific Medical Information</h3>
-
-                  {/* Treatment Required */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                      <Stethoscope size={16} className="text-[#00b4d8]" />
-                      Treatment Required
-                    </div>
-                    <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
-                      viewFormData.treatmentRequired === "yes" 
-                        ? "bg-orange-100 text-orange-800" 
-                        : "bg-green-100 text-green-800"
-                    }`}>
-                      {viewFormData.treatmentRequired === "yes" ? "Yes" : "No"}
-                    </div>
-
-                    {viewFormData.treatmentRequired === "yes" && viewFormData.treatmentDetails && (
-                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="text-sm font-medium text-gray-700 mb-3">Treatment Details:</div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${viewFormData.treatmentDetails.spectacles ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                            <span className="text-sm text-gray-600">Spectacles</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${viewFormData.treatmentDetails.cataract ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                            <span className="text-sm text-gray-600">Cataract</span>
-                          </div>
-                          {viewFormData.treatmentDetails.other && (
-                            <div className="flex items-center gap-2 col-span-2">
-                              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                              <span className="text-sm text-gray-600 mr-2">Other:</span>
-                              <span className="text-sm text-gray-800 font-medium">
-                                {viewFormData.treatmentDetails.otherText || "Not specified"}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Surgery Required */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                      <Stethoscope size={16} className="text-[#00b4d8]" />
-                      Surgery Required
-                    </div>
-                    <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
-                      viewFormData.surgeryRequired === "yes" 
-                        ? "bg-orange-100 text-orange-800" 
-                        : "bg-green-100 text-green-800"
-                    }`}>
-                      {viewFormData.surgeryRequired === "yes" ? "Yes" : "No"}
-                    </div>
-
-                    {viewFormData.surgeryRequired === "yes" && viewFormData.surgeryDetails && (
-                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="text-sm font-medium text-gray-700 mb-3">Surgery Details:</div>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${viewFormData.surgeryDetails.surgeryDone ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                            <span className="text-sm text-gray-600">Surgery Completed</span>
-                          </div>
-                          {viewFormData.surgeryDetails.followUpDate && (
-                            <div className="flex items-center gap-2">
-                              <CalendarIcon size={16} className="text-[#00b4d8]" />
-                              <span className="text-sm text-gray-600">Follow-up Date:</span>
-                              <span className="text-sm text-gray-800 font-medium ml-1">
-                                {viewFormData.surgeryDetails.followUpDate}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
 
                   {/* Blood Checkup */}
                   <div className="space-y-1">
@@ -1314,37 +1687,66 @@ export default function HealthCampPage() {
                       Blood Checkup
                     </div>
                     <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
-                      viewFormData.bloodCheckup 
+                      viewFormData.blood_checkup 
                         ? "bg-orange-100 text-orange-800" 
                         : "bg-green-100 text-green-800"
                     }`}>
-                      {viewFormData.bloodCheckup ? "Required" : "Not Required"}
+                      {viewFormData.blood_checkup ? "Required" : "Not Required"}
                     </div>
                   </div>
 
-                  {/* Medicine Required */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                      <Pill size={16} className="text-[#00b4d8]" />
-                      Medicine Required
-                    </div>
-                    <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
-                      viewFormData.medicineRequired === "yes" 
-                        ? "bg-orange-100 text-orange-800" 
-                        : "bg-green-100 text-green-800"
-                    }`}>
-                      {viewFormData.medicineRequired === "yes" ? "Yes" : "No"}
+                  {/* Display basic medical information */}
+                  <div className="mt-6 space-y-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                        <Stethoscope size={16} className="text-[#00b4d8]" />
+                        Treatment Required
+                      </div>
+                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                        viewFormData.treatment_required === "yes" 
+                          ? "bg-orange-100 text-orange-800" 
+                          : "bg-green-100 text-green-800"
+                      }`}>
+                        {viewFormData.treatment_required === "yes" ? "Yes" : "No"}
+                      </div>
                     </div>
 
-                    {viewFormData.medicineRequired === "yes" && viewFormData.medicineName && (
-                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="text-sm font-medium text-gray-700 mb-2">Medicine Details:</div>
-                        <div className="flex items-center gap-2">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                        <Stethoscope size={16} className="text-[#00b4d8]" />
+                        Surgery Required
+                      </div>
+                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                        viewFormData.surgery_required === "yes" 
+                          ? "bg-orange-100 text-orange-800" 
+                          : "bg-green-100 text-green-800"
+                      }`}>
+                        {viewFormData.surgery_required === "yes" ? "Yes" : "No"}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                        <Pill size={16} className="text-[#00b4d8]" />
+                        Medicine Required
+                      </div>
+                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-lg font-semibold mt-1 ${
+                        viewFormData.medicine_required === "yes" 
+                          ? "bg-orange-100 text-orange-800" 
+                          : "bg-green-100 text-green-800"
+                      }`}>
+                        {viewFormData.medicine_required === "yes" ? "Yes" : "No"}
+                      </div>
+                    </div>
+
+                    {viewFormData.medicine_required === "yes" && viewFormData.medicine_name && (
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
                           <Pill size={16} className="text-[#00b4d8]" />
-                          <span className="text-sm text-gray-600">Medicine Name:</span>
-                          <span className="text-sm text-gray-800 font-medium ml-1">
-                            {viewFormData.medicineName}
-                          </span>
+                          Medicine Name
+                        </div>
+                        <div className="text-lg font-semibold text-gray-800 mt-1">
+                          {viewFormData.medicine_name}
                         </div>
                       </div>
                     )}

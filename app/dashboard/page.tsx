@@ -316,6 +316,19 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
+  BarChart,
+  BarChart2Icon,
+  BarChartHorizontal,
+  UserCheck2Icon,
+  HousePlug,
+  UserCog2Icon,
+  CreativeCommonsIcon,
+  CreativeCommons,
+  TrendingUp,
+  Building2Icon,
+  TentIcon,
+  StethoscopeIcon,
+  TentTreeIcon,
 } from "lucide-react";
 
 import Dashboard from "@/app/components/Dashboard";
@@ -332,6 +345,19 @@ import SponsorshipsList from "../components/SponsorshipsList";
 import SponsorshipType from "../components/SponsorshipType";
 import FinancePage from "../components/FinancePage";
 import EducationSponsorshipProgram from "../components/EducationSponsorshipProgram";
+import ReportsPage from "../components/Reports";
+import CampCategories from "../components/CampCategories";
+import UsersPage from "../components/Users";
+import VendorPage from "../components/Vendor";
+import StockInward from "../components/StockInward";
+import CampAllocation from "../components/CampAllocation";
+import ReturnApproval from "../components/ReturnApproval";
+// import IssueMedicine from "../components/IssueMedicine";
+import StockAdjustment from "../components/StockAdjustment";
+import ReturnStock from "../components/ReturnStock";
+import ItemMaster from "../components/ItemMaster";
+//import CampCreation from "../components/CreateCamp";
+import PatientHistory from "../components/PatientHistory";
 
 // ✅ Sidebar items (renamed Admin Controls → Participant Management)
 const sidebarItems = [
@@ -340,9 +366,19 @@ const sidebarItems = [
     icon: Home,
     subItems: [],
   },
+  // {
+  //   label: "Camp Creation",
+  //   icon: TentIcon,
+  //   subItems: [],
+  // },
+  {
+    label: "Camp Management",
+    icon: TentIcon,
+    subItems: [],
+  },
   {
     label: "Participant Management",
-    icon: Shield,
+    icon: UserCheck2Icon,
     subItems: [], //"participant management"
   },
   {
@@ -350,6 +386,47 @@ const sidebarItems = [
     icon: Heart,
     subItems: [],
   },
+  {
+    label: "Patient History",
+    icon: StethoscopeIcon,
+    subItems: [],
+  },
+  {
+    label: "Reports",
+    icon: BarChartHorizontal,
+    subItems: [],
+  },
+  {
+    label: "Camp Categories",
+    icon: HousePlug,
+    subItems: [],
+  },
+  {
+    label: "Users",
+    icon: UserCog2Icon,
+    subItems: [],
+  },
+  {
+    label: "Inventory",
+    icon: CreativeCommons,
+    subItems: [
+      "Vendor",
+      "Item Master",
+      "Stock Inward",
+      "Camp Allocation",
+      "Return Approval",
+      "Issue Medicine",
+      "Return Stock",
+      "Stock Adjustment"
+    ],
+  },
+  {
+    label: "Stock Reports",
+    icon: TrendingUp,
+    subItems: [
+      "Stock Reports"
+    ]
+  }
 ];
 
 export default function DashboardLayout() {
@@ -368,6 +445,9 @@ export default function DashboardLayout() {
     if (!clickedItem) return;
 
     if (clickedItem.subItems.length === 0) {
+      setSelected({ group: label, sub: label });
+      setOpenGroup(null);
+    } else if (label === "Dashboard") {
       setSelected({ group: label, sub: label });
       setOpenGroup(null);
     } else {
@@ -394,10 +474,38 @@ export default function DashboardLayout() {
       case "Dashboard":
         return <Dashboard />;
       case "Participant Management":
-        // ✅ Directly render ParticipantManagement
         return <ParticipantManagement />;
       case "Health Camps":
         return <HealthCampPage />;
+      case "Reports":
+        return <ReportsPage />;
+      case "Camp Categories":
+        return <CampCategories />
+      case "Users":
+        return <UsersPage />
+      case "Inventory":
+        // Add your Inventory components here based on selected sub-item
+        if (selected.sub === "Vendor") return <VendorPage />;
+        if (selected.sub === "Item Master") return <ItemMaster /> ;
+        if (selected.sub === "Stock Inward") return <StockInward />;
+        if (selected.sub === "Camp Allocation") return <CampAllocation />;
+        if (selected.sub === "Return Approval") return <ReturnApproval />;
+        // if (selected.sub === "Issue Medicine") return <IssueMedicine />;
+        if (selected.sub === "Return Stock") return <ReturnStock />;
+        if (selected.sub === "Stock Adjustment") return <StockAdjustment />;
+        // Default fallback for Inventory
+        return <div className="p-6 text-gray-500">Select an Inventory option</div>;
+      case "Stock Reports":
+        if (selected.sub === "Stock Reports") return <div className="p-6"><h1>Stock Reports</h1></div>;
+        return <div className="p-6 text-gray-500">Stock Reports Content</div>;
+
+      // case "Camp Creation":
+      //   return <CampCreation />
+      case "Patient History":
+        return <PatientHistory />
+      case "Camp Management":
+        return <CampManagement />
+
       default:
         return (
           <div className="p-6 text-gray-500">

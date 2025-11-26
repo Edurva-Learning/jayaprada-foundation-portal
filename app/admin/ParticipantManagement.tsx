@@ -1,4 +1,4 @@
-// 'use client';
+// 'use client'; 
 // import React, { useState, useEffect } from 'react';
 // import { Pencil, Trash2, Plus, X, Eye, Search } from 'lucide-react';
 
@@ -16,15 +16,13 @@
 //   mandal: string;
 //   village: string;
 //   pincode: string;
+//   house_no?: string;
 //   registration_source: string;
 //   created_at: string;
 //   blood_checkup: boolean;
 //   medicine_required: string;
 //   medicine_name: string;
 //   treatment_required: string;
-//   surgery_required: string;
-//   campCategory?: string;
-//   house_no?: string;
 // }
 
 // interface Camp {
@@ -34,7 +32,6 @@
 //   location: string;
 //   services: string;
 //   status: string;
-//   campCategory: string;
 // }
 
 // const ParticipantManagement: React.FC = () => {
@@ -51,6 +48,7 @@
 //   const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
 //   const [successMessage, setSuccessMessage] = useState('');
 //   const [errorMessage, setErrorMessage] = useState('');
+//   const [activeTab, setActiveTab] = useState<string>('');
 
 //   const [formData, setFormData] = useState({
 //     name: '',
@@ -65,20 +63,31 @@
 //     mandal: '',
 //     village: '',
 //     pincode: '',
+//     house_no: '',
 //     registration_source: '',
-//     campCategory: '',
-//     house_no: ''
+//     blood_checkup: false,
+//     medicine_required: '',
+//     medicine_name: '',
+//     treatment_required: '',
+//     camp_category: '',
+//     eye_services: [] as string[],
+//     dental_services: [] as string[],
+//     cancer_services: [] as string[],
+//     general_services: [] as string[]
 //   });
 
-//   const API_BASE_URL = 'http://localhost:5000';
+//   const API_BASE_URL = 'https://api.jpf-portal-api.com';
 
-//   // Show success message
+//   const eyeServices = ['Spectacles', 'Cataract', 'Pterygium', 'Other'];
+//   const dentalServices = ['Cleaning', 'Filling', 'Extraction', 'Root Canal', 'Other'];
+//   const cancerServices = ['Oral Cancer', 'Breast Cancer', 'Cervical Cancer', 'Prostate Cancer', 'Other'];
+//   const generalServices = ['Blood Pressure', 'Sugar Test', 'ECG', 'X-Ray', 'Other'];
+
 //   const showSuccess = (message: string) => {
 //     setSuccessMessage(message);
 //     setTimeout(() => setSuccessMessage(''), 5000);
 //   };
 
-//   // Show error message
 //   const showError = (message: string) => {
 //     setErrorMessage(message);
 //     setTimeout(() => setErrorMessage(''), 5000);
@@ -114,16 +123,15 @@
 //     fetchCamps();
 //   }, []);
 
-//   // Auto-generate address when location fields change
 //   useEffect(() => {
 //     const addressParts = [];
     
 //     if (formData.house_no) addressParts.push(`H.No: ${formData.house_no}`);
-//     if (formData.village) addressParts.push(formData.village);
-//     if (formData.mandal) addressParts.push(formData.mandal);
-//     if (formData.district) addressParts.push(formData.district);
-//     if (formData.assemblyconstituency) addressParts.push(formData.assemblyconstituency);
-//     if (formData.state) addressParts.push(formData.state);
+//     if (formData.village) addressParts.push(`Village: ${formData.village}`);
+//     if (formData.mandal) addressParts.push(`Mandal: ${formData.mandal}`);
+//     if (formData.district) addressParts.push(`District: ${formData.district}`);
+//     if (formData.assemblyconstituency) addressParts.push(`Constituency: ${formData.assemblyconstituency}`);
+//     if (formData.state) addressParts.push(`State: ${formData.state}`);
 //     if (formData.pincode) addressParts.push(`Pincode: ${formData.pincode}`);
     
 //     const generatedAddress = addressParts.join(', ');
@@ -144,7 +152,14 @@
 //     formData.pincode
 //   ]);
 
-//   // Search functionality
+//   const handleTabClick = (tab: string) => {
+//     setActiveTab(tab);
+//     setFormData(prev => ({
+//       ...prev,
+//       camp_category: tab
+//     }));
+//   };
+
 //   const handleSearch = () => {
 //     if (searchName === '' && searchAadhar === '' && searchPhone === '') {
 //       setFilteredParticipants(participants);
@@ -177,8 +192,46 @@
 //   };
 
 //   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({ ...prev, [name]: value }));
+//     const { name, value, type } = e.target;
+    
+//     if (type === 'checkbox') {
+//       const checked = (e.target as HTMLInputElement).checked;
+//       setFormData((prev) => ({ ...prev, [name]: checked }));
+//     } else {
+//       setFormData((prev) => ({ ...prev, [name]: value }));
+//     }
+//   };
+
+//   const handleServiceCheckboxChange = (serviceType: string, service: string, checked: boolean) => {
+//     if (serviceType === 'eye') {
+//       setFormData(prev => ({
+//         ...prev,
+//         eye_services: checked 
+//           ? [...prev.eye_services, service]
+//           : prev.eye_services.filter(s => s !== service)
+//       }));
+//     } else if (serviceType === 'dental') {
+//       setFormData(prev => ({
+//         ...prev,
+//         dental_services: checked 
+//           ? [...prev.dental_services, service]
+//           : prev.dental_services.filter(s => s !== service)
+//       }));
+//     } else if (serviceType === 'cancer') {
+//       setFormData(prev => ({
+//         ...prev,
+//         cancer_services: checked 
+//           ? [...prev.cancer_services, service]
+//           : prev.cancer_services.filter(s => s !== service)
+//       }));
+//     } else if (serviceType === 'general') {
+//       setFormData(prev => ({
+//         ...prev,
+//         general_services: checked 
+//           ? [...prev.general_services, service]
+//           : prev.general_services.filter(s => s !== service)
+//       }));
+//     }
 //   };
 
 //   const handleSubmit = async (e: React.FormEvent) => {
@@ -188,19 +241,16 @@
 
 //       console.log('Form data being sent:', formData);
       
-//       // Validate required fields
 //       if (!formData.name || !formData.registration_source) {
 //         showError('Please fill in all required fields');
 //         return;
 //       }
 
-//       // Validate Aadhar number (12 digits) if provided
 //       if (formData.aadhar && (formData.aadhar.length !== 12 || !/^\d+$/.test(formData.aadhar))) {
 //         showError('Please enter a valid 12-digit Aadhar number');
 //         return;
 //       }
 
-//       // Validate phone number (10 digits) if provided
 //       if (formData.phone && (formData.phone.length !== 10 || !/^\d+$/.test(formData.phone))) {
 //         showError('Please enter a valid 10-digit phone number');
 //         return;
@@ -235,10 +285,19 @@
 //         mandal: '',
 //         village: '',
 //         pincode: '',
+//         house_no: '',
 //         registration_source: '',
-//         campCategory: '',
-//         house_no: ''
+//         blood_checkup: false,
+//         medicine_required: '',
+//         medicine_name: '',
+//         treatment_required: '',
+//         camp_category: '',
+//         eye_services: [],
+//         dental_services: [],
+//         cancer_services: [],
+//         general_services: []
 //       });
+//       setActiveTab('');
 //       setIsModalOpen(false);
 //       showSuccess('Participant added successfully!');
 //     } catch (err) {
@@ -264,10 +323,19 @@
 //       mandal: participant.mandal,
 //       village: participant.village,
 //       pincode: participant.pincode,
+//       house_no: participant.house_no || '',
 //       registration_source: participant.registration_source,
-//       campCategory: participant.campCategory || '',
-//       house_no: participant.house_no || ''
+//       blood_checkup: participant.blood_checkup,
+//       medicine_required: participant.medicine_required,
+//       medicine_name: participant.medicine_name,
+//       treatment_required: participant.treatment_required,
+//       camp_category: '',
+//       eye_services: [],
+//       dental_services: [],
+//       cancer_services: [],
+//       general_services: []
 //     });
+//     setActiveTab('');
 //     setIsEditModalOpen(true);
 //   };
 
@@ -278,19 +346,16 @@
 //     try {
 //       setLoading(true);
       
-//       // Validate required fields
 //       if (!formData.name || !formData.registration_source) {
 //         showError('Please fill in all required fields');
 //         return;
 //       }
 
-//       // Validate Aadhar number (12 digits) if provided
 //       if (formData.aadhar && (formData.aadhar.length !== 12 || !/^\d+$/.test(formData.aadhar))) {
 //         showError('Please enter a valid 12-digit Aadhar number');
 //         return;
 //       }
 
-//       // Validate phone number (10 digits) if provided
 //       if (formData.phone && (formData.phone.length !== 10 || !/^\d+$/.test(formData.phone))) {
 //         showError('Please enter a valid 10-digit phone number');
 //         return;
@@ -314,6 +379,7 @@
 //       await fetchParticipants();
 //       setIsEditModalOpen(false);
 //       setSelectedParticipant(null);
+//       setActiveTab('');
 //       showSuccess('Participant updated successfully!');
 //     } catch (err) {
 //       console.error('Error updating participant:', err);
@@ -365,17 +431,25 @@
 //       mandal: '',
 //       village: '',
 //       pincode: '',
+//       house_no: '',
 //       registration_source: '',
-//       campCategory: '',
-//       house_no: ''
+//       blood_checkup: false,
+//       medicine_required: '',
+//       medicine_name: '',
+//       treatment_required: '',
+//       camp_category: '',
+//       eye_services: [],
+//       dental_services: [],
+//       cancer_services: [],
+//       general_services: []
 //     });
+//     setActiveTab('');
 //     setIsModalOpen(false);
 //     setIsEditModalOpen(false);
 //     setIsViewModalOpen(false);
 //     setSelectedParticipant(null);
 //   };
 
-//   // Message Display Component
 //   const MessageDisplay = () => (
 //     <>
 //       {successMessage && (
@@ -401,7 +475,6 @@
 //       </div>
       
 //       <div className="flex justify-between mb-4">
-//         {/* Search Section */}
 //         <div className="flex items-center gap-3 flex-1 mr-4">
 //           <input
 //             type="text"
@@ -443,7 +516,6 @@
 //           )}
 //         </div>
 
-//         {/* Add Participant Button */}
 //         <button
 //           onClick={() => setIsModalOpen(true)}
 //           disabled={loading}
@@ -456,7 +528,7 @@
 //       {/* Add Participant Modal */}
 //       {isModalOpen && (
 //         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-//           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+//           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
 //             <div className="flex justify-between items-center p-6 border-b">
 //               <h2 className="text-xl font-semibold">Add New Participant</h2>
 //               <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
@@ -464,47 +536,9 @@
 //               </button>
 //             </div>
 //             <form onSubmit={handleSubmit} className="p-6 grid grid-cols-2 gap-6">
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Registration Source <span className="text-red-500">*</span>
-//                 </label>
-//                 <select
-//                   name="registration_source"
-//                   value={formData.registration_source}
-//                   onChange={handleInputChange}
-//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-//                   required
-//                 >
-//                   <option value="">Select Registration Source</option>
-//                   {camps.map((camp) => (
-//                     <option key={camp.id} value={camp.camp_name}>
-//                       {camp.camp_name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Camp Category
-//                 </label>
-//                 <select
-//                   name="campCategory"
-//                   value={formData.campCategory}
-//                   onChange={handleInputChange}
-//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-//                 >
-//                   <option value="">Select Camp Category</option>
-//                   <option value="Eye CheckUp">Eye CheckUp</option>
-//                   <option value="Dental CheckUp">Dental CheckUp</option>
-//                   <option value="General CheckUp">General CheckUp</option>
-//                   <option value="Cancer Screening">Cancer Screening</option>
-//                   {camps.map((camp) => (
-//                     <option key={camp.id} value={camp.campCategory}>
-//                       {camp.campCategory}
-//                     </option>
-//                   ))}
-//                 </select>
+//               {/* Personal Information */}
+//               <div className="col-span-2">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
 //               </div>
 
 //               <div className="col-span-2">
@@ -570,8 +604,12 @@
 //                   maxLength={12}
 //                 />
 //               </div>
+
+//               {/* Location Information */}
+//               <div className="col-span-2 mt-4">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Location Information</h3>
+//               </div>
               
-//               {/* Location Fields */}
 //               <div>
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
 //                 <select
@@ -612,7 +650,7 @@
 //               </div>
 
 //               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Mandal</label>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">Mandal/Town/Division</label>
 //                 <input
 //                   type="text"
 //                   name="mandal"
@@ -623,7 +661,7 @@
 //               </div>
 
 //               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">Village/Ward</label>
 //                 <input
 //                   type="text"
 //                   name="village"
@@ -644,7 +682,7 @@
 //                 />
 //               </div>
 
-//               <div>
+//               <div className="col-span-2">
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">
 //                   House No/Street No/Building No
 //                 </label>
@@ -653,14 +691,13 @@
 //                   name="house_no"
 //                   value={formData.house_no}
 //                   onChange={handleInputChange}
-//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-//                   placeholder="Enter house number, street, or building details"
+//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-y bg-gray-50"
 //                 />
 //               </div>
 
 //               <div className="col-span-2">
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Address (Auto-generated)
+//                   Address
 //                 </label>
 //                 <textarea
 //                   name="address"
@@ -675,6 +712,156 @@
 //                   This field is automatically generated from the location information you provide above.
 //                 </p>
 //               </div>
+
+//               {/* Registration Source */}
+//               <div className="col-span-2 mt-4">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
+//               </div>
+
+//               <div className="col-span-2">
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   Registration Source <span className="text-red-500">*</span>
+//                 </label>
+//                 <select
+//                   name="registration_source"
+//                   value={formData.registration_source}
+//                   onChange={handleInputChange}
+//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+//                   required
+//                 >
+//                   <option value="">Select Registration Source</option>
+//                   {Array.isArray(camps) && camps.map((camp) => (
+//                     <option key={camp.id} value={camp.camp_name}>
+//                       {camp.camp_name}
+//                     </option>
+//                   ))}
+//                 </select>
+//               </div>
+
+//               {/* General Checkup Section */}
+//                   <div className="mt-6">
+//                     <h4 className="text-md font-medium text-gray-900 mb-3">General Checkup</h4>
+//                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+//                       <div className="grid grid-cols-2 gap-4">
+//                         {generalServices.map(service => (
+//                           <label key={service} className="flex items-center space-x-3">
+//                             <input
+//                               type="checkbox"
+//                               checked={formData.general_services.includes(service)}
+//                               onChange={(e) => handleServiceCheckboxChange('general', service, e.target.checked)}
+//                               className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+//                             />
+//                             <span className="text-sm text-gray-700">{service}</span>
+//                           </label>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   </div>
+
+//               {/* Checkup Type Section - Only show when registration source is selected */}
+//               {formData.registration_source && (
+//                 <div className="col-span-2">
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Checkup Type
+//                   </label>
+                  
+//                   {/* Tabs */}
+//                   <div className="flex space-x-1 mb-6">
+//                     <button
+//                       type="button"
+//                       onClick={() => handleTabClick('Eye')}
+//                       className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+//                         activeTab === 'Eye' 
+//                           ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+//                           : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+//                       }`}
+//                     >
+//                       Eye Checkup
+//                     </button>
+//                     <button
+//                       type="button"
+//                       onClick={() => handleTabClick('Dental')}
+//                       className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+//                         activeTab === 'Dental' 
+//                           ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+//                           : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+//                       }`}
+//                     >
+//                       Dental Checkup
+//                     </button>
+//                     <button
+//                       type="button"
+//                       onClick={() => handleTabClick('Cancer Screening')}
+//                       className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+//                         activeTab === 'Cancer Screening' 
+//                           ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+//                           : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+//                       }`}
+//                     >
+//                       Cancer Screening
+//                     </button>
+//                   </div>
+
+//                   {/* Tab Content */}
+//                   {activeTab === 'Eye' && (
+//                     <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+//                       <label className="block text-sm font-medium text-gray-700 mb-3">Eye Checkup Details</label>
+//                       <div className="grid grid-cols-2 gap-4">
+//                         {eyeServices.map(service => (
+//                           <label key={service} className="flex items-center space-x-3">
+//                             <input
+//                               type="checkbox"
+//                               checked={formData.eye_services.includes(service)}
+//                               onChange={(e) => handleServiceCheckboxChange('eye', service, e.target.checked)}
+//                               className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+//                             />
+//                             <span className="text-sm text-gray-700">{service}</span>
+//                           </label>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   )}
+
+//                   {activeTab === 'Dental' && (
+//                     <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+//                       <label className="block text-sm font-medium text-gray-700 mb-3">Dental Checkup Details</label>
+//                       <div className="grid grid-cols-2 gap-4">
+//                         {dentalServices.map(service => (
+//                           <label key={service} className="flex items-center space-x-3">
+//                             <input
+//                               type="checkbox"
+//                               checked={formData.dental_services.includes(service)}
+//                               onChange={(e) => handleServiceCheckboxChange('dental', service, e.target.checked)}
+//                               className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+//                             />
+//                             <span className="text-sm text-gray-700">{service}</span>
+//                           </label>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   )}
+
+//                   {activeTab === 'Cancer Screening' && (
+//                     <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+//                       <label className="block text-sm font-medium text-gray-700 mb-3">Cancer Screening Details</label>
+//                       <div className="grid grid-cols-2 gap-4">
+//                         {cancerServices.map(service => (
+//                           <label key={service} className="flex items-center space-x-3">
+//                             <input
+//                               type="checkbox"
+//                               checked={formData.cancer_services.includes(service)}
+//                               onChange={(e) => handleServiceCheckboxChange('cancer', service, e.target.checked)}
+//                               className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+//                             />
+//                             <span className="text-sm text-gray-700">{service}</span>
+//                           </label>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   )}
+
+//                 </div>
+//               )}
 
 //               <div className="col-span-2 flex justify-end gap-3 pt-4 border-t">
 //                 <button
@@ -698,10 +885,10 @@
 //         </div>
 //       )}
 
-//       {/* Edit Participant Modal */}
+//       {/* Edit Participant Modal - Similar structure as Add Modal */}
 //       {isEditModalOpen && selectedParticipant && (
 //         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-//           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+//           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
 //             <div className="flex justify-between items-center p-6 border-b">
 //               <h2 className="text-xl font-semibold">Edit Participant</h2>
 //               <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
@@ -709,47 +896,9 @@
 //               </button>
 //             </div>
 //             <form onSubmit={handleUpdate} className="p-6 grid grid-cols-2 gap-6">
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Registration Source <span className="text-red-500">*</span>
-//                 </label>
-//                 <select
-//                   name="registration_source"
-//                   value={formData.registration_source}
-//                   onChange={handleInputChange}
-//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-//                   required
-//                 >
-//                   <option value="">Select Registration Source</option>
-//                   {camps.map((camp) => (
-//                     <option key={camp.id} value={camp.camp_name}>
-//                       {camp.camp_name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Camp Category
-//                 </label>
-//                 <select
-//                   name="campCategory"
-//                   value={formData.campCategory}
-//                   onChange={handleInputChange}
-//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-//                 >
-//                   <option value="">Select Camp Category</option>
-//                   <option value="Eye CheckUp">Eye CheckUp</option>
-//                   <option value="Dental CheckUp">Dental CheckUp</option>
-//                   <option value="General CheckUp">General CheckUp</option>
-//                   <option value="Cancer Screening">Cancer Screening</option>
-//                   {camps.map((camp) => (
-//                     <option key={camp.id} value={camp.campCategory}>
-//                       {camp.campCategory}
-//                     </option>
-//                   ))}
-//                 </select>
+//               {/* Personal Information */}
+//               <div className="col-span-2">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
 //               </div>
 
 //               <div className="col-span-2">
@@ -815,8 +964,12 @@
 //                   maxLength={12}
 //                 />
 //               </div>
+
+//               {/* Location Information */}
+//               <div className="col-span-2 mt-4">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Location Information</h3>
+//               </div>
               
-//               {/* Location Fields */}
 //               <div>
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
 //                 <select
@@ -857,7 +1010,7 @@
 //               </div>
 
 //               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Mandal</label>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">Mandal/Town/Division</label>
 //                 <input
 //                   type="text"
 //                   name="mandal"
@@ -868,7 +1021,7 @@
 //               </div>
 
 //               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">Village/Ward</label>
 //                 <input
 //                   type="text"
 //                   name="village"
@@ -889,7 +1042,7 @@
 //                 />
 //               </div>
 
-//               <div>
+//               <div className="col-span-2">
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">
 //                   House No/Street No/Building No
 //                 </label>
@@ -898,8 +1051,7 @@
 //                   name="house_no"
 //                   value={formData.house_no}
 //                   onChange={handleInputChange}
-//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-//                   placeholder="Enter house number, street, or building details"
+//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-y bg-gray-50"
 //                 />
 //               </div>
 
@@ -920,6 +1072,155 @@
 //                   This field is automatically generated from the location information you provide above.
 //                 </p>
 //               </div>
+
+//               {/* Registration Source */}
+//               <div className="col-span-2 mt-4">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
+//               </div>
+
+//               <div className="col-span-2">
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   Registration Source <span className="text-red-500">*</span>
+//                 </label>
+//                 <select
+//                   name="registration_source"
+//                   value={formData.registration_source}
+//                   onChange={handleInputChange}
+//                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+//                   required
+//                 >
+//                   <option value="">Select Registration Source</option>
+//                   {camps.map((camp) => (
+//                     <option key={camp.id} value={camp.camp_name}>
+//                       {camp.camp_name}
+//                     </option>
+//                   ))}
+//                 </select>
+//               </div>
+
+//               {/* Checkup Type Section - Only show when registration source is selected */}
+//               {formData.registration_source && (
+//                 <div className="col-span-2">
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Checkup Type
+//                   </label>
+                  
+//                   {/* Tabs */}
+//                   <div className="flex space-x-1 mb-6">
+//                     <button
+//                       type="button"
+//                       onClick={() => handleTabClick('Eye')}
+//                       className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+//                         activeTab === 'Eye' 
+//                           ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+//                           : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+//                       }`}
+//                     >
+//                       Eye Checkup
+//                     </button>
+//                     <button
+//                       type="button"
+//                       onClick={() => handleTabClick('Dental')}
+//                       className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+//                         activeTab === 'Dental' 
+//                           ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+//                           : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+//                       }`}
+//                     >
+//                       Dental Checkup
+//                     </button>
+//                     <button
+//                       type="button"
+//                       onClick={() => handleTabClick('Cancer Screening')}
+//                       className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+//                         activeTab === 'Cancer Screening' 
+//                           ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+//                           : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+//                       }`}
+//                     >
+//                       Cancer Screening
+//                     </button>
+//                   </div>
+
+//                   {/* Tab Content */}
+//                   {activeTab === 'Eye' && (
+//                     <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+//                       <label className="block text-sm font-medium text-gray-700 mb-3">Eye Checkup Details</label>
+//                       <div className="grid grid-cols-2 gap-4">
+//                         {eyeServices.map(service => (
+//                           <label key={service} className="flex items-center space-x-3">
+//                             <input
+//                               type="checkbox"
+//                               checked={formData.eye_services.includes(service)}
+//                               onChange={(e) => handleServiceCheckboxChange('eye', service, e.target.checked)}
+//                               className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+//                             />
+//                             <span className="text-sm text-gray-700">{service}</span>
+//                           </label>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   )}
+
+//                   {activeTab === 'Dental' && (
+//                     <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+//                       <label className="block text-sm font-medium text-gray-700 mb-3">Dental Checkup Details</label>
+//                       <div className="grid grid-cols-2 gap-4">
+//                         {dentalServices.map(service => (
+//                           <label key={service} className="flex items-center space-x-3">
+//                             <input
+//                               type="checkbox"
+//                               checked={formData.dental_services.includes(service)}
+//                               onChange={(e) => handleServiceCheckboxChange('dental', service, e.target.checked)}
+//                               className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+//                             />
+//                             <span className="text-sm text-gray-700">{service}</span>
+//                           </label>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   )}
+
+//                   {activeTab === 'Cancer Screening' && (
+//                     <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+//                       <label className="block text-sm font-medium text-gray-700 mb-3">Cancer Screening Details</label>
+//                       <div className="grid grid-cols-2 gap-4">
+//                         {cancerServices.map(service => (
+//                           <label key={service} className="flex items-center space-x-3">
+//                             <input
+//                               type="checkbox"
+//                               checked={formData.cancer_services.includes(service)}
+//                               onChange={(e) => handleServiceCheckboxChange('cancer', service, e.target.checked)}
+//                               className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+//                             />
+//                             <span className="text-sm text-gray-700">{service}</span>
+//                           </label>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   )}
+
+//                   {/* General Checkup Section */}
+//                   <div className="mt-6">
+//                     <h4 className="text-md font-medium text-gray-900 mb-3">General Checkup</h4>
+//                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+//                       <div className="grid grid-cols-2 gap-4">
+//                         {generalServices.map(service => (
+//                           <label key={service} className="flex items-center space-x-3">
+//                             <input
+//                               type="checkbox"
+//                               checked={formData.general_services.includes(service)}
+//                               onChange={(e) => handleServiceCheckboxChange('general', service, e.target.checked)}
+//                               className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+//                             />
+//                             <span className="text-sm text-gray-700">{service}</span>
+//                           </label>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               )}
 
 //               <div className="col-span-2 flex justify-end gap-3 pt-4 border-t">
 //                 <button
@@ -943,10 +1244,10 @@
 //         </div>
 //       )}
 
-//       {/* View Participant Modal */}
+//       {/* View Participant Modal - Keep as is */}
 //       {isViewModalOpen && selectedParticipant && (
 //         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-//           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+//           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
 //             <div className="flex justify-between items-center p-6 border-b">
 //               <h2 className="text-xl font-semibold">Participant Details</h2>
 //               <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
@@ -954,6 +1255,11 @@
 //               </button>
 //             </div>
 //             <div className="p-6 grid grid-cols-2 gap-6">
+//               {/* Personal Information */}
+//               <div className="col-span-2">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+//               </div>
+
 //               <div>
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
 //                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
@@ -984,18 +1290,12 @@
 //                   {selectedParticipant.aadhar}
 //                 </div>
 //               </div>
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Registration Source</label>
-//                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-//                   {selectedParticipant.registration_source}
-//                 </div>
+
+//               {/* Location Information */}
+//               <div className="col-span-2 mt-4">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Location Information</h3>
 //               </div>
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Camp Category</label>
-//                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-//                   {selectedParticipant.campCategory || 'Not specified'}
-//                 </div>
-//               </div>
+
 //               <div>
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
 //                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
@@ -1015,13 +1315,13 @@
 //                 </div>
 //               </div>
 //               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Mandal</label>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">Mandal/Town/Division</label>
 //                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
 //                   {selectedParticipant.mandal}
 //                 </div>
 //               </div>
 //               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">Village/Ward</label>
 //                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
 //                   {selectedParticipant.village}
 //                 </div>
@@ -1032,10 +1332,10 @@
 //                   {selectedParticipant.pincode}
 //                 </div>
 //               </div>
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">House No/Street No/Building No</label>
-//                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-//                   {selectedParticipant.house_no || 'Not specified'}
+//               <div className="col-span-2">
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">House No/Street No</label>
+//                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 min-h-[80px]">
+//                   {selectedParticipant.house_no}
 //                 </div>
 //               </div>
 //               <div className="col-span-2">
@@ -1044,12 +1344,19 @@
 //                   {selectedParticipant.address}
 //                 </div>
 //               </div>
-//               <div className="col-span-2">
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">Created At</label>
+
+//               {/* Camp Information */}
+//               <div className="col-span-2 mt-4">
+//                 <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
+//               </div>
+
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">Registration Source</label>
 //                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-//                   {new Date(selectedParticipant.created_at).toLocaleDateString()}
+//                   {selectedParticipant.registration_source}
 //                 </div>
 //               </div>
+
 //               <div className="col-span-2 flex justify-end gap-3 pt-4 border-t">
 //                 <button
 //                   onClick={handleClose}
@@ -1078,7 +1385,6 @@
 //                 <th className="px-4 py-3">Phone</th>
 //                 <th className="px-4 py-3">Aadhar</th>
 //                 <th className="px-4 py-3">Registration Source</th>
-//                 <th className="px-4 py-3">Camp Category</th>
 //                 <th className="px-4 py-3">Created At</th>
 //                 <th className="px-4 py-3">Actions</th>
 //               </tr>
@@ -1093,7 +1399,6 @@
 //                   <td className="px-4 py-3">{p.phone}</td>
 //                   <td className="px-4 py-3">{p.aadhar}</td>
 //                   <td className="px-4 py-3 text-gray-700">{p.registration_source}</td>
-//                   <td className="px-4 py-3 text-gray-700">{p.campCategory || 'Not specified'}</td>
 //                   <td className="px-4 py-3">{new Date(p.created_at).toLocaleDateString()}</td>
 //                   <td className="px-4 py-3 flex items-center gap-3">
 //                     <button 
@@ -1127,8 +1432,8 @@
 
 
 'use client'; 
-import React, { useState, useEffect } from 'react';
-import { Pencil, Trash2, Plus, X, Eye, Search } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Pencil, Trash2, Plus, X, Eye, Search, User } from 'lucide-react';
 
 interface Participant {
   id: number;
@@ -1151,7 +1456,6 @@ interface Participant {
   medicine_required: string;
   medicine_name: string;
   treatment_required: string;
-  campcategory: string; // 👈 updated to match backend
 }
 
 interface Camp {
@@ -1161,7 +1465,6 @@ interface Camp {
   location: string;
   services: string;
   status: string;
-  campCategory: string;
 }
 
 const ParticipantManagement: React.FC = () => {
@@ -1178,6 +1481,12 @@ const ParticipantManagement: React.FC = () => {
   const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [activeTab, setActiveTab] = useState<string>('');
+  const [aadharSuggestions, setAadharSuggestions] = useState<Participant[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const aadharInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -1194,22 +1503,44 @@ const ParticipantManagement: React.FC = () => {
     pincode: '',
     house_no: '',
     registration_source: '',
-    campcategory: '', // 👈 updated to match backend
     blood_checkup: false,
     medicine_required: '',
     medicine_name: '',
-    treatment_required: ''
+    treatment_required: '',
+    camp_category: '',
+    eye_services: [] as string[],
+    dental_services: [] as string[],
+    cancer_services: [] as string[],
+    general_services: [] as string[]
   });
 
   const API_BASE_URL = 'https://api.jpf-portal-api.com';
 
-  // Show success message
+  const eyeServices = ['Spectacles', 'Cataract', 'Pterygium', 'Other'];
+  const dentalServices = ['Cleaning', 'Filling', 'Extraction', 'Root Canal', 'Other'];
+  const cancerServices = ['Oral Cancer', 'Breast Cancer', 'Cervical Cancer', 'Prostate Cancer', 'Other'];
+  const generalServices = ['Blood Pressure', 'Sugar Test', 'ECG', 'X-Ray', 'Other'];
+
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) &&
+          aadharInputRef.current && !aadharInputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const showSuccess = (message: string) => {
     setSuccessMessage(message);
     setTimeout(() => setSuccessMessage(''), 5000);
   };
 
-  // Show error message
   const showError = (message: string) => {
     setErrorMessage(message);
     setTimeout(() => setErrorMessage(''), 5000);
@@ -1245,7 +1576,6 @@ const ParticipantManagement: React.FC = () => {
     fetchCamps();
   }, []);
 
-  // Auto-generate address when location fields change
   useEffect(() => {
     const addressParts = [];
     
@@ -1275,7 +1605,62 @@ const ParticipantManagement: React.FC = () => {
     formData.pincode
   ]);
 
-  // Search functionality
+  // Handle Aadhar input change for suggestions
+  const handleAadharChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, aadhar: value }));
+
+    if (value.length >= 4) {
+      const filtered = participants.filter(participant =>
+        participant.aadhar.includes(value)
+      );
+      setAadharSuggestions(filtered);
+      setShowSuggestions(true);
+    } else {
+      setAadharSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (participant: Participant) => {
+    setFormData({
+      name: participant.name,
+      aadhar: participant.aadhar,
+      age: participant.age.toString(),
+      gender: participant.gender,
+      phone: participant.phone,
+      address: participant.address,
+      state: participant.state,
+      district: participant.district,
+      assemblyconstituency: participant.assemblyconstituency,
+      mandal: participant.mandal,
+      village: participant.village,
+      pincode: participant.pincode,
+      house_no: participant.house_no || '',
+      registration_source: participant.registration_source,
+      blood_checkup: participant.blood_checkup,
+      medicine_required: participant.medicine_required,
+      medicine_name: participant.medicine_name,
+      treatment_required: participant.treatment_required,
+      camp_category: '',
+      eye_services: [],
+      dental_services: [],
+      cancer_services: [],
+      general_services: []
+    });
+    setAadharSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
+    setFormData(prev => ({
+      ...prev,
+      camp_category: tab
+    }));
+  };
+
   const handleSearch = () => {
     if (searchName === '' && searchAadhar === '' && searchPhone === '') {
       setFilteredParticipants(participants);
@@ -1318,6 +1703,38 @@ const ParticipantManagement: React.FC = () => {
     }
   };
 
+  const handleServiceCheckboxChange = (serviceType: string, service: string, checked: boolean) => {
+    if (serviceType === 'eye') {
+      setFormData(prev => ({
+        ...prev,
+        eye_services: checked 
+          ? [...prev.eye_services, service]
+          : prev.eye_services.filter(s => s !== service)
+      }));
+    } else if (serviceType === 'dental') {
+      setFormData(prev => ({
+        ...prev,
+        dental_services: checked 
+          ? [...prev.dental_services, service]
+          : prev.dental_services.filter(s => s !== service)
+      }));
+    } else if (serviceType === 'cancer') {
+      setFormData(prev => ({
+        ...prev,
+        cancer_services: checked 
+          ? [...prev.cancer_services, service]
+          : prev.cancer_services.filter(s => s !== service)
+      }));
+    } else if (serviceType === 'general') {
+      setFormData(prev => ({
+        ...prev,
+        general_services: checked 
+          ? [...prev.general_services, service]
+          : prev.general_services.filter(s => s !== service)
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -1325,19 +1742,16 @@ const ParticipantManagement: React.FC = () => {
 
       console.log('Form data being sent:', formData);
       
-      // Validate required fields
       if (!formData.name || !formData.registration_source) {
         showError('Please fill in all required fields');
         return;
       }
 
-      // Validate Aadhar number (12 digits) if provided
       if (formData.aadhar && (formData.aadhar.length !== 12 || !/^\d+$/.test(formData.aadhar))) {
         showError('Please enter a valid 12-digit Aadhar number');
         return;
       }
 
-      // Validate phone number (10 digits) if provided
       if (formData.phone && (formData.phone.length !== 10 || !/^\d+$/.test(formData.phone))) {
         showError('Please enter a valid 10-digit phone number');
         return;
@@ -1374,12 +1788,17 @@ const ParticipantManagement: React.FC = () => {
         pincode: '',
         house_no: '',
         registration_source: '',
-        campcategory: '',
         blood_checkup: false,
         medicine_required: '',
         medicine_name: '',
-        treatment_required: ''
+        treatment_required: '',
+        camp_category: '',
+        eye_services: [],
+        dental_services: [],
+        cancer_services: [],
+        general_services: []
       });
+      setActiveTab('');
       setIsModalOpen(false);
       showSuccess('Participant added successfully!');
     } catch (err) {
@@ -1407,12 +1826,17 @@ const ParticipantManagement: React.FC = () => {
       pincode: participant.pincode,
       house_no: participant.house_no || '',
       registration_source: participant.registration_source,
-      campcategory: participant.campcategory,
       blood_checkup: participant.blood_checkup,
       medicine_required: participant.medicine_required,
       medicine_name: participant.medicine_name,
-      treatment_required: participant.treatment_required
+      treatment_required: participant.treatment_required,
+      camp_category: '',
+      eye_services: [],
+      dental_services: [],
+      cancer_services: [],
+      general_services: []
     });
+    setActiveTab('');
     setIsEditModalOpen(true);
   };
 
@@ -1423,19 +1847,16 @@ const ParticipantManagement: React.FC = () => {
     try {
       setLoading(true);
       
-      // Validate required fields
       if (!formData.name || !formData.registration_source) {
         showError('Please fill in all required fields');
         return;
       }
 
-      // Validate Aadhar number (12 digits) if provided
       if (formData.aadhar && (formData.aadhar.length !== 12 || !/^\d+$/.test(formData.aadhar))) {
         showError('Please enter a valid 12-digit Aadhar number');
         return;
       }
 
-      // Validate phone number (10 digits) if provided
       if (formData.phone && (formData.phone.length !== 10 || !/^\d+$/.test(formData.phone))) {
         showError('Please enter a valid 10-digit phone number');
         return;
@@ -1459,6 +1880,7 @@ const ParticipantManagement: React.FC = () => {
       await fetchParticipants();
       setIsEditModalOpen(false);
       setSelectedParticipant(null);
+      setActiveTab('');
       showSuccess('Participant updated successfully!');
     } catch (err) {
       console.error('Error updating participant:', err);
@@ -1512,19 +1934,25 @@ const ParticipantManagement: React.FC = () => {
       pincode: '',
       house_no: '',
       registration_source: '',
-      campcategory: '',
       blood_checkup: false,
       medicine_required: '',
       medicine_name: '',
-      treatment_required: ''
+      treatment_required: '',
+      camp_category: '',
+      eye_services: [],
+      dental_services: [],
+      cancer_services: [],
+      general_services: []
     });
+    setActiveTab('');
+    setAadharSuggestions([]);
+    setShowSuggestions(false);
     setIsModalOpen(false);
     setIsEditModalOpen(false);
     setIsViewModalOpen(false);
     setSelectedParticipant(null);
   };
 
-  // Message Display Component
   const MessageDisplay = () => (
     <>
       {successMessage && (
@@ -1550,7 +1978,6 @@ const ParticipantManagement: React.FC = () => {
       </div>
       
       <div className="flex justify-between mb-4">
-        {/* Search Section */}
         <div className="flex items-center gap-3 flex-1 mr-4">
           <input
             type="text"
@@ -1592,7 +2019,6 @@ const ParticipantManagement: React.FC = () => {
           )}
         </div>
 
-        {/* Add Participant Button */}
         <button
           onClick={() => setIsModalOpen(true)}
           disabled={loading}
@@ -1616,6 +2042,47 @@ const ParticipantManagement: React.FC = () => {
               {/* Personal Information */}
               <div className="col-span-2">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+              </div>
+
+              {/* Aadhar Field - Moved to top */}
+              <div className="col-span-2 relative">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Aadhar Number
+                </label>
+                <input
+                  ref={aadharInputRef}
+                  type="text"
+                  name="aadhar"
+                  value={formData.aadhar}
+                  onChange={handleAadharChange}
+                  onFocus={() => formData.aadhar.length >= 4 && setShowSuggestions(true)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  maxLength={12}
+                  placeholder="Enter Aadhar number"
+                />
+                
+                {/* Aadhar Suggestions Dropdown */}
+                {showSuggestions && aadharSuggestions.length > 0 && (
+                  <div 
+                    ref={suggestionsRef}
+                    className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                  >
+                    {aadharSuggestions.map((participant) => (
+                      <div
+                        key={participant.id}
+                        className="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0"
+                        onClick={() => handleSuggestionClick(participant)}
+                      >
+                        <User className="w-4 h-4 text-gray-500 mr-3" />
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900">{participant.name}</div>
+                          <div className="text-sm text-gray-600">Aadhar: {participant.aadhar}</div>
+                          <div className="text-xs text-gray-500">Phone: {participant.phone}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="col-span-2">
@@ -1670,66 +2137,7 @@ const ParticipantManagement: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Aadhar Number</label>
-                <input
-                  type="text"
-                  name="aadhar"
-                  value={formData.aadhar}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  maxLength={12}
-                />
-              </div>
-
-              {/* Camp Information */}
-              <div className="col-span-2 mt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Registration Source <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="registration_source"
-                  value={formData.registration_source}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  required
-                >
-                  <option value="">Select Registration Source</option>
-                  {Array.isArray(camps) && camps.map((camp) => (
-  <option key={camp.id} value={camp.camp_name}>
-    {camp.camp_name}
-  </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Camp Category
-                </label>
-                <select
-                  name="campcategory"
-                  value={formData.campcategory}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                >
-                  <option value="">Select Camp Category</option>
-                  <option value="Eye CheckUp">Eye CheckUp</option>
-                  <option value="Dental CheckUp">Dental CheckUp</option>
-                  <option value="General CheckUp">General CheckUp</option>
-                  <option value="Cancer Screening">Cancer Screening</option>
-                  {camps.map((camp) => (
-                    <option key={camp.id} value={camp.campCategory}>
-                      {camp.campCategory}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+              {/* Rest of the form remains the same */}
               {/* Location Information */}
               <div className="col-span-2 mt-4">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Location Information</h3>
@@ -1775,7 +2183,7 @@ const ParticipantManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Mandal</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mandal/Town/Division</label>
                 <input
                   type="text"
                   name="mandal"
@@ -1786,7 +2194,7 @@ const ParticipantManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Village/Ward</label>
                 <input
                   type="text"
                   name="village"
@@ -1809,7 +2217,7 @@ const ParticipantManagement: React.FC = () => {
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  House No/Street No/BUilding No
+                  House No/Street No/Building No
                 </label>
                 <input
                   type="text"
@@ -1817,8 +2225,8 @@ const ParticipantManagement: React.FC = () => {
                   value={formData.house_no}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-y bg-gray-50"
-                  />
-                </div>
+                />
+              </div>
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1838,61 +2246,155 @@ const ParticipantManagement: React.FC = () => {
                 </p>
               </div>
 
-              {/* Medical Information */}
-              {/* <div className="col-span-2 mt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Medical Information</h3>
-              </div> */}
-
-              {/* <div className="col-span-2">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="blood_checkup"
-                    checked={formData.blood_checkup}
-                    onChange={handleInputChange}
-                    className="mr-2"
-                  />
-                  <span className="text-sm font-medium text-gray-700">Blood Checkup Required</span>
-                </label>
-              </div> */}
-
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Medicine Required</label>
-                <select
-                  name="medicine_required"
-                  value={formData.medicine_required}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                >
-                  <option value="">Select</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Medicine Name</label>
-                <input
-                  type="text"
-                  name="medicine_name"
-                  value={formData.medicine_name}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder="If medicine required"
-                />
+              {/* Registration Source */}
+              <div className="col-span-2 mt-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
               </div>
 
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Treatment Required</label>
-                <input
-                  type="text"
-                  name="treatment_required"
-                  value={formData.treatment_required}
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Registration Source <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="registration_source"
+                  value={formData.registration_source}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder="Specify treatment if required"
-                />
-              </div> */}
+                  required
+                >
+                  <option value="">Select Registration Source</option>
+                  {Array.isArray(camps) && camps.map((camp) => (
+                    <option key={camp.id} value={camp.camp_name}>
+                      {camp.camp_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* General Checkup Section */}
+              <div className="mt-6">
+                <h4 className="text-md font-medium text-gray-900 mb-3">General Checkup</h4>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <div className="grid grid-cols-2 gap-4">
+                    {generalServices.map(service => (
+                      <label key={service} className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          checked={formData.general_services.includes(service)}
+                          onChange={(e) => handleServiceCheckboxChange('general', service, e.target.checked)}
+                          className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+                        />
+                        <span className="text-sm text-gray-700">{service}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Checkup Type Section - Only show when registration source is selected */}
+              {formData.registration_source && (
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Checkup Type
+                  </label>
+                  
+                  {/* Tabs */}
+                  <div className="flex space-x-1 mb-6">
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('Eye')}
+                      className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+                        activeTab === 'Eye' 
+                          ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+                          : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+                      }`}
+                    >
+                      Eye Checkup
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('Dental')}
+                      className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+                        activeTab === 'Dental' 
+                          ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+                          : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+                      }`}
+                    >
+                      Dental Checkup
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('Cancer Screening')}
+                      className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+                        activeTab === 'Cancer Screening' 
+                          ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+                          : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+                      }`}
+                    >
+                      Cancer Screening
+                    </button>
+                  </div>
+
+                  {/* Tab Content */}
+                  {activeTab === 'Eye' && (
+                    <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Eye Checkup Details</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {eyeServices.map(service => (
+                          <label key={service} className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={formData.eye_services.includes(service)}
+                              onChange={(e) => handleServiceCheckboxChange('eye', service, e.target.checked)}
+                              className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+                            />
+                            <span className="text-sm text-gray-700">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'Dental' && (
+                    <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Dental Checkup Details</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {dentalServices.map(service => (
+                          <label key={service} className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={formData.dental_services.includes(service)}
+                              onChange={(e) => handleServiceCheckboxChange('dental', service, e.target.checked)}
+                              className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+                            />
+                            <span className="text-sm text-gray-700">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'Cancer Screening' && (
+                    <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Cancer Screening Details</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {cancerServices.map(service => (
+                          <label key={service} className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={formData.cancer_services.includes(service)}
+                              onChange={(e) => handleServiceCheckboxChange('cancer', service, e.target.checked)}
+                              className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+                            />
+                            <span className="text-sm text-gray-700">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              )}
 
               <div className="col-span-2 flex justify-end gap-3 pt-4 border-t">
                 <button
@@ -1916,7 +2418,7 @@ const ParticipantManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Edit Participant Modal */}
+      {/* Edit Participant Modal - Similar structure as Add Modal */}
       {isEditModalOpen && selectedParticipant && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -1996,54 +2498,6 @@ const ParticipantManagement: React.FC = () => {
                 />
               </div>
 
-              {/* Camp Information */}
-              <div className="col-span-2 mt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Registration Source <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="registration_source"
-                  value={formData.registration_source}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  required
-                >
-                  <option value="">Select Registration Source</option>
-                  {camps.map((camp) => (
-                    <option key={camp.id} value={camp.camp_name}>
-                      {camp.camp_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Camp Category
-                </label>
-                <select
-                  name="campcategory"
-                  value={formData.campcategory || ""}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                >
-                  <option value="">Select Camp Category</option>
-                  <option value="Eye CheckUp">Eye CheckUp</option>
-                  <option value="Dental CheckUp">Dental CheckUp</option>
-                  <option value="General CheckUp">General CheckUp</option>
-                  <option value="Cancer Screening">Cancer Screening</option>
-                  {camps.map((camp) => (
-                    <option key={camp.id} value={camp.campCategory}>
-                      {camp.campCategory}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               {/* Location Information */}
               <div className="col-span-2 mt-4">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Location Information</h3>
@@ -2089,7 +2543,7 @@ const ParticipantManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Mandal</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mandal/Town/Division</label>
                 <input
                   type="text"
                   name="mandal"
@@ -2100,7 +2554,7 @@ const ParticipantManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Village/Ward</label>
                 <input
                   type="text"
                   name="village"
@@ -2123,6 +2577,19 @@ const ParticipantManagement: React.FC = () => {
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  House No/Street No/Building No
+                </label>
+                <input
+                  type="text"
+                  name="house_no"
+                  value={formData.house_no}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-y bg-gray-50"
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Address (Auto-generated)
                 </label>
                 <textarea
@@ -2139,61 +2606,154 @@ const ParticipantManagement: React.FC = () => {
                 </p>
               </div>
 
-              {/* Medical Information */}
-              {/* <div className="col-span-2 mt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Medical Information</h3>
+              {/* Registration Source */}
+              <div className="col-span-2 mt-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
               </div>
 
               <div className="col-span-2">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="blood_checkup"
-                    checked={formData.blood_checkup}
-                    onChange={handleInputChange}
-                    className="mr-2"
-                  />
-                  <span className="text-sm font-medium text-gray-700">Blood Checkup Required</span>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Registration Source <span className="text-red-500">*</span>
                 </label>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Medicine Required</label>
                 <select
-                  name="medicine_required"
-                  value={formData.medicine_required}
+                  name="registration_source"
+                  value={formData.registration_source}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  required
                 >
-                  <option value="">Select</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
+                  <option value="">Select Registration Source</option>
+                  {camps.map((camp) => (
+                    <option key={camp.id} value={camp.camp_name}>
+                      {camp.camp_name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Medicine Name</label>
-                <input
-                  type="text"
-                  name="medicine_name"
-                  value={formData.medicine_name}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder="If medicine required"
-                />
-              </div>
+              {/* Checkup Type Section - Only show when registration source is selected */}
+              {formData.registration_source && (
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Checkup Type
+                  </label>
+                  
+                  {/* Tabs */}
+                  <div className="flex space-x-1 mb-6">
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('Eye')}
+                      className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+                        activeTab === 'Eye' 
+                          ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+                          : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+                      }`}
+                    >
+                      Eye Checkup
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('Dental')}
+                      className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+                        activeTab === 'Dental' 
+                          ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+                          : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+                      }`}
+                    >
+                      Dental Checkup
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('Cancer Screening')}
+                      className={`flex-1 py-3 px-4 text-center font-medium transition-all duration-200 ${
+                        activeTab === 'Cancer Screening' 
+                          ? 'bg-[#00b4d8] text-white rounded-t-lg border-b-2 border-[#00b4d8]' 
+                          : 'bg-gray-100 text-gray-600 rounded-t-lg hover:bg-gray-200 border-b-2 border-transparent'
+                      }`}
+                    >
+                      Cancer Screening
+                    </button>
+                  </div>
 
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Treatment Required</label>
-                <input
-                  type="text"
-                  name="treatment_required"
-                  value={formData.treatment_required}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder="Specify treatment if required"
-                />
-              </div> */}
+                  {/* Tab Content */}
+                  {activeTab === 'Eye' && (
+                    <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Eye Checkup Details</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {eyeServices.map(service => (
+                          <label key={service} className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={formData.eye_services.includes(service)}
+                              onChange={(e) => handleServiceCheckboxChange('eye', service, e.target.checked)}
+                              className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+                            />
+                            <span className="text-sm text-gray-700">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'Dental' && (
+                    <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Dental Checkup Details</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {dentalServices.map(service => (
+                          <label key={service} className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={formData.dental_services.includes(service)}
+                              onChange={(e) => handleServiceCheckboxChange('dental', service, e.target.checked)}
+                              className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+                            />
+                            <span className="text-sm text-gray-700">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'Cancer Screening' && (
+                    <div className="bg-gray-50 p-4 rounded-b-lg rounded-r-lg border border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Cancer Screening Details</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {cancerServices.map(service => (
+                          <label key={service} className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={formData.cancer_services.includes(service)}
+                              onChange={(e) => handleServiceCheckboxChange('cancer', service, e.target.checked)}
+                              className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+                            />
+                            <span className="text-sm text-gray-700">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* General Checkup Section */}
+                  <div className="mt-6">
+                    <h4 className="text-md font-medium text-gray-900 mb-3">General Checkup</h4>
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <div className="grid grid-cols-2 gap-4">
+                        {generalServices.map(service => (
+                          <label key={service} className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={formData.general_services.includes(service)}
+                              onChange={(e) => handleServiceCheckboxChange('general', service, e.target.checked)}
+                              className="w-4 h-4 text-[#00b4d8] border-gray-300 rounded focus:ring-[#00b4d8]"
+                            />
+                            <span className="text-sm text-gray-700">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="col-span-2 flex justify-end gap-3 pt-4 border-t">
                 <button
@@ -2264,24 +2824,6 @@ const ParticipantManagement: React.FC = () => {
                 </div>
               </div>
 
-              {/* Camp Information */}
-              <div className="col-span-2 mt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Registration Source</label>
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  {selectedParticipant.registration_source}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Camp Category</label>
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  {selectedParticipant.campcategory || 'Not specified'}
-                </div>
-              </div>
-
               {/* Location Information */}
               <div className="col-span-2 mt-4">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Location Information</h3>
@@ -2306,13 +2848,13 @@ const ParticipantManagement: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Mandal</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mandal/Town/Division</label>
                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
                   {selectedParticipant.mandal}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Village/Ward</label>
                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
                   {selectedParticipant.village}
                 </div>
@@ -2336,42 +2878,18 @@ const ParticipantManagement: React.FC = () => {
                 </div>
               </div>
 
-              {/* Medical Information */}
-              {/* <div className="col-span-2 mt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Medical Information</h3>
+              {/* Camp Information */}
+              <div className="col-span-2 mt-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Camp Information</h3>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Blood Checkup</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Registration Source</label>
                 <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  {selectedParticipant.blood_checkup ? 'Yes' : 'No'}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Medicine Required</label>
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  {selectedParticipant.medicine_required || 'Not specified'}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Medicine Name</label>
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  {selectedParticipant.medicine_name || 'Not specified'}
-                </div>
-              </div>
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Treatment Required</label>
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  {selectedParticipant.treatment_required || 'Not specified'}
+                  {selectedParticipant.registration_source}
                 </div>
               </div>
 
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Created At</label>
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                  {new Date(selectedParticipant.created_at).toLocaleDateString()}
-                </div>
-              </div> */}
               <div className="col-span-2 flex justify-end gap-3 pt-4 border-t">
                 <button
                   onClick={handleClose}
@@ -2385,7 +2903,7 @@ const ParticipantManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Participants Table */}
+      {/* Participants Table - This was missing in the previous response */}
       <div className="bg-white border border-[#90e0ef] rounded-lg p-6 shadow-sm">
         {loading ? (
           <div className="text-center py-8">Loading participants...</div>
@@ -2400,7 +2918,6 @@ const ParticipantManagement: React.FC = () => {
                 <th className="px-4 py-3">Phone</th>
                 <th className="px-4 py-3">Aadhar</th>
                 <th className="px-4 py-3">Registration Source</th>
-                <th className="px-4 py-3">Camp Category</th>
                 <th className="px-4 py-3">Created At</th>
                 <th className="px-4 py-3">Actions</th>
               </tr>
@@ -2415,7 +2932,6 @@ const ParticipantManagement: React.FC = () => {
                   <td className="px-4 py-3">{p.phone}</td>
                   <td className="px-4 py-3">{p.aadhar}</td>
                   <td className="px-4 py-3 text-gray-700">{p.registration_source}</td>
-                  <td className="px-4 py-3 text-gray-700">{p.campcategory || 'Not specified'}</td>
                   <td className="px-4 py-3">{new Date(p.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3 flex items-center gap-3">
                     <button 
@@ -2430,12 +2946,6 @@ const ParticipantManagement: React.FC = () => {
                     >
                       <Pencil size={18} />
                     </button>
-                    {/* <button 
-                      onClick={() => handleDelete(p.id)}
-                       className="text-gray-600 hover:text-red-500"
-                     >
-                       <Trash2 size={18} />
-                     </button> */}
                   </td>
                 </tr>
               ))}

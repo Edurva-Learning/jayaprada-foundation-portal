@@ -155,10 +155,13 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 px-4">
       <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-md border border-gray-100">
         {/* Title */}
-        <h2 className="text-3xl font-bold text-center mb-8 text-[#00b4d8] tracking-wide">
-          Jayaprada Foundation
-          
-        </h2>
+        <div className="flex justify-center mb-6">
+            <img
+              src="/logo/Jayaprada Foundation Logo (1).png"
+              alt="Jayaprada Foundation Logo"
+              className="h-19 transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
 
         {/* Error Message */}
         {error && (
