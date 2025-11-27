@@ -529,7 +529,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showWelcome = true }) => {
     { name: 'Women Empowerment', value: 120, color: '#8B5CF6' },
     { name: 'Organic Agriculture', value: 80, color: '#6EE7B7' },
     { name: 'Girl Child Support', value: 60, color: '#EF4444' },
-    { name: 'Covid Relief', value: 40, color: '#60A5FA' },
+    { name: 'Cultural Initiatives', value: 40, color: '#60A5FA' },
   ];
 
   // Static pie chart data
@@ -778,9 +778,10 @@ const Dashboard: React.FC<DashboardProps> = ({ showWelcome = true }) => {
           </ResponsiveContainer>
         </div>
 
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Activity */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          {/* <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Recent Activity
             </h2>
@@ -798,10 +799,10 @@ const Dashboard: React.FC<DashboardProps> = ({ showWelcome = true }) => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          {/* <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Quick Actions
             </h2>
@@ -824,8 +825,9 @@ const Dashboard: React.FC<DashboardProps> = ({ showWelcome = true }) => {
                 Map Users to Camps
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
+      
       </div>
     </div>
   );
