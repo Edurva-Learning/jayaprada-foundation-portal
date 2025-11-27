@@ -316,6 +316,18 @@ export default function DashboardLayout() {
     );
   }
 
+  // If there's no authenticated user, show the simplified Dashboard
+  // (landing-style) without the sidebar or welcome header.
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-start justify-center py-10">
+        <div className="w-full max-w-6xl">
+          <Dashboard showWelcome={false} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 overflow-x-hidden overflow-y-auto">
       {/* Role Indicator - Optional, can be removed */}

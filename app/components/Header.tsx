@@ -107,7 +107,7 @@ const Header = () => {
     localStorage.removeItem('user');
     setUser(null);
     window.dispatchEvent(new CustomEvent('userUpdated'));
-    router.push('/login');
+    router.push('/');
   };
 
   const handleLogin = () => {

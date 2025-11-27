@@ -484,6 +484,8 @@
 
 // export default Dashboard;
 
+// Dashboard component: add optional `showWelcome` prop so it can be used
+// as a public landing (no welcome header) before login.
 'use client';
 import React from 'react';
 import {
@@ -509,7 +511,11 @@ import {
   Label,
 } from 'recharts';
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+  showWelcome?: boolean;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ showWelcome = true }) => {
   // Static data - replace dynamic data with fixed values
   const totalBeneficiaries = 1250;
   const newParticipants = 25;
@@ -582,15 +588,13 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="p-6 space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">
-          Welcome back, Admin
-        </h1>
-        <p className="text-gray-500">
-          Here's what's happening with your foundation today
-        </p>
-      </div>
+      {/* Header (optional) */}
+      {showWelcome && (
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">Welcome back, Admin</h1>
+          <p className="text-gray-500">Here's what's happening with your foundation today</p>
+        </div>
+      )}
 
       {/* Top Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
