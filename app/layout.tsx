@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Jayaprada Foundation Portal",
   description: "NGO Management Dashboard for Jayaprada Foundation",
+  icons: {
+    icon: "/logo/Jayaprada Foundation Logo (1).png",
+  },
 };
 
 export default function RootLayout({

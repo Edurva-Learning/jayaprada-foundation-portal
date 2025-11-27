@@ -118,7 +118,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://api.jpf-portal-api.com/login', {
+      const res = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
