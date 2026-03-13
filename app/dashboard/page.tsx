@@ -56,6 +56,8 @@ import ReturnStock from "../components/ReturnStock";
 import ItemMaster from "../components/ItemMaster";
 //import CampCreation from "../components/CreateCamp";
 import PatientHistory from "../components/PatientHistory";
+import StockReportsPage from "../components/StockReport";
+import BalanceHistory from "../components/BalanceHistory";
 
 // ✅ All sidebar items for admin (role: "Admin")
 const adminSidebarItems = [
@@ -104,20 +106,21 @@ const adminSidebarItems = [
     icon: CreativeCommons,
     subItems: [
       "Vendor",
-      "Item Master",
+      // "Item Master",
       "Stock Inward",
-      "Camp Allocation",
-      "Return Approval",
-      "Issue Medicine",
-      "Return Stock",
-      "Stock Adjustment"
+      "Balance History"
+      // "Camp Allocation",
+      // "Return Approval",
+      // "Issue Medicine",
+      // "Return Stock",
+      // "Stock Adjustment"
     ],
   },
   {
-    label: "Stock Reports",
+    label: "Stock Information",
     icon: TrendingUp,
     subItems: [
-      "Stock Reports"
+      "Stock Information"
     ]
   }
 ];
@@ -279,12 +282,13 @@ export default function DashboardLayout() {
         if (selected.sub === "Stock Inward") return <StockInward />;
         if (selected.sub === "Camp Allocation") return <CampAllocation />;
         if (selected.sub === "Return Approval") return <ReturnApproval />;
+        if(selected.sub === "Balance History") return <BalanceHistory />;
         // if (selected.sub === "Issue Medicine") return <IssueMedicine />;
         if (selected.sub === "Return Stock") return <ReturnStock />;
         if (selected.sub === "Stock Adjustment") return <StockAdjustment />;
         return <div className="p-6 text-gray-500">Select an Inventory option</div>;
-      case "Stock Reports":
-        return userRole === "Admin" ? <div className="p-6"><h1>Stock Reports</h1></div> : <AccessDenied />;
+      case "Stock Information":
+        return <StockReportsPage />;
       case "Patient History":
         return userRole === "Admin" ? <PatientHistory /> : <AccessDenied />;
       case "Camp Management":

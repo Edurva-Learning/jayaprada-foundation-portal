@@ -1,5 +1,7 @@
-// pages/manage-users.js or components/ManageUsers.js
-import { useState } from 'react';
+'use client';
+
+
+import React, { useState } from 'react';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([
@@ -192,7 +194,7 @@ const ManageUsers = () => {
                 <option value="Superadmin">Superadmin</option>
                 <option value="Admin">Admin</option>
                 <option value="Staff">Staff</option>
-                <option value="Volunteer">Volunteer</option>
+                {/* <option value="Volunteer">Volunteer</option> */}
               </select>
             </div>
 

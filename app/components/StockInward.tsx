@@ -1,39 +1,39 @@
-// StockInwardPage.jsx
-import React, { useState } from 'react';
+'use client';
 
-const StockInwardPage = () => {
-  const [stockRecords, setStockRecords] = useState([
-    {
-      id: 1,
-      vendor: 'MediCare Suppliers',
-      item: 'Dolo 650',
-      batchNumber: 'BATCH001',
-      expiryDate: '15-12-2024',
-      quantity: 100,
-      costPrice: 5.50,
-      mrp: 8.00,
-      invoiceNumber: 'INV-001',
-      invoiceDate: '01-01-2024',
-      remarks: 'Initial stock',
-      dateAdded: '2024-01-01'
-    },
-    {
-      id: 2,
-      vendor: 'Pharma Distributors',
-      item: 'DRYDEX SYRUP',
-      batchNumber: 'BATCH002',
-      expiryDate: '30-06-2024',
-      quantity: 50,
-      costPrice: 45.00,
-      mrp: 65.00,
-      invoiceNumber: 'INV-002',
-      invoiceDate: '02-01-2024',
-      remarks: 'Winter stock',
-      dateAdded: '2024-01-02'
-    }
-  ]);
+import React, { useState, useEffect } from 'react';
 
-  const [newStock, setNewStock] = useState({
+type StockRecord = {
+  id?: number;
+  vendor?: string;
+  item?: string;
+  batch_number?: string | null;
+  expiry_date?: string | null;
+  quantity?: number | null;
+  cost_price?: number | string | null;
+  mrp?: number | string | null;
+  invoice_number?: string | null;
+  date_added?: string | null;
+  remarks?: string | null;
+};
+
+type NewStock = {
+  vendor: string;
+  item: string;
+  batchNumber: string;
+  expiryDate: string;
+  quantity: string;
+  costPrice: string;
+  mrp: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  remarks: string;
+};
+
+const StockInwardPage: React.FC = () => {
+  const [stockRecords, setStockRecords] = useState<StockRecord[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [newStock, setNewStock] = useState<NewStock>({
     vendor: '',
     item: '',
     batchNumber: '',
@@ -63,26 +63,77 @@ const StockInwardPage = () => {
     'Antiseptic Cream'
   ];
 
-  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
-    const { name, value } = e.target;
+  // Fetch all stock records on component mount
+  useEffect(() => {
+    fetchStockRecords();
+  }, []);
+
+  const fetchStockRecords = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/stock-inward');
+      if (!response.ok) throw new Error('Failed to fetch records');
+      const data = await response.json();
+      setStockRecords(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target as HTMLInputElement;
     setNewStock(prev => ({
       ...prev,
       [name]: value
-    }));
+    } as unknown as NewStock));
   };
 
-  const handleRecordStock = (e: { preventDefault: () => void; }) => {
+  const handleRecordStock = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (newStock.vendor && newStock.item && newStock.batchNumber && newStock.expiryDate && newStock.quantity && newStock.costPrice) {
-      const record = {
-        id: stockRecords.length + 1,
-        ...newStock,
-        quantity: parseInt(newStock.quantity),
-        costPrice: parseFloat(newStock.costPrice),
-        mrp: parseFloat(newStock.mrp) || 0,
-        dateAdded: new Date().toISOString().split('T')[0]
-      };
-      setStockRecords(prev => [...prev, record]);
+    if (
+      !newStock.vendor ||
+      !newStock.item ||
+      !newStock.batchNumber ||
+      !newStock.expiryDate ||
+      !newStock.quantity ||
+      !newStock.costPrice
+    ) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    // Prepare payload (ensure numbers are parsed)
+    const payload = {
+      vendor: newStock.vendor,
+      item: newStock.item,
+      batch_number: newStock.batchNumber || null,
+      expiry_date: newStock.expiryDate || null,
+      quantity: Number.parseInt(newStock.quantity || '0', 10),
+      cost_price: Number.parseFloat(newStock.costPrice || '0'),
+      mrp: newStock.mrp ? Number.parseFloat(newStock.mrp) : 0,
+      invoice_number: newStock.invoiceNumber || null,
+      invoice_date: newStock.invoiceDate || null,
+      remarks: newStock.remarks || null
+    } as Partial<StockRecord>;
+
+    try {
+      const response = await fetch('http://localhost:5000/stock-inward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error('Failed to add record');
+
+      const newRecord: StockRecord = await response.json();
+      // Add the newly created record to the table
+      setStockRecords(prev => [newRecord, ...prev]);
+
+      // Reset form
       setNewStock({
         vendor: '',
         item: '',
@@ -95,14 +146,33 @@ const StockInwardPage = () => {
         invoiceDate: '',
         remarks: ''
       });
+    } catch (err) {
+      alert('Error adding record: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
 
-  const formatDate = (dateString: string | number | Date) => {
+  const formatDate = (dateString?: string | null) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB');
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-GB'); // DD/MM/YYYY
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+        <p className="text-gray-600">Loading stock records...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+        <p className="text-red-600">Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -117,7 +187,7 @@ const StockInwardPage = () => {
           {/* Record Stock Inward Form */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Record Stock Inward</h2>
-            
+
             <form onSubmit={handleRecordStock} className="space-y-6">
               {/* Vendor and Item */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -303,7 +373,7 @@ const StockInwardPage = () => {
           {/* Stock Inward History */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Stock Inward History</h2>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -321,16 +391,16 @@ const StockInwardPage = () => {
                 </thead>
                 <tbody>
                   {stockRecords.map((record) => (
-                    <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 text-sm text-gray-800">{record.vendor}</td>
-                      <td className="py-3 px-4 text-sm text-gray-800 font-medium">{record.item}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">{record.batchNumber}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">{record.expiryDate}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">{record.quantity}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">₹{record.costPrice.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">₹{record.mrp.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">{record.invoiceNumber}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">{formatDate(record.dateAdded)}</td>
+                    <tr key={record.id ?? Math.random()} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-3 px-4 text-sm text-gray-800">{record.vendor ?? ''}</td>
+                      <td className="py-3 px-4 text-sm text-gray-800 font-medium">{record.item ?? ''}</td>
+                      <td className="py-3 px-4 text-sm text-gray-600">{record.batch_number ?? ''}</td>
+                      <td className="py-3 px-4 text-sm text-gray-600">{formatDate(record.expiry_date ?? '')}</td>
+                      <td className="py-3 px-4 text-sm text-gray-600">{record.quantity ?? ''}</td>
+                      <td className="py-3 px-4 text-sm text-gray-600">₹{(Number.parseFloat(String(record.cost_price ?? 0))).toFixed(2)}</td>
+                      <td className="py-3 px-4 text-sm text-gray-600">₹{(Number.parseFloat(String(record.mrp ?? 0))).toFixed(2)}</td>
+                      <td className="py-3 px-4 text-sm text-gray-600">{record.invoice_number ?? ''}</td>
+                      <td className="py-3 px-4 text-sm text-gray-600">{formatDate(record.date_added ?? '')}</td>
                     </tr>
                   ))}
                 </tbody>
