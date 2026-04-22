@@ -259,7 +259,7 @@ const PatientHistory = () => {
     try {
       setLoading(true);
       setSearched(true);
-
+      console.log('Fetching participants for Aadhar:', aadhar);
       const response = await fetch(`${API_BASE_URL}/participants`);
       const allParticipants: Participant[] = await response.json();
 
