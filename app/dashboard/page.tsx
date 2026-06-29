@@ -58,6 +58,9 @@ import ItemMaster from "../components/ItemMaster";
 import PatientHistory from "../components/PatientHistory";
 import StockReportsPage from "../components/StockReport";
 import BalanceHistory from "../components/BalanceHistory";
+import MedicineInward from "../components/MedicineInward";
+
+
 
 // ✅ All sidebar items for admin (role: "Admin")
 const adminSidebarItems = [
@@ -108,6 +111,7 @@ const adminSidebarItems = [
       "Vendor",
       // "Item Master",
       "Stock Inward",
+      "Medicine Inventory",
       "Balance History"
       // "Camp Allocation",
       // "Return Approval",
@@ -286,7 +290,8 @@ export default function DashboardLayout() {
         // if (selected.sub === "Issue Medicine") return <IssueMedicine />;
         if (selected.sub === "Return Stock") return <ReturnStock />;
         if (selected.sub === "Stock Adjustment") return <StockAdjustment />;
-        return <div className="p-6 text-gray-500">Select an Inventory option</div>;
+        if(selected.sub === "Medicine Inventory") return <MedicineInward />;
+    
       case "Stock Information":
         return <StockReportsPage />;
       case "Patient History":
